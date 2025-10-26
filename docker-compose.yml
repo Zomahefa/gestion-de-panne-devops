@@ -1,0 +1,79 @@
+version: "3.9"
+
+services:
+  db:
+    image: mysql:8.0
+    container_name: db
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${DB_NAME}
+      MYSQL_USER: ${DB_USER}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - "${DB_PORT}:3306"
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-p${MYSQL_ROOT_PASSWORD}"]
+      interval: 30s
+      timeout: 10s
+      retries: 10
+      start_period: 40s
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - panne_jirama
+
+  backend:
+    build:
+      context: ./backend
+      args:
+        APP_ENV: ${APP_ENV}
+    container_name: django-dev-panne
+    restart: always
+    environment:
+      APP_ENV: ${APP_ENV}
+      DEBUG: ${DEBUG}
+      DJANGO_SECRET_KEY: ${DJANGO_SECRET_KEY}
+      DJANGO_ALLOWED_HOSTS: ${DJANGO_ALLOWED_HOSTS}
+      DB_HOST: ${DB_HOST}
+      DB_NAME: ${DB_NAME}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_PORT: ${DB_PORT}
+    command: bash -c "sleep 15 && python manage.py migrate && python manage.py runserver 0.0.0.0:${BACK_PORT}"
+    ports:
+      - "${BACK_PORT}:${BACK_PORT}"
+    volumes:
+      - ./backend:/back
+      - ./backend/media:/back/media
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - panne_jirama
+
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.dev
+    container_name: react-dev-panne
+    restart: always
+    env_file:
+      - ./frontend/.env
+    ports:
+      - "${FRONT_PORT}:${FRONT_PORT}"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    depends_on:
+      backend:
+        condition: service_healthy
+    networks:
+      - panne_jirama
+
+volumes:
+  mysql_data:
+
+networks:
+  panne_jirama:

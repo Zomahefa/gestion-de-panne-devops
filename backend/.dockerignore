@@ -1,0 +1,34 @@
+# Fichiers Python compilés et caches
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Fichiers d'environnement et secrets
+.env
+.env.*
+secrets/
+
+# Gestion de version et dépendances
+.git
+.gitignore
+node_modules/
+
+# Fichiers de base de données et logs
+*.sqlite3
+*.log
+static/ 
+# Important : on veut que ce soit 'collectstatic' qui le crée DANS l'image
+
+# Fichiers liés à l'IDE et au système
+.vscode/
+.idea/
+*.swp
+.DS_Store
+
+# Fichiers liés à Docker
+Dockerfile
+.dockerignore
+#docker-compose.yml
+#docker-compose.override.yml
+env/

@@ -1,0 +1,21 @@
+# 🔐 Fichiers sensibles
+.env
+*.env
+
+# 🗂️ Fichiers système
+.DS_Store
+*.swp
+
+# 🧪 Fichiers de test ou de debug
+*.log
+*.sqlite3
+
+venv/
+/media/*
+!/media/.gitkeep
+
+
+# 🧠 Pourquoi ?
+# - .env : contient des mots de passe, clés secrètes
+# - .DS_Store, *.swp : fichiers créés par macOS ou éditeurs
+# - *.log, *.sqlite3 : fichiers générés localement, inutiles pour le repo

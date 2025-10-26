@@ -1,0 +1,54 @@
+# ---- Étape 1: Le "Builder" ----
+# On utilise une image Node.js pour construire l'application.
+# On nomme cette étape "builder" pour pouvoir s'y référer plus tard.
+FROM node:20-alpine AS builder
+
+# On définit le répertoire de travail.
+WORKDIR /app
+
+ENV NODE_ENV=production
+
+# On copie d'abord package.json et package-lock.json pour profiter du cache Docker.
+COPY package*.json ./
+
+
+# On installe les dépendances du projet. Cette étape est mise en cache tant que package.json ne change pas.
+RUN npm install --legacy-peer-deps
+
+
+# On copie le reste du code source de l'application.
+COPY . .
+
+# On lance le build de production. Cela va créer le dossier /app/build.
+RUN npm run build
+
+# ---- Étape 2: La "Production" ----
+# On repart d'une image Nginx ultra-légère. C'est notre image finale.
+FROM nginx:1.29.1-alpine-slim
+
+# Métadonnées pour identifier l’image dans un registre ou un audit
+LABEL maintainer="Zo <zomahefaranaivo@gmail.com>" \
+      description="frontend react pour l'appli de gestion de panne avec django comme back"
+
+
+# On expose le port 80, qui est le port par défaut de Nginx.
+EXPOSE 80
+
+# La commande magique : on copie UNIQUEMENT le résultat du build de l'étape "builder".
+# On copie le contenu de /app/build (de l'étape builder)
+# dans le dossier par défaut de Nginx pour servir des fichiers statiques.
+COPY --from=builder /app/build /usr/share/nginx/html
+
+# On remplace la configuration par défaut de Nginx pour gérer les routes React (évite les erreurs 404)
+COPY ./nginx/default.conf /etc/nginx/conf.d/default.conf
+
+
+# On installe curl pour le HEALTHCHECK
+RUN apk --no-cache add curl
+
+# Le HEALTHCHECK vérifie simplement si la page d'accueil répond.
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+  CMD curl -f http://localhost/ || exit 1
+
+# Pas besoin de CMD ou d'ENTRYPOINT. L'image Nginx est configurée
+# pour démarrer le serveur Nginx automatiquement.
