@@ -98,3 +98,4 @@ venv/ : environnement Python local
 
 👤 Auteur
 Zo Ranaivo – DevOps & Fullstack Developer Projet soutenu en octobre 2025
+# Test CI
