@@ -25,23 +25,35 @@ jobs:
         python manage.py test
     - name: Lint Python avec Ruff
       continue-on-error: true
-      uses: astral-sh/ruff-action@v3
-      with:
-        src: "./backend"  
+      run: |
+        cd backend
+        ruff check .
+    
     - name: Format Python avec Ruff
       continue-on-error: true
       run: |
-        ruff check backend --fix
-        ruff format backend
-    - name: configurer node pour react
+        cd backend
+        ruff check . --fix
+        ruff format .
+
+    - name: Configurer Node.js
       uses: actions/setup-node@v6
       with:
         node-version: 20.18.1
-        cache: 'npm'
+    
+    - name: Cache npm dependencies
+      uses: actions/cache@v3
+      with:
+        path: frontend/node_modules
+        key: ${{ runner.os }}-npm-${{ hashFiles('frontend/package-lock.json') }}
+        restore-keys: |
+          ${{ runner.os }}-npm-
+    
     - name: Installer les dépendances React
       run: |
         cd frontend
         npm ci
+
     - name: Lancer les tests React
       run: |
         cd frontend
