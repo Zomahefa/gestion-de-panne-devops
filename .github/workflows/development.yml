@@ -38,18 +38,13 @@ jobs:
     - name: Configurer Node.js
       uses: actions/setup-node@v6
       with:
-        node-version: 20.18.1
-    - name: Cache npm dependencies
-      uses: actions/cache@v3
-      with:
-        path: frontend/node_modules
-        key: ${{ runner.os }}-npm-${{ hashFiles('frontend/package-lock.json') }}
-        restore-keys: |
-          ${{ runner.os }}-npm-   
+        node-version: 20.18.1 
+        cache: 'npm'
+        cache-dependency-path: subdir/package-lock.json
     - name: Installer les dépendances React
       run: |
         cd frontend
-        npm ci
+        npm install
     - name: Lancer les tests React
       run: |
         cd frontend
