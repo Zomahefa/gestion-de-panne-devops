@@ -1,0 +1,100 @@
+name: Develop CI
+on:
+  push:
+    branches: [ "develop" ]
+
+jobs:
+  test-analyse:
+    runs-on: ubuntu-latest
+    steps:
+    - name: copie les codes
+      uses: actions/checkout@v5
+    - name: setup python
+      uses: actions/setup-python@v6
+      with:
+        python-version: '3.13'
+        cache: 'pip' # caching pip dependencies
+    - name: Installer les dépendances python
+      run: |
+        cd backend
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+    - name: Lancer les tests Django
+      run: |
+        cd backend
+        python manage.py test
+    - name: Lint Python avec Ruff
+      continue-on-error: true
+      uses: astral-sh/ruff-action@v3
+      with:
+        src: "./backend"  
+    - name: Format Python avec Ruff
+      run: |
+        ruff check backend --fix
+        ruff format backend
+    - name: configurer node pour react
+      uses: actions/setup-node@v6
+      with:
+        node-version: 20.18.1
+        cache: 'npm'
+    - name: Installer les dépendances React
+      run: |
+        cd frontend
+        npm ci
+    - name: Lancer les tests React
+      run: |
+        cd frontend
+        npm test -- --watchAll=false
+    - name: Lint React avec ESLint
+      run: |
+        cd frontend
+        npx eslint src --ext .js,.jsx,.ts,.tsx
+    - name: Installer Semgrep
+      run: pip install semgrep   
+    - name: Lancer Semgrep
+      continue-on-error: true
+      run: semgrep --config=auto
+
+    - name: Installer coverage.py
+      run: |
+        pip install coverage
+    - name: Lancer les tests avec coverage
+      run: |
+        cd backend
+        coverage run manage.py test
+        coverage report
+    - name: Générer rapport HTML
+      continue-on-error: true
+      run: |
+        cd backend
+        coverage html
+    - name: Lancer les tests avec couverture React
+      run: |
+        cd frontend
+        npm test -- --coverage  
+    - name: Scan backend Dockerfile avec trivy
+      continue-on-error: true
+      uses: aquasecurity/trivy-action@master
+      with:
+        scan-type: 'fs'
+        scan-ref: './backend/Dockerfile'
+
+    - name: Scan frontend Dockerfile.dev
+      continue-on-error: true
+      uses: aquasecurity/trivy-action@master
+      with:
+        scan-type: 'fs'
+        scan-ref: './frontend/Dockerfile.dev'
+
+    - name: Scan docker-compose.yml
+      continue-on-error: true
+      uses: aquasecurity/trivy-action@master
+      with:
+        scan-type: 'fs'
+        scan-ref: './docker-compose.yml'
+    - name: Résumé CI
+      run: echo "✅ CI terminé avec succès pour la branche develop"
+
+    
+
+
