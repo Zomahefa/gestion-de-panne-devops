@@ -2,9 +2,8 @@ name: Develop CI
 on:
   push:
     branches: [ "develop" ]
-
 jobs:
-  test-analyse:
+  test:
     runs-on: ubuntu-latest
     steps:
     - name: copie les codes
@@ -23,41 +22,42 @@ jobs:
       run: |
         cd backend
         python manage.py test
+    - name: Installer Ruff
+      run: pip install ruff
     - name: Lint Python avec Ruff
       continue-on-error: true
       run: |
         cd backend
         ruff check .
-    
     - name: Format Python avec Ruff
       continue-on-error: true
       run: |
         cd backend
         ruff check . --fix
         ruff format .
-
     - name: Configurer Node.js
       uses: actions/setup-node@v6
       with:
         node-version: 20.18.1
-    
     - name: Cache npm dependencies
       uses: actions/cache@v3
       with:
         path: frontend/node_modules
         key: ${{ runner.os }}-npm-${{ hashFiles('frontend/package-lock.json') }}
         restore-keys: |
-          ${{ runner.os }}-npm-
-    
+          ${{ runner.os }}-npm-   
     - name: Installer les dépendances React
       run: |
         cd frontend
         npm ci
-
     - name: Lancer les tests React
       run: |
         cd frontend
         npm test -- --watchAll=false
+    - name: Installer ESLint
+      run: |
+        cd frontend
+        npm install eslint --save-dev
     - name: Lint React avec ESLint
       run: |
         cd frontend
@@ -67,7 +67,6 @@ jobs:
     - name: Lancer Semgrep
       continue-on-error: true
       run: semgrep --config=auto
-
     - name: Installer coverage.py
       run: |
         pip install coverage
@@ -91,14 +90,12 @@ jobs:
       with:
         scan-type: 'fs'
         scan-ref: './backend/Dockerfile'
-
     - name: Scan frontend Dockerfile.dev
       continue-on-error: true
       uses: aquasecurity/trivy-action@master
       with:
         scan-type: 'fs'
         scan-ref: './frontend/Dockerfile.dev'
-
     - name: Scan docker-compose.yml
       continue-on-error: true
       uses: aquasecurity/trivy-action@master
