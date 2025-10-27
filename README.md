@@ -97,5 +97,5 @@ venv/ : environnement Python local
 .DS_Store, *.swp : fichiers système inutiles
 
 👤 Auteur
-Zo Ranaivo – DevOps & Fullstack Developer Projet soutenu en octobre 2025
+Zo mahefa Ranaivo – DevOps & Fullstack Developer Projet soutenu en octobre 2025
 # Test CI
