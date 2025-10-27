@@ -1,4 +1,4 @@
-# 🚀 Gestion de Panne – DevOps Django + React
+# 🚀 Gestion de Panne – DevOps Django + React +
 
 # 🎯 Objectif
 Application web conteneurisée avec CI/CD, DevSecOps, et déploiement automatisé.
