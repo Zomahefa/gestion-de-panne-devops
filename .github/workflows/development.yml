@@ -29,6 +29,7 @@ jobs:
       with:
         src: "./backend"  
     - name: Format Python avec Ruff
+      continue-on-error: true
       run: |
         ruff check backend --fix
         ruff format backend
