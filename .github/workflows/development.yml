@@ -38,6 +38,7 @@ jobs:
       with:
         node-version: 20.18.1
         cache: 'npm'
+      working-directory: frontend
     - name: Installer les dépendances React
       run: |
         cd frontend
