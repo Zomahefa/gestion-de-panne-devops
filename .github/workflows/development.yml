@@ -45,10 +45,15 @@ jobs:
       run: |
         cd frontend
         npm ci
-    - name: Vérifier react-router-dom
+    - name: Vérifier installation npm
       run: |
         cd frontend
-        ls node_modules/react-router-dom || echo "❌ react-router-dom non installé"
+        npm ci || echo "❌ npm ci a échoué"
+    - name: Lister node_modules
+      run: |
+        cd frontend
+        ls node_modules
+
 
     - name: Lancer les tests React
       run: |
