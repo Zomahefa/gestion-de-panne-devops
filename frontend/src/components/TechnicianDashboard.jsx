@@ -117,7 +117,7 @@ const TechnicianDashboard = () => {
                   <strong>📷 Photo signalée :</strong><br />
                   <img
                     src={incident.image}
-                    alt="Photo de la panne"
+                    alt="Panne"
                     className="incident-image"
                   />
                 </div>

@@ -170,7 +170,7 @@ const AdminDashboard = () => {
                 {panne.image ? (
                   <img
                     src={panne.image}
-                    alt="Photo de la panne"
+                    alt="Panne"
                     className="admin-image"
                   />
                 ) : (

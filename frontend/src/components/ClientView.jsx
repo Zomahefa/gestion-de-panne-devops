@@ -53,7 +53,7 @@ const ClientView = () => {
                 <strong>📷 Photo signalée :</strong><br />
                 <img
                   src={incident.image}
-                  alt="Photo de la panne"
+                  alt="Panne signalée"
                   style={{ maxWidth: '100%', maxHeight: '300px', borderRadius: '8px', marginTop: '8px' }}
                 />
               </div>

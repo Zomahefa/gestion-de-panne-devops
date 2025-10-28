@@ -1,6 +1,6 @@
 import React from 'react';
 import LoginTechnician from './components/LoginTechnician.jsx';
-import TechnicianDashboard from './components/TechnicianDashboard.jsx';
+//import TechnicianDashboard from './components/TechnicianDashboard';
 
 function AppTechnician() {
   return (
