@@ -44,17 +44,11 @@ jobs:
     - name: Installer les dépendances React
       run: |
         cd frontend
-        npm ci
-    - name: Vérifier installation npm
-      run: |
-        cd frontend
-        npm ci || echo "❌ npm ci a échoué"
+        npm install --legacy-peer-deps
     - name: Lister node_modules
       run: |
         cd frontend
         ls node_modules
-
-
     - name: Lancer les tests React
       run: |
         cd frontend
