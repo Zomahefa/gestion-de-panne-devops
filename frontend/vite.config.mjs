@@ -8,5 +8,10 @@ export default defineConfig({
     environment: 'happy-dom',
     globals: true,
     setupFiles: ['./src/setupTests.js'],
+    coverage: {
+      provider: 'v8', // utilise le moteur installé
+      reporter: ['text', 'html'], // formats de sortie
+      reportsDirectory: './coverage', // dossier de sortie
+    },
   },
 });
