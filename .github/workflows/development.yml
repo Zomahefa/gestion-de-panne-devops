@@ -53,10 +53,6 @@ jobs:
       run: |
         cd frontend
         npm test -- --watchAll=false
-    - name: Installer ESLint
-      run: |
-        cd frontend
-        npm install eslint --save-dev
     - name: Lint React avec ESLint
       run: |
         cd frontend
