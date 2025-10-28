@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import './TechnicianDashboard.css';
 import { Link } from 'react-router-dom';
-import MapView from './MapView';
+import MapView from './MapView.jsx';
 
 const TechnicianDashboard = () => {
   const extractCoordinates = (text) => {

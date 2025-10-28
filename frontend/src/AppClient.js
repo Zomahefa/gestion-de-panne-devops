@@ -1,6 +1,6 @@
 import React from 'react';
-import ClientForm from './components/ClientForm';
-import ClientView from './components/ClientView';
+import ClientForm from './components/ClientForm.jsx';
+import ClientView from './components/ClientView.jsx';
 
 function AppClient() {
   return (

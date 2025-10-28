@@ -1,16 +1,16 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import ClientForm from './components/ClientForm';
-import ClientView from './components/ClientView';
-import LoginTechnician from './components/LoginTechnician';
-import TechnicianDashboard from './components/TechnicianDashboard';
-import AdminLogin from './components/AdminLogin';
-import AdminDashboard from './components/AdminDashboard';
+import ClientForm from './components/ClientForm.jsx';
+import ClientView from './components/ClientView.jsx';
+import LoginTechnician from './components/LoginTechnician.jsx';
+import TechnicianDashboard from './components/TechnicianDashboard.jsx';
+import AdminLogin from './components/AdminLogin.jsx';
+import AdminDashboard from './components/AdminDashboard.jsx';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import AdminTechnicianManager from './components/AdminTechnicianManager';
-import HelpPage from './components/HelpPage';
-import AdminProfile from './components/AdminProfile';
-import PanneChart from './components/PanneChart';
+import AdminTechnicianManager from './components/AdminTechnicianManager.jsx';
+import HelpPage from './components/HelpPage.jsx';
+import AdminProfile from './components/AdminProfile.jsx';
+import PanneChart from './components/PanneChart.jsx';
 
 
 
