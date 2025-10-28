@@ -41,14 +41,6 @@ jobs:
       run: |
         cd frontend
         npm install --legacy-peer-deps
-    - name: Lister node_modules
-      run: |
-        cd frontend
-        ls node_modules
-    - name: Lancer les tests React avec Vitest
-      run: |
-        cd frontend
-        npx vitest run
     - name: Lint React avec ESLint
       run: |
         cd frontend
@@ -72,7 +64,7 @@ jobs:
       run: |
         cd backend
         coverage html
-    - name: Lancer les tests avec couverture React (Vitest)
+    - name: Lancer les tests React avec Vitest + coverage
       run: |
         cd frontend
         npx vitest run --coverage
