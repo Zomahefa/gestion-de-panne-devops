@@ -67,6 +67,16 @@ Rebuild complet	                        docker compose build
 Supprimer volumes	                    docker compose down -v
 Exécuter une commande dans un conteneur	docker compose exec backend bash
 
+guide après le démarrage de compose:
+Donnez les droit aux dossier media pour l'utilisateur dans le conteneur
+	sudo chown -R 100:101 backend/media
+	sudo chmod -R 755 backend/media
+Accéder au bash du conteneur
+	docker exec -it django-dev-panne bash
+Créer un superuser pour créer l'admin dans db
+	python manage.py createsuperuser
+	va sur http://localhost:8000/admin et créer un admin
+
 🧼 Fichiers à ignorer dans .gitignore
 gitignore
 # 🔐 Fichiers sensibles
