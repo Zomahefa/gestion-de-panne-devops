@@ -3,8 +3,6 @@
 # 🎯 Objectif
 Application web conteneurisée avec CI/CD, DevSecOps, et déploiement automatisé.
 
----
-
 ## 🗂️ Branches Git
 
 | Branche | Rôle |
