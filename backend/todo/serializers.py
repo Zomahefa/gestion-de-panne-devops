@@ -1,4 +1,6 @@
 from rest_framework import serializers
+from django.contrib.auth.password_validation import validate_password # Ajouté pour Semgrep
+from django.core.exceptions import ValidationError # Ajouté pour Semgrep
 from .models import Technician, Todo, Admin, Attribution, Notification
 
 class TechnicianSerializer(serializers.ModelSerializer):
@@ -17,9 +19,15 @@ class TechnicianSerializer(serializers.ModelSerializer):
         username = validated_data.get('username')
         if not username:
             raise serializers.ValidationError({"username": "Ce champ est requis."})
+        
+        # Correction Semgrep: Valider le mot de passe avant de le définir
+        try:
+            validate_password(password)
+        except ValidationError as e:
+            raise serializers.ValidationError({"password": list(e.messages)})
+            
         technician = Technician(**validated_data)
         technician.set_password(password)
-        technician.save()
         return technician
 
     def update(self, instance, validated_data):
@@ -29,8 +37,16 @@ class TechnicianSerializer(serializers.ModelSerializer):
             instance.username = new_name.lower().replace(' ', '')
         for attr, value in validated_data.items():
             setattr(instance, attr, value)
+            
         if password:
+            # Correction Semgrep: Valider le mot de passe avant de le définir
+            try:
+                validate_password(password)
+            except ValidationError as e:
+                raise serializers.ValidationError({"password": list(e.messages)})
+                
             instance.set_password(password)
+            
         instance.save()
         return instance
 

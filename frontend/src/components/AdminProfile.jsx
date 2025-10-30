@@ -15,8 +15,8 @@ const AdminProfile = () => {
     email: '',
     password: '',
   });
-
-  const navigate = useNavigate();
+  //eslint
+  //const navigate = useNavigate();
 
   useEffect(() => {
     const fetchAdmin = async () => {

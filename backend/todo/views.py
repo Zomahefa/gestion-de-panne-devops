@@ -3,6 +3,7 @@ from rest_framework import viewsets, status
 from rest_framework.decorators import api_view
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
+from django.views.decorators.http import require_GET # Déplacé ici pour E402
 
 from .models import Technician, Todo, Admin, Attribution, Notification
 from .serializers import (
@@ -11,7 +12,7 @@ from .serializers import (
     AdminSerializer,
     AttributionSerializer,
     NotificationSerializer,
-)
+ )
 
 
 def home(request):
@@ -112,7 +113,8 @@ def admin_login(request):
     username = request.data.get('username')
     password = request.data.get('password')
     try:
-        admin = Admin.objects.get(username=username, password=password)
+        # Correction F841: la variable 'admin' n'est plus assignée car non utilisée.
+        Admin.objects.get(username=username, password=password)
         return Response({'token': 'admin-token-123'})  # à remplacer par JWT plus tard
     except Admin.DoesNotExist:
         return Response({'error': 'Identifiants incorrects'}, status=401)
@@ -124,9 +126,6 @@ def notify_admin(request):
     Notification.objects.create(message=message)
     return Response({'status': 'Notification enregistrée'})
 
-
-from django.http import JsonResponse
-from django.views.decorators.http import require_GET
 
 @require_GET
 def health_check(request):

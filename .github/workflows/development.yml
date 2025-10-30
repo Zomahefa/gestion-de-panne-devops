@@ -64,7 +64,19 @@ jobs:
       run: |
         cd backend
         coverage html
+<<<<<<< HEAD
     - name: Lancer les tests React avec Vitest + coverage
+=======
+    - name: Upload coverage report
+      uses: actions/upload-artifact@v4
+      with:
+        name: html-coverage-report
+        path: htmlcov/
+        # Si vous voulez que l'artefact expire après un certain temps (optionnel)
+        # retention-days: 7 
+
+    - name: Lancer les tests avec couverture React (Vitest)
+>>>>>>> 8d36dfc (version corrigé,résolution des logs détecté par les ruff,semgrep,eslint)
       run: |
         cd frontend
         npx vitest run --coverage
