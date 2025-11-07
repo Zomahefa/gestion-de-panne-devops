@@ -11,8 +11,8 @@
 *.sqlite3
 
 venv/
-/media/*
-!/media/.gitkeep
+media/*
+!media/.gitkeep
 
 
 # 🧠 Pourquoi ?

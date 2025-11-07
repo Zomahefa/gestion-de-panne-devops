@@ -4,6 +4,8 @@ from rest_framework.decorators import api_view
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from django.views.decorators.http import require_GET # Déplacé ici pour E402
+from django.contrib.auth.hashers import check_password
+from django.contrib.auth.hashers import make_password
 
 from .models import Technician, Todo, Admin, Attribution, Notification
 from .serializers import (
@@ -53,14 +55,17 @@ class AdminViewSet(viewsets.ModelViewSet):
         admin = self.get_object()
         data = request.data
 
-        for field in ['username', 'full_name', 'matricule', 'role', 'contact', 'email', 'password']:
+        for field in ['username', 'full_name', 'matricule', 'role', 'contact', 'email']:
             if field in data:
                 setattr(admin, field, data[field])
+
+        # Hash le mot de passe si présent
+        if 'password' in data:
+            admin.password = make_password(data['password'])
 
         admin.save()
         serializer = self.get_serializer(admin)
         return Response(serializer.data)
-
 
 class AttributionViewSet(viewsets.ModelViewSet):
     queryset = Attribution.objects.all()
@@ -112,12 +117,15 @@ def admin_profile(request):
 def admin_login(request):
     username = request.data.get('username')
     password = request.data.get('password')
+
     try:
-        # Correction F841: la variable 'admin' n'est plus assignée car non utilisée.
-        Admin.objects.get(username=username, password=password)
-        return Response({'token': 'admin-token-123'})  # à remplacer par JWT plus tard
+        admin = Admin.objects.get(username=username)
+        if check_password(password, admin.password):
+            return Response({'token': 'admin-token-123'})  # à remplacer par JWT plus tard
+        else:
+            return Response({'error': 'Mot de passe incorrect'}, status=status.HTTP_401_UNAUTHORIZED)
     except Admin.DoesNotExist:
-        return Response({'error': 'Identifiants incorrects'}, status=401)
+        return Response({'error': 'Admin introuvable'}, status=status.HTTP_404_NOT_FOUND)
 
 
 @api_view(['POST'])

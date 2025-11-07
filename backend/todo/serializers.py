@@ -28,8 +28,10 @@ class TechnicianSerializer(serializers.ModelSerializer):
             
         technician = Technician(**validated_data)
         technician.set_password(password)
+        technician.save()
         return technician
 
+    
     def update(self, instance, validated_data):
         password = validated_data.pop('password', None)
         if 'full_name' in validated_data:
@@ -51,7 +53,7 @@ class TechnicianSerializer(serializers.ModelSerializer):
         return instance
 
 class TodoSerializer(serializers.ModelSerializer):
-    image = serializers.ImageField(required=False, allow_null=True, use_url=True)
+    image = serializers.ImageField(required=False, allow_null=True)
     technician_confirmed = TechnicianSerializer(read_only=True)
 
     class Meta:

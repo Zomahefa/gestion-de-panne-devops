@@ -10,7 +10,11 @@ const statusLabels = {
   in_progress: 'En cours',
   resolved: 'Terminé',
 };
-
+const getImageUrl = (imagePath) => {
+  if (!imagePath) return null;
+  if (imagePath.startsWith('http')) return imagePath;
+  return `${window.location.origin}${imagePath}`;
+  };
 const AdminDashboard = () => {
   const [pannes, setPannes] = useState([]);
   const [technicians, setTechnicians] = useState([]);
@@ -169,7 +173,7 @@ const AdminDashboard = () => {
               <td>
                 {panne.image ? (
                   <img
-                    src={panne.image}
+                    src={getImageUrl(panne.image)}
                     alt="Panne"
                     className="admin-image"
                   />

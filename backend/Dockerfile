@@ -11,7 +11,7 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 WORKDIR /back
 
 RUN apt-get update && \
-    apt-get install -y --no-install-recommends curl && \
+    apt-get install -y --no-install-recommends curl netcat-openbsd && \
     python3 -m venv /opt/venv && \
     rm -rf /var/lib/apt/lists/*
 
@@ -19,7 +19,7 @@ COPY requirements.txt .
 RUN pip install --upgrade pip && \
     pip install --no-cache-dir -r requirements.txt
 
-    FROM base
+FROM base
 
 ARG APP_ENV=prod
 ENV DJANGO_ENV=${APP_ENV}
@@ -35,6 +35,9 @@ RUN if [ "$DJANGO_ENV" = "prod" ]; then \
     python manage.py collectstatic --noinput; \
     fi
 
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
 USER zoappuser
 
 EXPOSE 8000
@@ -42,8 +45,9 @@ EXPOSE 8000
 HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=5 \
   CMD curl -f http://localhost:8000/health/ || exit 1
 
-
 STOPSIGNAL SIGTERM
+
+ENTRYPOINT ["/entrypoint.sh"]
 
 CMD ["sh", "-c", "if [ \"$DJANGO_ENV\" = \"prod\" ]; then \
     gunicorn backend.wsgi:application --bind 0.0.0.0:8000 --workers=3; \
