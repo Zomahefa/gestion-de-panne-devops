@@ -141,9 +141,9 @@ jobs:
       with:
         scan-type: 'fs'
         scan-ref: './frontend/Dockerfile.dev'
-    - name: Scan docker-compose.yml
+    - name: Scan docker-compose.dev.yml
       continue-on-error: true
       uses: aquasecurity/trivy-action@master
       with:
         scan-type: 'fs'
-        scan-ref: './docker-compose.yml'
+        scan-ref: './docker-compose.dev.yml'
