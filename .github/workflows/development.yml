@@ -1,46 +1,57 @@
 name: Develop CI
+
 on:
   push:
     branches: [ "develop" ]
+
 jobs:
-  test:
+  lint:
+    name: Lint Python & React
     runs-on: ubuntu-latest
     steps:
-    - name: copie les codes
+    - name: Checkout du code
       uses: actions/checkout@v5
-    - name: setup python
+
+    - name: Setup Python
       uses: actions/setup-python@v6
       with:
         python-version: '3.13'
-        cache: 'pip' # caching pip dependencies
-    - name: Installer les dépendances python
-      run: |
-        cd backend
-        python -m pip install --upgrade pip
-        pip install -r requirements.txt
+        cache: 'pip'
+
     - name: Installer Ruff
       run: pip install ruff
+
     - name: Lint Python avec Ruff
       continue-on-error: true
       run: |
         cd backend
         ruff check .
+
     - name: Format Python avec Ruff
       continue-on-error: true
       run: |
         cd backend
         ruff check . --fix
         ruff format .
-    - name: Configurer Node.js
+
+    - name: Setup Node.js
       uses: actions/setup-node@v6
       with:
+<<<<<<< HEAD
         node-version: 20.18.1 
         cache: 'npm'
         cache-dependency-path: frontend/package-lock.json
+=======
+        node-version: 20.18.1
+        cache: 'npm'
+        cache-dependency-path: frontend/package-lock.json
+
+>>>>>>> temp-staging-fix
     - name: Installer les dépendances React
       run: |
         cd frontend
         npm install --legacy-peer-deps
+<<<<<<< HEAD
     - name: Lister node_modules
       run: |
         cd frontend
@@ -49,54 +60,113 @@ jobs:
       run: |
         cd frontend
         npx vitest run
+=======
+
+>>>>>>> temp-staging-fix
     - name: Lint React avec ESLint
       run: |
         cd frontend
         npx eslint src --ext .js,.jsx,.ts,.tsx
-    - name: Installer Semgrep
-      run: pip install semgrep   
-    - name: Lancer Semgrep
-      continue-on-error: true
-      run: semgrep --config=auto
-    - name: Installer coverage.py
+
+  test:
+    name: Tests Django & React + Coverage
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout du code
+      uses: actions/checkout@v5
+
+    - name: Setup Python
+      uses: actions/setup-python@v6
+      with:
+        python-version: '3.13'
+        cache: 'pip'
+
+    - name: Installer les dépendances Python
       run: |
-        pip install coverage
-    - name: Lancer les tests Django avec coverage
+        cd backend
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+
+    - name: Installer coverage.py
+      run: pip install coverage
+
+    - name: Tests Django avec coverage
       run: |
         cd backend
         coverage run manage.py test
         coverage report
-
-    - name: Générer rapport HTML
-      continue-on-error: true
-      run: |
-        cd backend
         coverage html
+<<<<<<< HEAD
     - name: Lancer les tests avec couverture React (Vitest)
+=======
+
+    - name: Upload rapport coverage Django
+      uses: actions/upload-artifact@v4
+      with:
+        name: django-coverage-report
+        path: backend/htmlcov
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v6
+      with:
+        node-version: 20.18.1
+        cache: 'npm'
+        cache-dependency-path: frontend/package-lock.json
+
+    - name: Installer les dépendances React
+      run: |
+        cd frontend
+        npm install --legacy-peer-deps
+
+    - name: Tests React avec Vitest + coverage
+>>>>>>> temp-staging-fix
       run: |
         cd frontend
         npx vitest run --coverage
-    - name: Scan backend Dockerfile avec trivy
+
+    - name: Upload rapport coverage React
+      uses: actions/upload-artifact@v4
+      with:
+        name: react-coverage-report
+        path: frontend/coverage
+
+  security:
+    name: Analyse de sécurité (Semgrep + Trivy)
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout du code
+      uses: actions/checkout@v5
+
+    - name: Setup Python
+      uses: actions/setup-python@v6
+      with:
+        python-version: '3.13'
+        cache: 'pip'
+
+    - name: Installer Semgrep
+      run: pip install semgrep
+
+    - name: Scan de sécurité avec Semgrep
+      continue-on-error: true
+      run: semgrep --config=auto
+
+    - name: Scan Dockerfile backend
       continue-on-error: true
       uses: aquasecurity/trivy-action@master
       with:
         scan-type: 'fs'
         scan-ref: './backend/Dockerfile'
-    - name: Scan frontend Dockerfile.dev
+
+    - name: Scan Dockerfile frontend
       continue-on-error: true
       uses: aquasecurity/trivy-action@master
       with:
         scan-type: 'fs'
         scan-ref: './frontend/Dockerfile.dev'
+
     - name: Scan docker-compose.yml
       continue-on-error: true
       uses: aquasecurity/trivy-action@master
       with:
         scan-type: 'fs'
         scan-ref: './docker-compose.yml'
-    - name: Résumé CI
-      run: echo "✅ CI terminé avec succès pour la branche develop"
-
-    
-
-
