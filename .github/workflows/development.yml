@@ -37,32 +37,15 @@ jobs:
     - name: Setup Node.js
       uses: actions/setup-node@v6
       with:
-<<<<<<< HEAD
-        node-version: 20.18.1 
-        cache: 'npm'
-        cache-dependency-path: frontend/package-lock.json
-=======
         node-version: 20.18.1
         cache: 'npm'
         cache-dependency-path: frontend/package-lock.json
 
->>>>>>> temp-staging-fix
     - name: Installer les dépendances React
       run: |
         cd frontend
         npm install --legacy-peer-deps
-<<<<<<< HEAD
-    - name: Lister node_modules
-      run: |
-        cd frontend
-        ls node_modules
-    - name: Lancer les tests React avec Vitest
-      run: |
-        cd frontend
-        npx vitest run
-=======
 
->>>>>>> temp-staging-fix
     - name: Lint React avec ESLint
       run: |
         cd frontend
@@ -96,9 +79,6 @@ jobs:
         coverage run manage.py test
         coverage report
         coverage html
-<<<<<<< HEAD
-    - name: Lancer les tests avec couverture React (Vitest)
-=======
 
     - name: Upload rapport coverage Django
       uses: actions/upload-artifact@v4
@@ -119,7 +99,6 @@ jobs:
         npm install --legacy-peer-deps
 
     - name: Tests React avec Vitest + coverage
->>>>>>> temp-staging-fix
       run: |
         cd frontend
         npx vitest run --coverage
@@ -156,14 +135,12 @@ jobs:
       with:
         scan-type: 'fs'
         scan-ref: './backend/Dockerfile'
-
     - name: Scan Dockerfile frontend
       continue-on-error: true
       uses: aquasecurity/trivy-action@master
       with:
         scan-type: 'fs'
         scan-ref: './frontend/Dockerfile.dev'
-
     - name: Scan docker-compose.yml
       continue-on-error: true
       uses: aquasecurity/trivy-action@master
