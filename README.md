@@ -104,6 +104,91 @@ venv/ : environnement Python local
 
 .DS_Store, *.swp : fichiers système inutiles
 
+
+## 🧰 2. Liste complète des commandes disponibles dans ton Makefile
+
+Voici un tableau clair avec **chaque commande**, son usage, et ce qu’elle fait :
+
+| Commande | Description | Environnement |
+|---------|-------------|----------------|
+| `make dev-up` | Démarre les services en développement | Dev |
+| `make dev-down` | Stoppe et supprime les conteneurs | Dev |
+| `make dev-build` | Rebuild les images et démarre | Dev |
+| `make dev-start` | Redémarre les conteneurs arrêtés | Dev |
+| `make dev-stop` | Stoppe les conteneurs sans les supprimer | Dev |
+| `make dev-restart` | Redémarre tous les conteneurs | Dev |
+| `make dev-logs` | Affiche tous les logs en continu | Dev |
+| `make backend-dev-logs` | Affiche les logs du backend uniquement | Dev |
+| `make frontend-dev-logs` | Affiche les logs du frontend uniquement | Dev |
+| `make db-dev-logs` | Affiche les logs de la base (⚠️ cible backend par erreur) | Dev |
+| `make django-shell` | Ouvre le shell Python Django | Dev |
+| `make dev-db-bash` | Ouvre le terminal MySQL dans le conteneur DB | Dev |
+| `make dev-backend-bash` | Ouvre le bash du conteneur backend | Dev |
+| `make dev-frontend-bash` | Ouvre le bash du conteneur frontend | Dev |
+| `make staging-up` | Démarre les services en staging | Staging |
+| `make staging-down` | Stoppe et supprime les conteneurs | Staging |
+| `make staging-start` | Redémarre les conteneurs arrêtés | Staging |
+| `make staging-stop` | Stoppe les conteneurs sans les supprimer | Staging |
+| `make staging-restart` | Redémarre tous les conteneurs | Staging |
+| `make staging-build` | Rebuild les images et démarre | Staging |
+| `make staging-logs` | Affiche tous les logs en continu | Staging |
+| `make backend-staging-logs` | Logs du backend staging | Staging |
+| `make frontend-staging-logs` | Logs du frontend staging | Staging |
+| `make db-staging-logs` | Logs de la base (⚠️ cible backend par erreur) | Staging |
+| `make staging-db-bash` | Terminal MySQL dans le conteneur DB | Staging |
+| `make staging-backend-bash` | Bash du backend staging | Staging |
+| `make staging-frontend-bash` | Bash du frontend staging | Staging |
+| `make prod-up` | Démarre les services en production | Prod |
+| `make prod-down` | Stoppe et supprime les conteneurs | Prod |
+| `make prod-build` | Rebuild les images et démarre | Prod |
+| `make prod-logs` | Affiche tous les logs en continu | Prod |
+| `make prod-start` | Redémarre les conteneurs arrêtés | Prod |
+| `make prod-stop` | Stoppe les conteneurs sans les supprimer | Prod |
+| `make prod-restart` | Redémarre tous les conteneurs | Prod |
+| `make prod-db-bash` | Terminal MySQL dans le conteneur DB | Prod |
+| `make prod-backend-bash` | Bash du backend prod | Prod |
+| `make prod-frontend-bash` | Bash du frontend prod | Prod |
+| `make backend-prod-logs` | Logs du backend prod | Prod |
+| `make frontend-prod-logs` | Logs du frontend prod | Prod |
+| `make db-prod-logs` | Logs de la base (⚠️ cible backend par erreur) | Prod |
+
+l'astuce c'est juste= **make + commande dans Makefile par exemple si il y a db-staging-logs:
+	docker container logs $(CONTAINER_DB_STAGING) dedans vous regardez juste le tableau d'explication çi_dessus et vous pouvez l'utilisez selon vos bésoin.N'hésitez pas à me demandez si il y a des commandes personnels que vous aimeriez ajoutez dedans pour faciliser la mémoire et rendre le dev encore plus rapide
+
+## 🧠 3. Avantages du Makefile 
+
+> “Le Makefile permet d’automatiser et de simplifier les commandes Docker Compose pour chaque environnement (développement, staging, production).  
+> Il offre une interface cohérente (`make dev-up`, `make prod-logs`, etc.) qui réduit les erreurs humaines, accélère l’onboarding des développeurs, et améliore la maintenabilité du projet.  
+> Grâce au Makefile, les développeurs n’ont pas besoin de mémoriser les noms de fichiers Compose, les variables d’environnement ou les noms de conteneurs.  
+> Cette approche est conforme aux bonnes pratiques DevOps : automatisation, reproductibilité, et documentation claire des workflows.”
+
+---
+
+## 📘 4. Guide pour les développeurs (à inclure dans ton README ou mémoire)
+
+### 🔧 Installation
+
+1. Cloner le projet
+2. Installer Docker et Docker Compose
+3. Vérifier que le fichier `Makefile` est présent à la racine
+
+### 🚀 Démarrer le projet
+
+```bash
+make dev-up          # Démarrer l’environnement de développement
+make dev-build       # Rebuilder les images
+make dev-logs        # Suivre les logs en temps réel
+```
+
+
+
+
+
+
+
+
+
+
 👤 Auteur
 Zo mahefa Ranaivo – DevOps & Fullstack Developer Projet soutenu en octobre 2025
 # Test CI

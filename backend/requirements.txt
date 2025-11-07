@@ -10,3 +10,5 @@ pycparser==2.22
 PyJWT==2.10.1
 PyMySQL==1.1.2
 sqlparse==0.5.3
+gunicorn==23.0.0
+packaging==25.0

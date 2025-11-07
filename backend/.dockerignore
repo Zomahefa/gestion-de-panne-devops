@@ -29,6 +29,7 @@ static/
 # Fichiers liés à Docker
 Dockerfile
 .dockerignore
-#docker-compose.yml
-#docker-compose.override.yml
 env/
+
+media/*
+!media/.gitkeep

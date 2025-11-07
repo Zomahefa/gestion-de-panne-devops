@@ -17,7 +17,11 @@ const TechnicianDashboard = () => {
     }
     return null;
   };
-
+  const getImageUrl = (imagePath) => {
+    if (!imagePath) return null;
+    if (imagePath.startsWith('http')) return imagePath;
+    return `${window.location.origin}${imagePath}`;
+  };
   const [incidents, setIncidents] = useState([]);
   const [filter, setFilter] = useState('Tous');
   const [currentUsername, setCurrentUsername] = useState('');
@@ -116,13 +120,12 @@ const TechnicianDashboard = () => {
                 <div className="incident-image-container mt-2">
                   <strong>📷 Photo signalée :</strong><br />
                   <img
-                    src={incident.image}
+                    src={getImageUrl(incident.image)}
                     alt="Panne"
                     className="incident-image"
                   />
                 </div>
               )}
-
               {coords ? (
                 <MapView
                   latitude={coords.latitude}

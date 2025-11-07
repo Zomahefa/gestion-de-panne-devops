@@ -10,7 +10,7 @@ const ClientView = () => {
 
   const fetchIncidents = async () => {
     try {
-      const res = await axios.get('http://localhost:8000/api/todos/');
+      const res = await axios.get(`${process.env.REACT_APP_API_URL}todos/`);
       // 🔼 Trie les pannes par date décroissante (nouvelle en haut)
       setIncidents(res.data.sort((a, b) => new Date(b.created_at) - new Date(a.created_at)));
     } catch (err) {

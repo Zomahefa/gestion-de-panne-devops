@@ -12,10 +12,9 @@ const AdminTechnicianManager = () => {
     contact: '',
     password: '',
   });
-
   const fetchTechnicians = async () => {
     try {
-      const res = await axios.get('http://localhost:8000/api/technicians/');
+      const res = await axios.get(`${process.env.REACT_APP_API_URL}technicians/`);
       setTechnicians(res.data);
     } catch (err) {
       console.error('Erreur chargement techniciens', err);
@@ -40,7 +39,7 @@ const AdminTechnicianManager = () => {
     }
 
     try {
-      await axios.post('http://localhost:8000/api/technicians/', {
+      await axios.post(`${process.env.REACT_APP_API_URL}technicians/`, {
         username: generatedUsername,
         full_name: formData.full_name,
         matricule: formData.matricule,
@@ -52,7 +51,30 @@ const AdminTechnicianManager = () => {
       fetchTechnicians();
     } catch (err) {
       console.log(err.response?.data);
-      Swal.fire('❌ Erreur création technicien');
+      if (err.response && err.response.data) {
+      const errors = err.response.data;
+
+      // Traduction personnalisée des messages
+      const translate = (msg) => {
+        if (msg.includes('This password is too short')) {
+          return 'Le mot de passe est trop court. Il doit contenir au moins 8 caractères.';
+        }
+        if (msg.includes('This password is too common')) {
+          return 'Le mot de passe est trop commun. Choisissez un mot de passe plus sécurisé.';
+        }
+        if (msg.includes('This password is entirely numeric')) {
+          return 'Le mot de passe ne doit pas être uniquement composé de chiffres.';
+        }
+        return msg; // Message par défaut si non reconnu
+      };
+
+      const rawMessages = Object.values(errors).flat();
+      const translatedMessages = rawMessages.map(translate).join('\n');
+
+      Swal.fire('❌ Erreur création technicien', translatedMessages, 'error');
+    } else {
+      Swal.fire('❌ Erreur création technicien', 'Une erreur inconnue est survenue.', 'error');
+    }
     }
   };
 
@@ -80,7 +102,7 @@ const AdminTechnicianManager = () => {
 
     if (formValues) {
       try {
-        await axios.put(`http://localhost:8000/api/technicians/${tech.id}/`, formValues);
+        await axios.put(`${process.env.REACT_APP_API_URL}technicians/${tech.id}/`, formValues);
         Swal.fire('✅ Technicien modifié !');
         fetchTechnicians();
       } catch (err) {
@@ -102,7 +124,7 @@ const AdminTechnicianManager = () => {
 
     if (result.isConfirmed) {
       try {
-        await axios.delete(`http://localhost:8000/api/technicians/${id}/`);
+        await axios.delete(`${process.env.REACT_APP_API_URL}technicians/${id}/`);
         Swal.fire('✅ Supprimé !');
         fetchTechnicians();
       } catch (err) {
