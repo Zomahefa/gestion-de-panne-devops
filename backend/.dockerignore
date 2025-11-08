@@ -40,3 +40,6 @@ Dockerfile
 # 📁 Dossier media (exclure les fichiers, garder le dossier)
 media/*
 !media/.gitkeep
+
+backend/settings_ci.py
+

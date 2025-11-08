@@ -76,7 +76,7 @@ jobs:
     - name: Tests Django avec coverage
       run: |
         cd backend
-        coverage run manage.py test
+        coverage run manage.py test --settings=backend.settings_ci
         coverage report
         coverage html
 
