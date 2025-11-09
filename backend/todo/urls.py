@@ -19,8 +19,8 @@ router.register('notifications', NotificationViewSet)
 
 urlpatterns = [
     path('', include(router.urls)),
-    path('admin-login/', admin_login),
-    path('notify-admin/', notify_admin),
+    path('admin-login/', admin_login , name='admin-login'),
+    path('notify-admin/', notify_admin , name='notify-admin'),
 ]
 
 

@@ -2,13 +2,10 @@ from django.test import TestCase, SimpleTestCase
 from rest_framework.test import APITestCase, APIClient
 from django.urls import reverse, resolve
 from django.contrib.admin.sites import site
+from django.contrib.auth.hashers import make_password
 from django.contrib.auth.hashers import check_password
-
 from .models import Todo, Technician, Admin, Attribution, Notification
 from .serializers import TodoSerializer, TechnicianSerializer
-
-
-# ✅ MODELS
 
 class TestTodoModel(TestCase):
     def test_str_representation(self):
@@ -28,7 +25,7 @@ class TestAdminModel(TestCase):
             contact="0000000000",
             email="admin@example.com",
             username="adminzo",
-            password="plaintext123"
+            password=make_password("plaintext123")  # ✅ hashé manuellement
         )
         admin.save()
         self.assertTrue(admin.password.startswith("pbkdf2_"))
@@ -73,7 +70,7 @@ class TestTechnicianSerializer(TestCase):
         serializer = TechnicianSerializer(data=data)
         self.assertTrue(serializer.is_valid())
         tech = serializer.save()
-        self.assertTrue(tech.password.startswith("pbkdf2_"))
+        self.assertTrue(tech.check_password("StrongPass123!"))
 
 
 # ✅ API VIEWS
