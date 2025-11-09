@@ -137,14 +137,18 @@ jobs:
         pip install pip-audit
         pip-audit || echo "Vulnérabilités connues, documentées dans SECURITY.md"
 
-
     - name: Installer Semgrep
       run: pip install semgrep
 
     - name: Scan de sécurité avec Semgrep
       continue-on-error: true
-      run: semgrep --config=auto
-
+      run: semgrep --config=auto --json > semgrep-report.json
+    - name: Upload rapport Semgrep
+      uses: actions/upload-artifact@v4
+      with:
+        name: semgrep-report
+        path: semgrep-report.json
+        
     - name: Scan Dockerfile backend
       continue-on-error: true
       uses: aquasecurity/trivy-action@master
