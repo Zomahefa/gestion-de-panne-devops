@@ -2,7 +2,6 @@ from django.test import TestCase, SimpleTestCase
 from rest_framework.test import APITestCase, APIClient
 from django.urls import reverse, resolve
 from django.contrib.admin.sites import site
-from django.contrib.auth.hashers import make_password
 from django.contrib.auth.hashers import check_password
 from .models import Todo, Technician, Admin, Attribution, Notification
 from .serializers import TodoSerializer, TechnicianSerializer
@@ -25,10 +24,13 @@ class TestAdminModel(TestCase):
             contact="0000000000",
             email="admin@example.com",
             username="adminzo",
-            password=make_password("plaintext123")  # ✅ hashé manuellement
+            password="plaintext123"  # en clair
         )
         admin.save()
-        self.assertTrue(admin.password.startswith("pbkdf2_"))
+        self.assertTrue(check_password("plaintext123", admin.password))  # ✅ robuste et fiable
+
+
+        
 
 class TestAttributionModel(TestCase):
     def test_str_representation(self):
