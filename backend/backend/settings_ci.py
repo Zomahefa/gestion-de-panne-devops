@@ -1,7 +1,10 @@
 from pathlib import Path
 
-
 BASE_DIR = Path(__file__).resolve().parent.parent
+SECRET_KEY = "ci-secret-key"  # ✅ valeur fictive pour les tests
+DEBUG = True
+ALLOWED_HOSTS = ["*"]
+
 
 # ✅ Base de données légère pour CI
 DATABASES = {

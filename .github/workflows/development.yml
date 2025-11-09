@@ -60,7 +60,7 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: eslint-report
-        path: eslint-report.json
+        path: frontend/eslint-report.json
 
   test:
     name: Tests Django & React + Coverage
