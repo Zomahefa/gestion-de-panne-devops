@@ -1,4 +1,3 @@
-// vite.config.mjs
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 
@@ -9,9 +8,18 @@ export default defineConfig({
     globals: true,
     setupFiles: ['./src/setupTests.js'],
     coverage: {
-      provider: 'v8', // utilise le moteur installé
-      reporter: ['text', 'html'], // formats de sortie
-      reportsDirectory: './coverage', // dossier de sortie
+      provider: 'v8',
+      reporter: ['text', 'html'],
+      reportsDirectory: './coverage',
+      exclude: [
+        'src/assets/**',
+        '**/*.css',
+        '**/*.png',
+        '**/*.jpg',
+        '**/*.svg',
+        '**/*.jpeg',
+        '**/*.gif',
+      ],
     },
   },
 });

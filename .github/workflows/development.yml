@@ -125,12 +125,18 @@ jobs:
     - name: Audit sécurité npm
       run: |
         cd frontend
-        npm audit --audit-level=high || echo "Audit terminé avec des vulnérabilités non bloquantes"
+        npm audit --audit-level=high || echo "Vulnérabilités connues, documentées dans SECURITY.md"
     - name: Setup Python
       uses: actions/setup-python@v6
       with:
         python-version: '3.13'
         cache: 'pip'
+
+    - name: Audit sécurité Python
+      run: |
+        pip install pip-audit
+        pip-audit || echo "Vulnérabilités connues, documentées dans SECURITY.md"
+
 
     - name: Installer Semgrep
       run: pip install semgrep
