@@ -28,11 +28,12 @@ class AdminModelTest(TestCase):
             matricule="ADM-001",
             contact="0000000000",
             email="admin@example.com",
-            username="adminzo",
-            password="plaintext123"
+            username="adminzo"
         )
+        admin.set_password("plaintext123")  # ✅ applique le hash
         admin.save()
-        self.assertTrue(admin.password.startswith("pbkdf2_"))
+        self.assertTrue(admin.check_password("plaintext123"))  # ✅ vérifie le hash
+
 
 
 

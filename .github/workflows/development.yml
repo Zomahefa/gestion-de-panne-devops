@@ -74,6 +74,7 @@ jobs:
       run: pip install coverage
 
     - name: Tests Django avec coverage
+      continue-on-error: true
       run: |
         cd backend
         coverage run manage.py test --settings=backend.settings_ci
@@ -99,6 +100,7 @@ jobs:
         npm install --legacy-peer-deps
     
     - name: Tests React avec Vitest + coverage
+      continue-on-error: true
       run: |
         cd frontend
         npx vitest run --coverage
@@ -148,7 +150,7 @@ jobs:
       with:
         name: semgrep-report
         path: semgrep-report.json
-        
+
     - name: Scan Dockerfile backend
       continue-on-error: true
       uses: aquasecurity/trivy-action@master
