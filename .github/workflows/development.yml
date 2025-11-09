@@ -25,7 +25,13 @@ jobs:
       continue-on-error: true
       run: |
         cd backend
-        ruff check .
+        ruff check . --output-format=json > ruff-report.json
+      
+    - name: Upload Ruff report
+      uses: actions/upload-artifact@v4
+      with:
+        name: ruff-report
+        path: backend/ruff-report.json
 
     - name: Format Python avec Ruff
       continue-on-error: true
@@ -49,7 +55,12 @@ jobs:
     - name: Lint React avec ESLint
       run: |
         cd frontend
-        npx eslint src --ext .js,.jsx,.ts,.tsx
+        npx eslint src --ext .js,.jsx,.ts,.tsx -f json -o eslint-report.json
+    - name: Upload ESLint report
+      uses: actions/upload-artifact@v4
+      with:
+        name: eslint-report
+        path: eslint-report.json
 
   test:
     name: Tests Django & React + Coverage

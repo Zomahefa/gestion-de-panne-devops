@@ -1,5 +1,5 @@
 from django.test import TestCase, SimpleTestCase
-from rest_framework.test import APITestCase, APIClient
+from rest_framework.test import APITestCase
 from django.urls import reverse, resolve
 from django.contrib.admin.sites import site
 from django.contrib.auth.hashers import check_password
@@ -95,7 +95,7 @@ class TestTodoAPI(APITestCase):
 
 class TestAdminLoginAPI(APITestCase):
     def setUp(self):
-        self.admin = Admin.objects.create(
+        self.admin = Admin(
             full_name="Admin Zo",
             matricule="ADM-001",
             contact="0000000000",
@@ -103,7 +103,8 @@ class TestAdminLoginAPI(APITestCase):
             username="adminzo",
             password="plaintext123"
         )
-        self.admin.save()
+        self.admin.save()  # ✅ déclenche le hash dans ta méthode save()
+
 
     def test_login_success(self):
         url = reverse('admin-login')

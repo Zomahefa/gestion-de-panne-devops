@@ -1,5 +1,5 @@
 from pathlib import Path
-from .settings import SECRET_KEY, DEBUG, ALLOWED_HOSTS
+
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
