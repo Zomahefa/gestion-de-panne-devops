@@ -1,0 +1,46 @@
+# 🔐 Fichiers sensibles
+.env
+*.env
+.env.staging
+
+# 🗂️ Fichiers système
+.DS_Store
+*.swp
+
+# 🧪 Fichiers de test ou de debug
+*.log
+*.sqlite3
+
+# 🐍 Environnements Python
+venv/
+env/
+ENV/
+*.egg-info/
+*.coverage
+
+# 📦 Fichiers compilés Python
+__pycache__/
+*.pyc
+*.pyo
+
+# 📁 Dossier media (images backend)
+media/**
+!media/.gitkeep
+
+# 📦 Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# 🐳 Docker
+*.tar
+*.bak
+*.tmp
+
+# 🧠 Pourquoi ?
+# - .env : contient des mots de passe, clés secrètes
+# - .DS_Store, *.swp : fichiers créés par macOS ou éditeurs
+# - *.log, *.sqlite3 : fichiers générés localement, inutiles pour le repo
+# - __pycache__, *.pyc : fichiers compilés automatiquement
+# - media/** : évite de versionner les images, mais garde le dossier vide avec .gitkeep

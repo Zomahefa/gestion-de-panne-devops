@@ -1,0 +1,66 @@
+services:
+  db:
+    image: mysql:8.0
+    container_name: db-staging
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${DB_NAME}
+      MYSQL_USER: ${DB_USER}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-p${MYSQL_ROOT_PASSWORD}"]
+      interval: 30s
+      timeout: 10s
+      retries: 10
+      start_period: 40s
+    volumes:
+      - mysql_data_staging:/var/lib/mysql
+    networks:
+      - panne_jirama_staging
+
+  backend:
+    image: zomahefaranaivo/django-backend-nginx-panne-staging:v1.0
+    container_name: backend-staging
+    restart: always
+    environment:
+      APP_ENV: ${APP_ENV}
+      DEBUG: ${DEBUG}
+      DJANGO_SECRET_KEY: ${DJANGO_SECRET_KEY}
+      DJANGO_ALLOWED_HOSTS: ${DJANGO_ALLOWED_HOSTS}
+      DB_HOST: ${DB_HOST}
+      DB_NAME: ${DB_NAME}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_PORT: ${DB_PORT}
+    volumes:
+      - django_static:/back/staticfiles
+      - django_media:/back/media
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - panne_jirama_staging
+
+  frontend:
+    image: zomahefaranaivo/react-frontend-nginx-panne-staging:v1.0
+    container_name: frontend-staging
+    restart: always
+    ports:
+      - 80:80
+    volumes:
+      - django_static:/back/staticfiles
+      - django_media:/back/media
+    depends_on:
+      backend:
+        condition: service_healthy
+    networks:
+      - panne_jirama_staging
+
+volumes:
+  mysql_data_staging:
+  django_static:
+  django_media:
+
+networks:
+  panne_jirama_staging:

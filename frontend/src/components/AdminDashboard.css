@@ -1,0 +1,30 @@
+.admin-dashboard-container {
+  padding: 2rem;
+  background-color: #fff8e1;
+  min-height: 100vh;
+}
+
+.admin-dashboard-container h2 {
+  color: #003366;
+  margin-bottom: 1rem;
+}
+
+.table th {
+  background-color: #003366;
+  color: white;
+}
+
+.table td {
+  vertical-align: middle;
+}
+.admin-nav {
+  display: flex;
+  justify-content: flex-start;
+  gap: 1rem;
+}
+.admin-image {
+  max-width: 120px;
+  max-height: 120px;
+  border-radius: 6px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}

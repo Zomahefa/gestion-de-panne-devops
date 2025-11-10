@@ -1,0 +1,61 @@
+.client-view {
+  max-width: 800px;
+  margin: auto;
+  padding: 2rem;
+  background: linear-gradient(to bottom right, #ffbd53, #ffe0b2);
+  border-radius: 12px;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.logo {
+  height: 60px;
+}
+
+.incident-list .card {
+  background-color: #ffffff;
+  border-left: 5px solid #ff9800;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  padding: 1rem;
+  margin-bottom: 1rem;
+  border-radius: 8px;
+}
+
+.incident-list .card h5 {
+  margin-bottom: 0.5rem;
+  color: #003366;
+}
+
+.incident-list .card p {
+  margin: 0.3rem 0;
+  font-size: 0.95rem;
+}
+
+@media (max-width: 768px) {
+  .client-view {
+    padding: 1rem;
+  }
+
+  .logo {
+    height: 40px;
+  }
+
+  .incident-list .card {
+    padding: 0.8rem;
+  }
+
+  .header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+img {
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}

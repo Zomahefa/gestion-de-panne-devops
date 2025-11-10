@@ -1,0 +1,32 @@
+.admin-tech-container {
+  padding: 2rem;
+  background-color: #fff8e1;
+  min-height: 100vh;
+}
+
+.admin-tech-container h2 {
+  color: #003366;
+  margin-bottom: 1rem;
+}
+
+.tech-form {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-bottom: 2rem;
+}
+
+.tech-form input {
+  padding: 0.5rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.tech-form button {
+  background-color: #003366;
+  color: white;
+  border: none;
+  padding: 0.6rem 1rem;
+  border-radius: 4px;
+  font-weight: bold;
+}

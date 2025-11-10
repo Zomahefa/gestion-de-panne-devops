@@ -1,0 +1,76 @@
+.help-page {
+  max-width: 800px;
+  margin: auto;
+  padding: 2rem;
+  background-color: #fff8e1;
+  border-radius: 12px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+  font-family: 'Segoe UI', sans-serif;
+}
+
+.help-tabs {
+  display: flex;
+  border-bottom: 2px solid #ccc;
+  margin-bottom: 1.5rem;
+  overflow-x: auto;
+}
+
+.help-tabs button {
+  background: none;
+  border: none;
+  padding: 0.8rem 1.2rem;
+  font-weight: bold;
+  cursor: pointer;
+  border-bottom: 3px solid transparent;
+  transition: border-color 0.3s, background-color 0.3s;
+  font-size: 1rem;
+  color: #333;
+}
+
+.help-tabs button.active {
+  border-bottom: 3px solid #ff9800;
+  color: #ff9800;
+  background-color: #fff3e0;
+}
+
+.help-tabs button:hover {
+  background-color: #ffe0b2;
+}
+
+.help-content h2 {
+  font-size: 1.6rem;
+  margin-bottom: 1rem;
+  color: #333;
+}
+
+.help-content p {
+  margin-bottom: 1rem;
+  font-size: 1rem;
+  color: #555;
+}
+
+.help-content ul {
+  list-style-type: disc;
+  padding-left: 1.5rem;
+  margin-bottom: 2rem;
+  color: #444;
+}
+
+.help-content li {
+  margin-bottom: 0.5rem;
+}
+
+.help-content h4 {
+  margin-top: 2rem;
+  font-size: 1.2rem;
+  color: #333;
+}
+
+.help-content a {
+  color: #ff9800;
+  text-decoration: none;
+}
+
+.help-content a:hover {
+  text-decoration: underline;
+}

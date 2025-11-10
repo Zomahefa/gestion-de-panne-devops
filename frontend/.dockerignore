@@ -1,0 +1,31 @@
+# 📦 Dépendances locales
+node_modules/
+
+# 🏗️ Dossier de build local
+build/
+dist/
+
+# 🔐 Fichiers d'environnement locaux
+.env
+.env.*
+
+# 🧪 Logs et débogage
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# 🐳 Fichiers Docker
+Dockerfile
+.dockerignore
+docker-compose.yml
+docker-compose.override.yml
+
+# 🧠 Fichiers liés à Git
+.git
+.gitignore
+
+# 🧠 Fichiers liés à l'éditeur
+.vscode/
+.idea/
+*.swp
+.DS_Store
