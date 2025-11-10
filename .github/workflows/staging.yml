@@ -1,0 +1,211 @@
+name: Staging CI
+on:
+  push:
+    branches: [ "staging" ]
+  pull_request:
+    branches: [ "staging"]
+
+jobs:
+  Lint:
+    name: Lint Python & React
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout du code
+      uses: actions/checkout@v5
+
+    - name: Setup Python
+      uses: actions/setup-python@v6
+      with:
+        python-version: '3.13'
+        cache: 'pip'
+
+    - name: Installer Ruff
+      run: pip install ruff
+
+    - name: Lint Python avec Ruff
+      run: |
+        cd backend
+        ruff check . --output-format=json > ruff-report.json
+      
+    - name: Upload Ruff report
+      uses: actions/upload-artifact@v4
+      with:
+        name: ruff-report
+        path: backend/ruff-report.json
+
+    - name: Format Python avec Ruff
+      run: |
+        cd backend
+        ruff check . --fix
+        ruff format .
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v6
+      with:
+        node-version: 20.19.0
+        cache: 'npm'
+        cache-dependency-path: frontend/package-lock.json
+
+    - name: Installer les dépendances React
+      run: |
+        cd frontend
+        npm install --legacy-peer-deps
+
+    - name: Lint React avec ESLint
+      run: |
+        cd frontend
+        npx eslint src --ext .js,.jsx,.ts,.tsx -f json -o eslint-report.json
+    - name: Upload ESLint report
+      uses: actions/upload-artifact@v4
+      with:
+        name: eslint-report
+        path: frontend/eslint-report.json
+
+  Test:
+    name: Tests Django & React + Coverage
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout du code
+      uses: actions/checkout@v5
+
+    - name: Setup Python
+      uses: actions/setup-python@v6
+      with:
+        python-version: '3.13'
+        cache: 'pip'
+
+    - name: Installer les dépendances Python
+      run: |
+        cd backend
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+
+    - name: Installer coverage.py
+      run: pip install coverage
+
+    - name: Tests Django avec coverage
+      run: |
+        cd backend
+        coverage run manage.py test --settings=backend.settings_ci
+        coverage report
+        coverage html
+
+    - name: Upload rapport coverage Django
+      uses: actions/upload-artifact@v4
+      with:
+        name: django-coverage-report
+        path: backend/htmlcov
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v6
+      with:
+        node-version: 20.19.0
+        cache: 'npm'
+        cache-dependency-path: frontend/package-lock.json
+
+    - name: Installer les dépendances React
+      run: |
+        cd frontend
+        npm install --legacy-peer-deps
+    
+    - name: Tests React avec Vitest + coverage
+      run: |
+        cd frontend
+        npx vitest run --coverage
+
+    - name: Upload rapport coverage React
+      uses: actions/upload-artifact@v4
+      with:
+        name: react-coverage-report
+        path: frontend/coverage
+
+  Security:
+    name: Analyse de sécurité (Semgrep + Trivy)
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout du code
+      uses: actions/checkout@v5
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v6
+      with:
+        node-version: 20.19.0
+        cache: 'npm'
+        cache-dependency-path: frontend/package-lock.json
+    - name: Audit sécurité npm
+      run: |
+        cd frontend
+        npm audit --audit-level=high || echo "Vulnérabilités connues, documentées dans SECURITY.md"
+    - name: Setup Python
+      uses: actions/setup-python@v6
+      with:
+        python-version: '3.13'
+        cache: 'pip'
+
+    - name: Audit sécurité Python
+      run: |
+        pip install pip-audit
+        pip-audit || echo "Vulnérabilités connues, documentées dans SECURITY.md"
+
+    - name: Installer Semgrep
+      run: pip install semgrep
+
+    - name: Scan de sécurité avec Semgrep
+      run: semgrep --config=auto --json > semgrep-report.json
+    - name: Upload rapport Semgrep
+      uses: actions/upload-artifact@v4
+      with:
+        name: semgrep-report
+        path: semgrep-report.json
+
+    - name: Scan Dockerfile backend
+      uses: aquasecurity/trivy-action@master
+      with:
+        scan-type: 'fs'
+        scan-ref: './backend/Dockerfile'
+    - name: Scan Dockerfile frontend
+      uses: aquasecurity/trivy-action@master
+      with:
+        scan-type: 'fs'
+        scan-ref: './frontend/Dockerfile.dev'
+    - name: Scan docker-compose.dev.yml
+      uses: aquasecurity/trivy-action@master
+      with:
+        scan-type: 'fs'
+        scan-ref: './docker-compose.dev.yml'
+  Dockerhub:
+    name: Build & push des images vers dockerhub
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout du code
+        uses: actions/checkout@v5
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ vars.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+  
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+  
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+  
+      - name: Build & Push Frontend
+        uses: docker/build-push-action@v6
+        with:
+          context: ./frontend
+          file: ./frontend/Dockerfile.prod
+          push: true
+          build-args: |
+            REACT_APP_API_URL=${{ vars.REACT_APP_API_URL }}
+          tags: ${{ vars.DOCKERHUB_USERNAME }}/react-frontend-nginx-panne-staging:staging-v${{ github.run_number }}
+
+      - name: Build & Push Backend
+        uses: docker/build-push-action@v6
+        with:
+          context: ./backend
+          file: ./backend/Dockerfile
+          push: true
+          tags: ${{ vars.DOCKERHUB_USERNAME }}/django-backend-nginx-panne-staging:staging-v${{ github.run_number }}
