@@ -20,7 +20,7 @@ services:
       - panne_jirama_staging
 
   backend:
-    image: zomahefaranaivo/django-backend-panne-staging:v6
+    image: zomahefaranaivo/django-backend-panne-staging:v8
     container_name: backend-staging
     restart: always
     environment:
@@ -43,7 +43,7 @@ services:
       - panne_jirama_staging
 
   frontend:
-    image: zomahefaranaivo/react-frontend-nginx-panne-staging:v6
+    image: zomahefaranaivo/react-frontend-nginx-panne-staging:v8
     container_name: frontend-staging
     restart: always
     ports:
@@ -72,7 +72,7 @@ services:
     ports:
       - "3001:3000"  # On expose Grafana sur le port 3001
     volumes:
-      - gestion-de-panne-devops_grafana_data:/var/lib/grafana
+      - grafana_data:/var/lib/grafana
     depends_on:
       - prometheus
     networks:
@@ -103,7 +103,9 @@ volumes:
   mysql_data_staging:
   django_static:
   django_media:
-  gestion-de-panne-devops_grafana_data:
+  grafana_data:
+    external: true
+    name: gestion-de-panne-devops_grafana_data
 
 networks:
   panne_jirama_staging:
