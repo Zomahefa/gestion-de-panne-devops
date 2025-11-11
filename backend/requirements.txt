@@ -3,12 +3,12 @@ cffi==1.17.1
 cryptography==45.0.7
 Django==5.2.6
 django-cors-headers==4.7.0
+django-prometheus==2.4.1
 djangorestframework==3.16.1
 djangorestframework_simplejwt==5.5.1
 pillow==11.3.0
+prometheus_client==0.23.1
 pycparser==2.22
 PyJWT==2.10.1
 PyMySQL==1.1.2
-django-prometheus==2.4.1
-prometheus_client==0.23.1
 sqlparse==0.5.3
