@@ -21,7 +21,8 @@ echo "Vérification de l'admin applicatif..."
 python manage.py shell <<EOF
 from todo.models import Admin
 from django.contrib.auth.hashers import make_password
-if not Admin.objects.filter(username="adminapp").exists():
+
+if not Admin.objects.exists():
     Admin.objects.create(
         full_name="Admin Principal",
         matricule="CH-01",
@@ -31,6 +32,8 @@ if not Admin.objects.filter(username="adminapp").exists():
         username="mahefa",
         password=make_password("jirama+/2025")
     )
+else:
+    print("Admin déjà présent en base, aucune création.")
 EOF
 
 echo "Initialisation terminée"
