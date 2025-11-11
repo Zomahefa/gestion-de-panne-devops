@@ -20,7 +20,7 @@ services:
       - panne_jirama_staging
 
   backend:
-    image: zomahefaranaivo/django-backend-panne-staging:v4
+    image: zomahefaranaivo/django-backend-panne-staging:v5
     container_name: backend-staging
     restart: always
     environment:
@@ -43,7 +43,7 @@ services:
       - panne_jirama_staging
 
   frontend:
-    image: zomahefaranaivo/react-frontend-nginx-panne-staging:v4
+    image: zomahefaranaivo/react-frontend-nginx-panne-staging:v5
     container_name: frontend-staging
     restart: always
     ports:
