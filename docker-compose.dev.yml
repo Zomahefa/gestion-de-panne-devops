@@ -1,13 +1,15 @@
 services:
   db:
     image: mysql:8.0
-    container_name: db-staging
-    restart: always
+    container_name: db
+    restart: unless-stopped
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
       MYSQL_DATABASE: ${DB_NAME}
       MYSQL_USER: ${DB_USER}
       MYSQL_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - "${DB_PORT}:3306"
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-p${MYSQL_ROOT_PASSWORD}"]
       interval: 30s
@@ -15,14 +17,17 @@ services:
       retries: 10
       start_period: 40s
     volumes:
-      - mysql_data_staging:/var/lib/mysql
+      - mysql_data:/var/lib/mysql
     networks:
-      - panne_jirama_staging
+      - panne_jirama
 
   backend:
-    image: zomahefaranaivo/django-backend-panne-staging:v4
-    container_name: backend-staging
-    restart: always
+    build:
+      context: ./backend
+      args:
+        APP_ENV: ${APP_ENV}
+    container_name: django-dev-panne
+    restart: unless-stopped
     environment:
       APP_ENV: ${APP_ENV}
       DEBUG: ${DEBUG}
@@ -33,30 +38,38 @@ services:
       DB_USER: ${DB_USER}
       DB_PASSWORD: ${DB_PASSWORD}
       DB_PORT: ${DB_PORT}
+    ports:
+      - "${BACK_PORT}:${BACK_PORT}"
     volumes:
-      - django_static:/back/staticfiles
-      - django_media:/back/media
+      - ./backend:/back
+      - ./backend/media:/back/media
     depends_on:
       db:
         condition: service_healthy
     networks:
-      - panne_jirama_staging
+      - panne_jirama
+
 
   frontend:
-    image: zomahefaranaivo/react-frontend-nginx-panne-staging:v4
-    container_name: frontend-staging
-    restart: always
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.dev
+    container_name: react-dev-panne
+    restart: unless-stopped
+    env_file:
+      - ./frontend/.env
     ports:
-      - 80:80
+      - "${FRONT_PORT}:${FRONT_PORT}"
     volumes:
-      - django_static:/back/staticfiles
-      - django_media:/back/media
+      - ./frontend:/app
+      - /app/node_modules
     depends_on:
       backend:
         condition: service_healthy
     networks:
-      - panne_jirama_staging
+      - panne_jirama
 
+    rvices:
   prometheus:
     image: prom/prometheus
     container_name: prometheus
@@ -65,18 +78,18 @@ services:
     ports:
       - "9090:9090"
     networks:
-      - panne_jirama_staging
+      - monitoring
   grafana:
     image: grafana/grafana
     container_name: grafana
     ports:
       - "3001:3000"  # On expose Grafana sur le port 3001
     volumes:
-      - gestion-de-panne-devops_grafana_data:/var/lib/grafana
+      - grafana_data:/var/lib/grafana
     depends_on:
       - prometheus
     networks:
-      - panne_jirama_staging
+      - monitoring
   loki:
     image: grafana/loki:2.9.4
     container_name: loki
@@ -84,7 +97,7 @@ services:
       - "3100:3100"
     command: -config.file=/etc/loki/local-config.yaml
     networks:
-      - panne_jirama_staging
+      - monitoring
 
   promtail:
     image: grafana/promtail:2.9.4
@@ -97,13 +110,11 @@ services:
     depends_on:
       - loki
     networks:
-      - panne_jirama_staging
+      - monitoring
+
 
 volumes:
-  mysql_data_staging:
-  django_static:
-  django_media:
-  gestion-de-panne-devops_grafana_data:
+  mysql_data:
 
 networks:
-  panne_jirama_staging:
+  panne_jirama:

@@ -1,5 +1,6 @@
 from django.contrib import admin
 from django.urls import path, include
+from django_prometheus import exports
 from rest_framework_simplejwt.views import (
     TokenObtainPairView,
     TokenRefreshView,
@@ -17,6 +18,8 @@ urlpatterns = [
     path('api/', include('todo.urls')),
     path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),  # ✅ login
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),  # ✅ refresh
+    path('metrics/', exports.ExportToDjangoView.as_view()),
+
 ]
 
 
