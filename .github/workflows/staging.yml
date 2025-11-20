@@ -168,11 +168,31 @@ jobs:
       with:
         scan-type: 'fs'
         scan-ref: './frontend/Dockerfile.dev'
-    - name: Scan docker-compose.dev.yml
+    - name: Scan docker-compose.blue.yml
       uses: aquasecurity/trivy-action@master
       with:
         scan-type: 'fs'
-        scan-ref: './docker-compose.staging.yml'
+        scan-ref: './docker-compose.blue.yml'
+    - name: Scan docker-compose.green.yml
+      uses: aquasecurity/trivy-action@master
+      with:
+        scan-type: 'fs'
+        scan-ref: './docker-compose.green.yml'
+    - name: Scan docker-compose.db.yml
+      uses: aquasecurity/trivy-action@master
+      with:
+        scan-type: 'fs'
+        scan-ref: './docker-compose.db.yml'
+    - name: Scan docker-compose.monitoring.yml
+      uses: aquasecurity/trivy-action@master
+      with:
+        scan-type: 'fs'
+        scan-ref: './docker-compose.monitoring.yml'
+    - name: Scan docker-compose.edge.yml
+      uses: aquasecurity/trivy-action@master
+      with:
+        scan-type: 'fs'
+        scan-ref: './docker-compose.edge.yml'
   Dockerhub:
     name: Build & push des images vers dockerhub
     runs-on: ubuntu-latest
