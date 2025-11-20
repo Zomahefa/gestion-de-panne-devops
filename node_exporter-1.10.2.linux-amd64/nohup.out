@@ -1,0 +1,549 @@
+time=2025-11-12T09:20:14.611+03:00 level=INFO source=node_exporter.go:216 msg="Starting node_exporter" version="(version=1.10.2, branch=HEAD, revision=654f19dee6a0c41de78a8d6d870e8c742cdb43b9)"
+time=2025-11-12T09:20:14.612+03:00 level=INFO source=node_exporter.go:217 msg="Build context" build_context="(go=go1.25.3, platform=linux/amd64, user=root@b29b4019149a, date=20251025-20:05:32, tags=unknown)"
+time=2025-11-12T09:20:14.612+03:00 level=WARN source=node_exporter.go:219 msg="Node Exporter is running as root user. This exporter is designed to run as unprivileged user, root is not required."
+time=2025-11-12T09:20:14.613+03:00 level=INFO source=filesystem_common.go:265 msg="Parsed flag --collector.filesystem.mount-points-exclude" collector=filesystem flag=^/(dev|proc|run/credentials/.+|sys|var/lib/docker/.+|var/lib/containers/storage/.+)($|/)
+time=2025-11-12T09:20:14.613+03:00 level=INFO source=filesystem_common.go:294 msg="Parsed flag --collector.filesystem.fs-types-exclude" collector=filesystem flag=^(autofs|binfmt_misc|bpf|cgroup2?|configfs|debugfs|devpts|devtmpfs|fusectl|hugetlbfs|iso9660|mqueue|nsfs|overlay|proc|procfs|pstore|rpc_pipefs|securityfs|selinuxfs|squashfs|erofs|sysfs|tracefs)$
+time=2025-11-12T09:20:14.614+03:00 level=INFO source=diskstats_common.go:110 msg="Parsed flag --collector.diskstats.device-exclude" collector=diskstats flag=^(z?ram|loop|fd|(h|s|v|xv)d[a-z]|nvme\d+n\d+p)\d+$
+time=2025-11-12T09:20:14.615+03:00 level=INFO source=node_exporter.go:135 msg="Enabled collectors"
+time=2025-11-12T09:20:14.615+03:00 level=INFO source=node_exporter.go:141 msg=arp
+time=2025-11-12T09:20:14.615+03:00 level=INFO source=node_exporter.go:141 msg=bcache
+time=2025-11-12T09:20:14.615+03:00 level=INFO source=node_exporter.go:141 msg=bonding
+time=2025-11-12T09:20:14.615+03:00 level=INFO source=node_exporter.go:141 msg=btrfs
+time=2025-11-12T09:20:14.615+03:00 level=INFO source=node_exporter.go:141 msg=conntrack
+time=2025-11-12T09:20:14.615+03:00 level=INFO source=node_exporter.go:141 msg=cpu
+time=2025-11-12T09:20:14.615+03:00 level=INFO source=node_exporter.go:141 msg=cpufreq
+time=2025-11-12T09:20:14.615+03:00 level=INFO source=node_exporter.go:141 msg=diskstats
+time=2025-11-12T09:20:14.615+03:00 level=INFO source=node_exporter.go:141 msg=dmi
+time=2025-11-12T09:20:14.615+03:00 level=INFO source=node_exporter.go:141 msg=edac
+time=2025-11-12T09:20:14.615+03:00 level=INFO source=node_exporter.go:141 msg=entropy
+time=2025-11-12T09:20:14.615+03:00 level=INFO source=node_exporter.go:141 msg=fibrechannel
+time=2025-11-12T09:20:14.615+03:00 level=INFO source=node_exporter.go:141 msg=filefd
+time=2025-11-12T09:20:14.615+03:00 level=INFO source=node_exporter.go:141 msg=filesystem
+time=2025-11-12T09:20:14.615+03:00 level=INFO source=node_exporter.go:141 msg=hwmon
+time=2025-11-12T09:20:14.615+03:00 level=INFO source=node_exporter.go:141 msg=infiniband
+time=2025-11-12T09:20:14.615+03:00 level=INFO source=node_exporter.go:141 msg=ipvs
+time=2025-11-12T09:20:14.615+03:00 level=INFO source=node_exporter.go:141 msg=loadavg
+time=2025-11-12T09:20:14.615+03:00 level=INFO source=node_exporter.go:141 msg=mdadm
+time=2025-11-12T09:20:14.615+03:00 level=INFO source=node_exporter.go:141 msg=meminfo
+time=2025-11-12T09:20:14.615+03:00 level=INFO source=node_exporter.go:141 msg=netclass
+time=2025-11-12T09:20:14.615+03:00 level=INFO source=node_exporter.go:141 msg=netdev
+time=2025-11-12T09:20:14.615+03:00 level=INFO source=node_exporter.go:141 msg=netstat
+time=2025-11-12T09:20:14.615+03:00 level=INFO source=node_exporter.go:141 msg=nfs
+time=2025-11-12T09:20:14.615+03:00 level=INFO source=node_exporter.go:141 msg=nfsd
+time=2025-11-12T09:20:14.615+03:00 level=INFO source=node_exporter.go:141 msg=nvme
+time=2025-11-12T09:20:14.615+03:00 level=INFO source=node_exporter.go:141 msg=os
+time=2025-11-12T09:20:14.615+03:00 level=INFO source=node_exporter.go:141 msg=powersupplyclass
+time=2025-11-12T09:20:14.615+03:00 level=INFO source=node_exporter.go:141 msg=pressure
+time=2025-11-12T09:20:14.615+03:00 level=INFO source=node_exporter.go:141 msg=rapl
+time=2025-11-12T09:20:14.615+03:00 level=INFO source=node_exporter.go:141 msg=schedstat
+time=2025-11-12T09:20:14.615+03:00 level=INFO source=node_exporter.go:141 msg=selinux
+time=2025-11-12T09:20:14.615+03:00 level=INFO source=node_exporter.go:141 msg=sockstat
+time=2025-11-12T09:20:14.615+03:00 level=INFO source=node_exporter.go:141 msg=softnet
+time=2025-11-12T09:20:14.615+03:00 level=INFO source=node_exporter.go:141 msg=stat
+time=2025-11-12T09:20:14.615+03:00 level=INFO source=node_exporter.go:141 msg=tapestats
+time=2025-11-12T09:20:14.615+03:00 level=INFO source=node_exporter.go:141 msg=textfile
+time=2025-11-12T09:20:14.615+03:00 level=INFO source=node_exporter.go:141 msg=thermal_zone
+time=2025-11-12T09:20:14.615+03:00 level=INFO source=node_exporter.go:141 msg=time
+time=2025-11-12T09:20:14.615+03:00 level=INFO source=node_exporter.go:141 msg=timex
+time=2025-11-12T09:20:14.615+03:00 level=INFO source=node_exporter.go:141 msg=udp_queues
+time=2025-11-12T09:20:14.615+03:00 level=INFO source=node_exporter.go:141 msg=uname
+time=2025-11-12T09:20:14.615+03:00 level=INFO source=node_exporter.go:141 msg=vmstat
+time=2025-11-12T09:20:14.615+03:00 level=INFO source=node_exporter.go:141 msg=watchdog
+time=2025-11-12T09:20:14.615+03:00 level=INFO source=node_exporter.go:141 msg=xfs
+time=2025-11-12T09:20:14.615+03:00 level=INFO source=node_exporter.go:141 msg=zfs
+time=2025-11-12T09:20:14.616+03:00 level=INFO source=tls_config.go:346 msg="Listening on" address=[::]:9100
+time=2025-11-12T09:20:14.616+03:00 level=INFO source=tls_config.go:349 msg="TLS is disabled." http2=false address=[::]:9100
+time=2025-11-13T10:00:02.994+03:00 level=INFO source=node_exporter.go:216 msg="Starting node_exporter" version="(version=1.10.2, branch=HEAD, revision=654f19dee6a0c41de78a8d6d870e8c742cdb43b9)"
+time=2025-11-13T10:00:02.994+03:00 level=INFO source=node_exporter.go:217 msg="Build context" build_context="(go=go1.25.3, platform=linux/amd64, user=root@b29b4019149a, date=20251025-20:05:32, tags=unknown)"
+time=2025-11-13T10:00:02.994+03:00 level=WARN source=node_exporter.go:219 msg="Node Exporter is running as root user. This exporter is designed to run as unprivileged user, root is not required."
+time=2025-11-13T10:00:02.995+03:00 level=INFO source=filesystem_common.go:265 msg="Parsed flag --collector.filesystem.mount-points-exclude" collector=filesystem flag=^/(dev|proc|run/credentials/.+|sys|var/lib/docker/.+|var/lib/containers/storage/.+)($|/)
+time=2025-11-13T10:00:02.995+03:00 level=INFO source=filesystem_common.go:294 msg="Parsed flag --collector.filesystem.fs-types-exclude" collector=filesystem flag=^(autofs|binfmt_misc|bpf|cgroup2?|configfs|debugfs|devpts|devtmpfs|fusectl|hugetlbfs|iso9660|mqueue|nsfs|overlay|proc|procfs|pstore|rpc_pipefs|securityfs|selinuxfs|squashfs|erofs|sysfs|tracefs)$
+time=2025-11-13T10:00:02.995+03:00 level=INFO source=diskstats_common.go:110 msg="Parsed flag --collector.diskstats.device-exclude" collector=diskstats flag=^(z?ram|loop|fd|(h|s|v|xv)d[a-z]|nvme\d+n\d+p)\d+$
+time=2025-11-13T10:00:02.996+03:00 level=INFO source=node_exporter.go:135 msg="Enabled collectors"
+time=2025-11-13T10:00:02.996+03:00 level=INFO source=node_exporter.go:141 msg=arp
+time=2025-11-13T10:00:02.996+03:00 level=INFO source=node_exporter.go:141 msg=bcache
+time=2025-11-13T10:00:02.996+03:00 level=INFO source=node_exporter.go:141 msg=bonding
+time=2025-11-13T10:00:02.996+03:00 level=INFO source=node_exporter.go:141 msg=btrfs
+time=2025-11-13T10:00:02.996+03:00 level=INFO source=node_exporter.go:141 msg=conntrack
+time=2025-11-13T10:00:02.996+03:00 level=INFO source=node_exporter.go:141 msg=cpu
+time=2025-11-13T10:00:02.997+03:00 level=INFO source=node_exporter.go:141 msg=cpufreq
+time=2025-11-13T10:00:02.997+03:00 level=INFO source=node_exporter.go:141 msg=diskstats
+time=2025-11-13T10:00:02.997+03:00 level=INFO source=node_exporter.go:141 msg=dmi
+time=2025-11-13T10:00:02.997+03:00 level=INFO source=node_exporter.go:141 msg=edac
+time=2025-11-13T10:00:02.997+03:00 level=INFO source=node_exporter.go:141 msg=entropy
+time=2025-11-13T10:00:02.997+03:00 level=INFO source=node_exporter.go:141 msg=fibrechannel
+time=2025-11-13T10:00:02.997+03:00 level=INFO source=node_exporter.go:141 msg=filefd
+time=2025-11-13T10:00:02.997+03:00 level=INFO source=node_exporter.go:141 msg=filesystem
+time=2025-11-13T10:00:02.997+03:00 level=INFO source=node_exporter.go:141 msg=hwmon
+time=2025-11-13T10:00:02.997+03:00 level=INFO source=node_exporter.go:141 msg=infiniband
+time=2025-11-13T10:00:02.997+03:00 level=INFO source=node_exporter.go:141 msg=ipvs
+time=2025-11-13T10:00:02.997+03:00 level=INFO source=node_exporter.go:141 msg=loadavg
+time=2025-11-13T10:00:02.997+03:00 level=INFO source=node_exporter.go:141 msg=mdadm
+time=2025-11-13T10:00:02.997+03:00 level=INFO source=node_exporter.go:141 msg=meminfo
+time=2025-11-13T10:00:02.997+03:00 level=INFO source=node_exporter.go:141 msg=netclass
+time=2025-11-13T10:00:02.997+03:00 level=INFO source=node_exporter.go:141 msg=netdev
+time=2025-11-13T10:00:02.997+03:00 level=INFO source=node_exporter.go:141 msg=netstat
+time=2025-11-13T10:00:02.997+03:00 level=INFO source=node_exporter.go:141 msg=nfs
+time=2025-11-13T10:00:02.997+03:00 level=INFO source=node_exporter.go:141 msg=nfsd
+time=2025-11-13T10:00:02.997+03:00 level=INFO source=node_exporter.go:141 msg=nvme
+time=2025-11-13T10:00:02.997+03:00 level=INFO source=node_exporter.go:141 msg=os
+time=2025-11-13T10:00:02.997+03:00 level=INFO source=node_exporter.go:141 msg=powersupplyclass
+time=2025-11-13T10:00:02.997+03:00 level=INFO source=node_exporter.go:141 msg=pressure
+time=2025-11-13T10:00:02.997+03:00 level=INFO source=node_exporter.go:141 msg=rapl
+time=2025-11-13T10:00:02.997+03:00 level=INFO source=node_exporter.go:141 msg=schedstat
+time=2025-11-13T10:00:02.997+03:00 level=INFO source=node_exporter.go:141 msg=selinux
+time=2025-11-13T10:00:02.997+03:00 level=INFO source=node_exporter.go:141 msg=sockstat
+time=2025-11-13T10:00:02.997+03:00 level=INFO source=node_exporter.go:141 msg=softnet
+time=2025-11-13T10:00:02.997+03:00 level=INFO source=node_exporter.go:141 msg=stat
+time=2025-11-13T10:00:02.997+03:00 level=INFO source=node_exporter.go:141 msg=tapestats
+time=2025-11-13T10:00:02.997+03:00 level=INFO source=node_exporter.go:141 msg=textfile
+time=2025-11-13T10:00:02.997+03:00 level=INFO source=node_exporter.go:141 msg=thermal_zone
+time=2025-11-13T10:00:02.997+03:00 level=INFO source=node_exporter.go:141 msg=time
+time=2025-11-13T10:00:02.997+03:00 level=INFO source=node_exporter.go:141 msg=timex
+time=2025-11-13T10:00:02.997+03:00 level=INFO source=node_exporter.go:141 msg=udp_queues
+time=2025-11-13T10:00:02.997+03:00 level=INFO source=node_exporter.go:141 msg=uname
+time=2025-11-13T10:00:02.997+03:00 level=INFO source=node_exporter.go:141 msg=vmstat
+time=2025-11-13T10:00:02.997+03:00 level=INFO source=node_exporter.go:141 msg=watchdog
+time=2025-11-13T10:00:02.997+03:00 level=INFO source=node_exporter.go:141 msg=xfs
+time=2025-11-13T10:00:02.997+03:00 level=INFO source=node_exporter.go:141 msg=zfs
+time=2025-11-13T10:00:02.998+03:00 level=INFO source=tls_config.go:346 msg="Listening on" address=[::]:9100
+time=2025-11-13T10:00:02.998+03:00 level=INFO source=tls_config.go:349 msg="TLS is disabled." http2=false address=[::]:9100
+time=2025-11-13T10:08:10.402+03:00 level=INFO source=node_exporter.go:216 msg="Starting node_exporter" version="(version=1.10.2, branch=HEAD, revision=654f19dee6a0c41de78a8d6d870e8c742cdb43b9)"
+time=2025-11-13T10:08:10.402+03:00 level=INFO source=node_exporter.go:217 msg="Build context" build_context="(go=go1.25.3, platform=linux/amd64, user=root@b29b4019149a, date=20251025-20:05:32, tags=unknown)"
+time=2025-11-13T10:08:10.402+03:00 level=WARN source=node_exporter.go:219 msg="Node Exporter is running as root user. This exporter is designed to run as unprivileged user, root is not required."
+time=2025-11-13T10:08:10.403+03:00 level=INFO source=filesystem_common.go:265 msg="Parsed flag --collector.filesystem.mount-points-exclude" collector=filesystem flag=^/(dev|proc|run/credentials/.+|sys|var/lib/docker/.+|var/lib/containers/storage/.+)($|/)
+time=2025-11-13T10:08:10.403+03:00 level=INFO source=filesystem_common.go:294 msg="Parsed flag --collector.filesystem.fs-types-exclude" collector=filesystem flag=^(autofs|binfmt_misc|bpf|cgroup2?|configfs|debugfs|devpts|devtmpfs|fusectl|hugetlbfs|iso9660|mqueue|nsfs|overlay|proc|procfs|pstore|rpc_pipefs|securityfs|selinuxfs|squashfs|erofs|sysfs|tracefs)$
+time=2025-11-13T10:08:10.403+03:00 level=INFO source=diskstats_common.go:110 msg="Parsed flag --collector.diskstats.device-exclude" collector=diskstats flag=^(z?ram|loop|fd|(h|s|v|xv)d[a-z]|nvme\d+n\d+p)\d+$
+time=2025-11-13T10:08:10.404+03:00 level=INFO source=node_exporter.go:135 msg="Enabled collectors"
+time=2025-11-13T10:08:10.404+03:00 level=INFO source=node_exporter.go:141 msg=arp
+time=2025-11-13T10:08:10.404+03:00 level=INFO source=node_exporter.go:141 msg=bcache
+time=2025-11-13T10:08:10.404+03:00 level=INFO source=node_exporter.go:141 msg=bonding
+time=2025-11-13T10:08:10.404+03:00 level=INFO source=node_exporter.go:141 msg=btrfs
+time=2025-11-13T10:08:10.404+03:00 level=INFO source=node_exporter.go:141 msg=conntrack
+time=2025-11-13T10:08:10.404+03:00 level=INFO source=node_exporter.go:141 msg=cpu
+time=2025-11-13T10:08:10.404+03:00 level=INFO source=node_exporter.go:141 msg=cpufreq
+time=2025-11-13T10:08:10.404+03:00 level=INFO source=node_exporter.go:141 msg=diskstats
+time=2025-11-13T10:08:10.404+03:00 level=INFO source=node_exporter.go:141 msg=dmi
+time=2025-11-13T10:08:10.404+03:00 level=INFO source=node_exporter.go:141 msg=edac
+time=2025-11-13T10:08:10.404+03:00 level=INFO source=node_exporter.go:141 msg=entropy
+time=2025-11-13T10:08:10.404+03:00 level=INFO source=node_exporter.go:141 msg=fibrechannel
+time=2025-11-13T10:08:10.404+03:00 level=INFO source=node_exporter.go:141 msg=filefd
+time=2025-11-13T10:08:10.404+03:00 level=INFO source=node_exporter.go:141 msg=filesystem
+time=2025-11-13T10:08:10.404+03:00 level=INFO source=node_exporter.go:141 msg=hwmon
+time=2025-11-13T10:08:10.404+03:00 level=INFO source=node_exporter.go:141 msg=infiniband
+time=2025-11-13T10:08:10.404+03:00 level=INFO source=node_exporter.go:141 msg=ipvs
+time=2025-11-13T10:08:10.404+03:00 level=INFO source=node_exporter.go:141 msg=loadavg
+time=2025-11-13T10:08:10.404+03:00 level=INFO source=node_exporter.go:141 msg=mdadm
+time=2025-11-13T10:08:10.404+03:00 level=INFO source=node_exporter.go:141 msg=meminfo
+time=2025-11-13T10:08:10.404+03:00 level=INFO source=node_exporter.go:141 msg=netclass
+time=2025-11-13T10:08:10.404+03:00 level=INFO source=node_exporter.go:141 msg=netdev
+time=2025-11-13T10:08:10.404+03:00 level=INFO source=node_exporter.go:141 msg=netstat
+time=2025-11-13T10:08:10.404+03:00 level=INFO source=node_exporter.go:141 msg=nfs
+time=2025-11-13T10:08:10.404+03:00 level=INFO source=node_exporter.go:141 msg=nfsd
+time=2025-11-13T10:08:10.404+03:00 level=INFO source=node_exporter.go:141 msg=nvme
+time=2025-11-13T10:08:10.404+03:00 level=INFO source=node_exporter.go:141 msg=os
+time=2025-11-13T10:08:10.404+03:00 level=INFO source=node_exporter.go:141 msg=powersupplyclass
+time=2025-11-13T10:08:10.404+03:00 level=INFO source=node_exporter.go:141 msg=pressure
+time=2025-11-13T10:08:10.404+03:00 level=INFO source=node_exporter.go:141 msg=rapl
+time=2025-11-13T10:08:10.404+03:00 level=INFO source=node_exporter.go:141 msg=schedstat
+time=2025-11-13T10:08:10.404+03:00 level=INFO source=node_exporter.go:141 msg=selinux
+time=2025-11-13T10:08:10.404+03:00 level=INFO source=node_exporter.go:141 msg=sockstat
+time=2025-11-13T10:08:10.404+03:00 level=INFO source=node_exporter.go:141 msg=softnet
+time=2025-11-13T10:08:10.404+03:00 level=INFO source=node_exporter.go:141 msg=stat
+time=2025-11-13T10:08:10.405+03:00 level=INFO source=node_exporter.go:141 msg=tapestats
+time=2025-11-13T10:08:10.405+03:00 level=INFO source=node_exporter.go:141 msg=textfile
+time=2025-11-13T10:08:10.405+03:00 level=INFO source=node_exporter.go:141 msg=thermal_zone
+time=2025-11-13T10:08:10.405+03:00 level=INFO source=node_exporter.go:141 msg=time
+time=2025-11-13T10:08:10.405+03:00 level=INFO source=node_exporter.go:141 msg=timex
+time=2025-11-13T10:08:10.405+03:00 level=INFO source=node_exporter.go:141 msg=udp_queues
+time=2025-11-13T10:08:10.405+03:00 level=INFO source=node_exporter.go:141 msg=uname
+time=2025-11-13T10:08:10.405+03:00 level=INFO source=node_exporter.go:141 msg=vmstat
+time=2025-11-13T10:08:10.405+03:00 level=INFO source=node_exporter.go:141 msg=watchdog
+time=2025-11-13T10:08:10.405+03:00 level=INFO source=node_exporter.go:141 msg=xfs
+time=2025-11-13T10:08:10.405+03:00 level=INFO source=node_exporter.go:141 msg=zfs
+time=2025-11-13T10:08:10.405+03:00 level=INFO source=tls_config.go:346 msg="Listening on" address=[::]:9100
+time=2025-11-13T10:08:10.405+03:00 level=INFO source=tls_config.go:349 msg="TLS is disabled." http2=false address=[::]:9100
+time=2025-11-13T10:10:19.734+03:00 level=INFO source=node_exporter.go:216 msg="Starting node_exporter" version="(version=1.10.2, branch=HEAD, revision=654f19dee6a0c41de78a8d6d870e8c742cdb43b9)"
+time=2025-11-13T10:10:19.734+03:00 level=INFO source=node_exporter.go:217 msg="Build context" build_context="(go=go1.25.3, platform=linux/amd64, user=root@b29b4019149a, date=20251025-20:05:32, tags=unknown)"
+time=2025-11-13T10:10:19.734+03:00 level=WARN source=node_exporter.go:219 msg="Node Exporter is running as root user. This exporter is designed to run as unprivileged user, root is not required."
+time=2025-11-13T10:10:19.735+03:00 level=INFO source=diskstats_common.go:110 msg="Parsed flag --collector.diskstats.device-exclude" collector=diskstats flag=^(z?ram|loop|fd|(h|s|v|xv)d[a-z]|nvme\d+n\d+p)\d+$
+time=2025-11-13T10:10:19.736+03:00 level=INFO source=filesystem_common.go:265 msg="Parsed flag --collector.filesystem.mount-points-exclude" collector=filesystem flag=^/(dev|proc|run/credentials/.+|sys|var/lib/docker/.+|var/lib/containers/storage/.+)($|/)
+time=2025-11-13T10:10:19.736+03:00 level=INFO source=filesystem_common.go:294 msg="Parsed flag --collector.filesystem.fs-types-exclude" collector=filesystem flag=^(autofs|binfmt_misc|bpf|cgroup2?|configfs|debugfs|devpts|devtmpfs|fusectl|hugetlbfs|iso9660|mqueue|nsfs|overlay|proc|procfs|pstore|rpc_pipefs|securityfs|selinuxfs|squashfs|erofs|sysfs|tracefs)$
+time=2025-11-13T10:10:19.737+03:00 level=INFO source=node_exporter.go:135 msg="Enabled collectors"
+time=2025-11-13T10:10:19.737+03:00 level=INFO source=node_exporter.go:141 msg=arp
+time=2025-11-13T10:10:19.737+03:00 level=INFO source=node_exporter.go:141 msg=bcache
+time=2025-11-13T10:10:19.737+03:00 level=INFO source=node_exporter.go:141 msg=bonding
+time=2025-11-13T10:10:19.737+03:00 level=INFO source=node_exporter.go:141 msg=btrfs
+time=2025-11-13T10:10:19.737+03:00 level=INFO source=node_exporter.go:141 msg=conntrack
+time=2025-11-13T10:10:19.737+03:00 level=INFO source=node_exporter.go:141 msg=cpu
+time=2025-11-13T10:10:19.737+03:00 level=INFO source=node_exporter.go:141 msg=cpufreq
+time=2025-11-13T10:10:19.737+03:00 level=INFO source=node_exporter.go:141 msg=diskstats
+time=2025-11-13T10:10:19.737+03:00 level=INFO source=node_exporter.go:141 msg=dmi
+time=2025-11-13T10:10:19.737+03:00 level=INFO source=node_exporter.go:141 msg=edac
+time=2025-11-13T10:10:19.737+03:00 level=INFO source=node_exporter.go:141 msg=entropy
+time=2025-11-13T10:10:19.737+03:00 level=INFO source=node_exporter.go:141 msg=fibrechannel
+time=2025-11-13T10:10:19.737+03:00 level=INFO source=node_exporter.go:141 msg=filefd
+time=2025-11-13T10:10:19.737+03:00 level=INFO source=node_exporter.go:141 msg=filesystem
+time=2025-11-13T10:10:19.737+03:00 level=INFO source=node_exporter.go:141 msg=hwmon
+time=2025-11-13T10:10:19.737+03:00 level=INFO source=node_exporter.go:141 msg=infiniband
+time=2025-11-13T10:10:19.737+03:00 level=INFO source=node_exporter.go:141 msg=ipvs
+time=2025-11-13T10:10:19.738+03:00 level=INFO source=node_exporter.go:141 msg=loadavg
+time=2025-11-13T10:10:19.738+03:00 level=INFO source=node_exporter.go:141 msg=mdadm
+time=2025-11-13T10:10:19.738+03:00 level=INFO source=node_exporter.go:141 msg=meminfo
+time=2025-11-13T10:10:19.738+03:00 level=INFO source=node_exporter.go:141 msg=netclass
+time=2025-11-13T10:10:19.738+03:00 level=INFO source=node_exporter.go:141 msg=netdev
+time=2025-11-13T10:10:19.738+03:00 level=INFO source=node_exporter.go:141 msg=netstat
+time=2025-11-13T10:10:19.738+03:00 level=INFO source=node_exporter.go:141 msg=nfs
+time=2025-11-13T10:10:19.738+03:00 level=INFO source=node_exporter.go:141 msg=nfsd
+time=2025-11-13T10:10:19.738+03:00 level=INFO source=node_exporter.go:141 msg=nvme
+time=2025-11-13T10:10:19.738+03:00 level=INFO source=node_exporter.go:141 msg=os
+time=2025-11-13T10:10:19.738+03:00 level=INFO source=node_exporter.go:141 msg=powersupplyclass
+time=2025-11-13T10:10:19.738+03:00 level=INFO source=node_exporter.go:141 msg=pressure
+time=2025-11-13T10:10:19.738+03:00 level=INFO source=node_exporter.go:141 msg=rapl
+time=2025-11-13T10:10:19.738+03:00 level=INFO source=node_exporter.go:141 msg=schedstat
+time=2025-11-13T10:10:19.738+03:00 level=INFO source=node_exporter.go:141 msg=selinux
+time=2025-11-13T10:10:19.738+03:00 level=INFO source=node_exporter.go:141 msg=sockstat
+time=2025-11-13T10:10:19.738+03:00 level=INFO source=node_exporter.go:141 msg=softnet
+time=2025-11-13T10:10:19.738+03:00 level=INFO source=node_exporter.go:141 msg=stat
+time=2025-11-13T10:10:19.738+03:00 level=INFO source=node_exporter.go:141 msg=tapestats
+time=2025-11-13T10:10:19.738+03:00 level=INFO source=node_exporter.go:141 msg=textfile
+time=2025-11-13T10:10:19.738+03:00 level=INFO source=node_exporter.go:141 msg=thermal_zone
+time=2025-11-13T10:10:19.738+03:00 level=INFO source=node_exporter.go:141 msg=time
+time=2025-11-13T10:10:19.738+03:00 level=INFO source=node_exporter.go:141 msg=timex
+time=2025-11-13T10:10:19.738+03:00 level=INFO source=node_exporter.go:141 msg=udp_queues
+time=2025-11-13T10:10:19.738+03:00 level=INFO source=node_exporter.go:141 msg=uname
+time=2025-11-13T10:10:19.738+03:00 level=INFO source=node_exporter.go:141 msg=vmstat
+time=2025-11-13T10:10:19.738+03:00 level=INFO source=node_exporter.go:141 msg=watchdog
+time=2025-11-13T10:10:19.738+03:00 level=INFO source=node_exporter.go:141 msg=xfs
+time=2025-11-13T10:10:19.738+03:00 level=INFO source=node_exporter.go:141 msg=zfs
+time=2025-11-13T10:10:19.739+03:00 level=ERROR source=node_exporter.go:247 msg="listen tcp :9100: bind: address already in use"
+time=2025-11-13T20:08:11.807+03:00 level=INFO source=node_exporter.go:216 msg="Starting node_exporter" version="(version=1.10.2, branch=HEAD, revision=654f19dee6a0c41de78a8d6d870e8c742cdb43b9)"
+time=2025-11-13T20:08:11.818+03:00 level=INFO source=node_exporter.go:217 msg="Build context" build_context="(go=go1.25.3, platform=linux/amd64, user=root@b29b4019149a, date=20251025-20:05:32, tags=unknown)"
+time=2025-11-13T20:08:11.818+03:00 level=WARN source=node_exporter.go:219 msg="Node Exporter is running as root user. This exporter is designed to run as unprivileged user, root is not required."
+time=2025-11-13T20:08:11.826+03:00 level=INFO source=filesystem_common.go:265 msg="Parsed flag --collector.filesystem.mount-points-exclude" collector=filesystem flag=^/(dev|proc|run/credentials/.+|sys|var/lib/docker/.+|var/lib/containers/storage/.+)($|/)
+time=2025-11-13T20:08:11.827+03:00 level=INFO source=filesystem_common.go:294 msg="Parsed flag --collector.filesystem.fs-types-exclude" collector=filesystem flag=^(autofs|binfmt_misc|bpf|cgroup2?|configfs|debugfs|devpts|devtmpfs|fusectl|hugetlbfs|iso9660|mqueue|nsfs|overlay|proc|procfs|pstore|rpc_pipefs|securityfs|selinuxfs|squashfs|erofs|sysfs|tracefs)$
+time=2025-11-13T20:08:11.901+03:00 level=INFO source=diskstats_common.go:110 msg="Parsed flag --collector.diskstats.device-exclude" collector=diskstats flag=^(z?ram|loop|fd|(h|s|v|xv)d[a-z]|nvme\d+n\d+p)\d+$
+time=2025-11-13T20:08:11.902+03:00 level=INFO source=node_exporter.go:135 msg="Enabled collectors"
+time=2025-11-13T20:08:11.902+03:00 level=INFO source=node_exporter.go:141 msg=arp
+time=2025-11-13T20:08:11.902+03:00 level=INFO source=node_exporter.go:141 msg=bcache
+time=2025-11-13T20:08:11.902+03:00 level=INFO source=node_exporter.go:141 msg=bonding
+time=2025-11-13T20:08:11.902+03:00 level=INFO source=node_exporter.go:141 msg=btrfs
+time=2025-11-13T20:08:11.902+03:00 level=INFO source=node_exporter.go:141 msg=conntrack
+time=2025-11-13T20:08:11.902+03:00 level=INFO source=node_exporter.go:141 msg=cpu
+time=2025-11-13T20:08:11.903+03:00 level=INFO source=node_exporter.go:141 msg=cpufreq
+time=2025-11-13T20:08:11.903+03:00 level=INFO source=node_exporter.go:141 msg=diskstats
+time=2025-11-13T20:08:11.903+03:00 level=INFO source=node_exporter.go:141 msg=dmi
+time=2025-11-13T20:08:11.903+03:00 level=INFO source=node_exporter.go:141 msg=edac
+time=2025-11-13T20:08:11.903+03:00 level=INFO source=node_exporter.go:141 msg=entropy
+time=2025-11-13T20:08:11.903+03:00 level=INFO source=node_exporter.go:141 msg=fibrechannel
+time=2025-11-13T20:08:11.903+03:00 level=INFO source=node_exporter.go:141 msg=filefd
+time=2025-11-13T20:08:11.903+03:00 level=INFO source=node_exporter.go:141 msg=filesystem
+time=2025-11-13T20:08:11.903+03:00 level=INFO source=node_exporter.go:141 msg=hwmon
+time=2025-11-13T20:08:11.903+03:00 level=INFO source=node_exporter.go:141 msg=infiniband
+time=2025-11-13T20:08:11.903+03:00 level=INFO source=node_exporter.go:141 msg=ipvs
+time=2025-11-13T20:08:11.903+03:00 level=INFO source=node_exporter.go:141 msg=loadavg
+time=2025-11-13T20:08:11.903+03:00 level=INFO source=node_exporter.go:141 msg=mdadm
+time=2025-11-13T20:08:11.903+03:00 level=INFO source=node_exporter.go:141 msg=meminfo
+time=2025-11-13T20:08:11.903+03:00 level=INFO source=node_exporter.go:141 msg=netclass
+time=2025-11-13T20:08:11.903+03:00 level=INFO source=node_exporter.go:141 msg=netdev
+time=2025-11-13T20:08:11.903+03:00 level=INFO source=node_exporter.go:141 msg=netstat
+time=2025-11-13T20:08:11.903+03:00 level=INFO source=node_exporter.go:141 msg=nfs
+time=2025-11-13T20:08:11.903+03:00 level=INFO source=node_exporter.go:141 msg=nfsd
+time=2025-11-13T20:08:11.903+03:00 level=INFO source=node_exporter.go:141 msg=nvme
+time=2025-11-13T20:08:11.903+03:00 level=INFO source=node_exporter.go:141 msg=os
+time=2025-11-13T20:08:11.903+03:00 level=INFO source=node_exporter.go:141 msg=powersupplyclass
+time=2025-11-13T20:08:11.903+03:00 level=INFO source=node_exporter.go:141 msg=pressure
+time=2025-11-13T20:08:11.903+03:00 level=INFO source=node_exporter.go:141 msg=rapl
+time=2025-11-13T20:08:11.903+03:00 level=INFO source=node_exporter.go:141 msg=schedstat
+time=2025-11-13T20:08:11.903+03:00 level=INFO source=node_exporter.go:141 msg=selinux
+time=2025-11-13T20:08:11.903+03:00 level=INFO source=node_exporter.go:141 msg=sockstat
+time=2025-11-13T20:08:11.903+03:00 level=INFO source=node_exporter.go:141 msg=softnet
+time=2025-11-13T20:08:11.903+03:00 level=INFO source=node_exporter.go:141 msg=stat
+time=2025-11-13T20:08:11.903+03:00 level=INFO source=node_exporter.go:141 msg=tapestats
+time=2025-11-13T20:08:11.903+03:00 level=INFO source=node_exporter.go:141 msg=textfile
+time=2025-11-13T20:08:11.903+03:00 level=INFO source=node_exporter.go:141 msg=thermal_zone
+time=2025-11-13T20:08:11.903+03:00 level=INFO source=node_exporter.go:141 msg=time
+time=2025-11-13T20:08:11.903+03:00 level=INFO source=node_exporter.go:141 msg=timex
+time=2025-11-13T20:08:11.903+03:00 level=INFO source=node_exporter.go:141 msg=udp_queues
+time=2025-11-13T20:08:11.903+03:00 level=INFO source=node_exporter.go:141 msg=uname
+time=2025-11-13T20:08:11.903+03:00 level=INFO source=node_exporter.go:141 msg=vmstat
+time=2025-11-13T20:08:11.903+03:00 level=INFO source=node_exporter.go:141 msg=watchdog
+time=2025-11-13T20:08:11.903+03:00 level=INFO source=node_exporter.go:141 msg=xfs
+time=2025-11-13T20:08:11.903+03:00 level=INFO source=node_exporter.go:141 msg=zfs
+time=2025-11-13T20:08:11.904+03:00 level=INFO source=tls_config.go:346 msg="Listening on" address=[::]:9100
+time=2025-11-13T20:08:11.904+03:00 level=INFO source=tls_config.go:349 msg="TLS is disabled." http2=false address=[::]:9100
+time=2025-11-14T10:34:07.738+03:00 level=INFO source=node_exporter.go:216 msg="Starting node_exporter" version="(version=1.10.2, branch=HEAD, revision=654f19dee6a0c41de78a8d6d870e8c742cdb43b9)"
+time=2025-11-14T10:34:07.877+03:00 level=INFO source=node_exporter.go:217 msg="Build context" build_context="(go=go1.25.3, platform=linux/amd64, user=root@b29b4019149a, date=20251025-20:05:32, tags=unknown)"
+time=2025-11-14T10:34:07.877+03:00 level=WARN source=node_exporter.go:219 msg="Node Exporter is running as root user. This exporter is designed to run as unprivileged user, root is not required."
+time=2025-11-14T10:34:08.090+03:00 level=INFO source=filesystem_common.go:265 msg="Parsed flag --collector.filesystem.mount-points-exclude" collector=filesystem flag=^/(dev|proc|run/credentials/.+|sys|var/lib/docker/.+|var/lib/containers/storage/.+)($|/)
+time=2025-11-14T10:34:08.090+03:00 level=INFO source=filesystem_common.go:294 msg="Parsed flag --collector.filesystem.fs-types-exclude" collector=filesystem flag=^(autofs|binfmt_misc|bpf|cgroup2?|configfs|debugfs|devpts|devtmpfs|fusectl|hugetlbfs|iso9660|mqueue|nsfs|overlay|proc|procfs|pstore|rpc_pipefs|securityfs|selinuxfs|squashfs|erofs|sysfs|tracefs)$
+time=2025-11-14T10:34:08.092+03:00 level=INFO source=diskstats_common.go:110 msg="Parsed flag --collector.diskstats.device-exclude" collector=diskstats flag=^(z?ram|loop|fd|(h|s|v|xv)d[a-z]|nvme\d+n\d+p)\d+$
+time=2025-11-14T10:34:08.092+03:00 level=INFO source=node_exporter.go:135 msg="Enabled collectors"
+time=2025-11-14T10:34:08.092+03:00 level=INFO source=node_exporter.go:141 msg=arp
+time=2025-11-14T10:34:08.092+03:00 level=INFO source=node_exporter.go:141 msg=bcache
+time=2025-11-14T10:34:08.092+03:00 level=INFO source=node_exporter.go:141 msg=bonding
+time=2025-11-14T10:34:08.092+03:00 level=INFO source=node_exporter.go:141 msg=btrfs
+time=2025-11-14T10:34:08.092+03:00 level=INFO source=node_exporter.go:141 msg=conntrack
+time=2025-11-14T10:34:08.092+03:00 level=INFO source=node_exporter.go:141 msg=cpu
+time=2025-11-14T10:34:08.092+03:00 level=INFO source=node_exporter.go:141 msg=cpufreq
+time=2025-11-14T10:34:08.092+03:00 level=INFO source=node_exporter.go:141 msg=diskstats
+time=2025-11-14T10:34:08.092+03:00 level=INFO source=node_exporter.go:141 msg=dmi
+time=2025-11-14T10:34:08.092+03:00 level=INFO source=node_exporter.go:141 msg=edac
+time=2025-11-14T10:34:08.092+03:00 level=INFO source=node_exporter.go:141 msg=entropy
+time=2025-11-14T10:34:08.092+03:00 level=INFO source=node_exporter.go:141 msg=fibrechannel
+time=2025-11-14T10:34:08.092+03:00 level=INFO source=node_exporter.go:141 msg=filefd
+time=2025-11-14T10:34:08.092+03:00 level=INFO source=node_exporter.go:141 msg=filesystem
+time=2025-11-14T10:34:08.092+03:00 level=INFO source=node_exporter.go:141 msg=hwmon
+time=2025-11-14T10:34:08.092+03:00 level=INFO source=node_exporter.go:141 msg=infiniband
+time=2025-11-14T10:34:08.092+03:00 level=INFO source=node_exporter.go:141 msg=ipvs
+time=2025-11-14T10:34:08.092+03:00 level=INFO source=node_exporter.go:141 msg=loadavg
+time=2025-11-14T10:34:08.092+03:00 level=INFO source=node_exporter.go:141 msg=mdadm
+time=2025-11-14T10:34:08.092+03:00 level=INFO source=node_exporter.go:141 msg=meminfo
+time=2025-11-14T10:34:08.092+03:00 level=INFO source=node_exporter.go:141 msg=netclass
+time=2025-11-14T10:34:08.092+03:00 level=INFO source=node_exporter.go:141 msg=netdev
+time=2025-11-14T10:34:08.092+03:00 level=INFO source=node_exporter.go:141 msg=netstat
+time=2025-11-14T10:34:08.092+03:00 level=INFO source=node_exporter.go:141 msg=nfs
+time=2025-11-14T10:34:08.092+03:00 level=INFO source=node_exporter.go:141 msg=nfsd
+time=2025-11-14T10:34:08.092+03:00 level=INFO source=node_exporter.go:141 msg=nvme
+time=2025-11-14T10:34:08.092+03:00 level=INFO source=node_exporter.go:141 msg=os
+time=2025-11-14T10:34:08.092+03:00 level=INFO source=node_exporter.go:141 msg=powersupplyclass
+time=2025-11-14T10:34:08.092+03:00 level=INFO source=node_exporter.go:141 msg=pressure
+time=2025-11-14T10:34:08.092+03:00 level=INFO source=node_exporter.go:141 msg=rapl
+time=2025-11-14T10:34:08.092+03:00 level=INFO source=node_exporter.go:141 msg=schedstat
+time=2025-11-14T10:34:08.092+03:00 level=INFO source=node_exporter.go:141 msg=selinux
+time=2025-11-14T10:34:08.092+03:00 level=INFO source=node_exporter.go:141 msg=sockstat
+time=2025-11-14T10:34:08.092+03:00 level=INFO source=node_exporter.go:141 msg=softnet
+time=2025-11-14T10:34:08.092+03:00 level=INFO source=node_exporter.go:141 msg=stat
+time=2025-11-14T10:34:08.092+03:00 level=INFO source=node_exporter.go:141 msg=tapestats
+time=2025-11-14T10:34:08.092+03:00 level=INFO source=node_exporter.go:141 msg=textfile
+time=2025-11-14T10:34:08.092+03:00 level=INFO source=node_exporter.go:141 msg=thermal_zone
+time=2025-11-14T10:34:08.092+03:00 level=INFO source=node_exporter.go:141 msg=time
+time=2025-11-14T10:34:08.092+03:00 level=INFO source=node_exporter.go:141 msg=timex
+time=2025-11-14T10:34:08.092+03:00 level=INFO source=node_exporter.go:141 msg=udp_queues
+time=2025-11-14T10:34:08.092+03:00 level=INFO source=node_exporter.go:141 msg=uname
+time=2025-11-14T10:34:08.092+03:00 level=INFO source=node_exporter.go:141 msg=vmstat
+time=2025-11-14T10:34:08.092+03:00 level=INFO source=node_exporter.go:141 msg=watchdog
+time=2025-11-14T10:34:08.092+03:00 level=INFO source=node_exporter.go:141 msg=xfs
+time=2025-11-14T10:34:08.092+03:00 level=INFO source=node_exporter.go:141 msg=zfs
+time=2025-11-14T10:34:08.093+03:00 level=INFO source=tls_config.go:346 msg="Listening on" address=[::]:9100
+time=2025-11-14T10:34:08.093+03:00 level=INFO source=tls_config.go:349 msg="TLS is disabled." http2=false address=[::]:9100
+time=2025-11-15T20:08:24.356+03:00 level=INFO source=node_exporter.go:216 msg="Starting node_exporter" version="(version=1.10.2, branch=HEAD, revision=654f19dee6a0c41de78a8d6d870e8c742cdb43b9)"
+time=2025-11-15T20:08:24.396+03:00 level=INFO source=node_exporter.go:217 msg="Build context" build_context="(go=go1.25.3, platform=linux/amd64, user=root@b29b4019149a, date=20251025-20:05:32, tags=unknown)"
+time=2025-11-15T20:08:24.396+03:00 level=WARN source=node_exporter.go:219 msg="Node Exporter is running as root user. This exporter is designed to run as unprivileged user, root is not required."
+time=2025-11-15T20:08:24.411+03:00 level=INFO source=filesystem_common.go:265 msg="Parsed flag --collector.filesystem.mount-points-exclude" collector=filesystem flag=^/(dev|proc|run/credentials/.+|sys|var/lib/docker/.+|var/lib/containers/storage/.+)($|/)
+time=2025-11-15T20:08:24.412+03:00 level=INFO source=filesystem_common.go:294 msg="Parsed flag --collector.filesystem.fs-types-exclude" collector=filesystem flag=^(autofs|binfmt_misc|bpf|cgroup2?|configfs|debugfs|devpts|devtmpfs|fusectl|hugetlbfs|iso9660|mqueue|nsfs|overlay|proc|procfs|pstore|rpc_pipefs|securityfs|selinuxfs|squashfs|erofs|sysfs|tracefs)$
+time=2025-11-15T20:08:24.412+03:00 level=INFO source=diskstats_common.go:110 msg="Parsed flag --collector.diskstats.device-exclude" collector=diskstats flag=^(z?ram|loop|fd|(h|s|v|xv)d[a-z]|nvme\d+n\d+p)\d+$
+time=2025-11-15T20:08:24.413+03:00 level=INFO source=node_exporter.go:135 msg="Enabled collectors"
+time=2025-11-15T20:08:24.413+03:00 level=INFO source=node_exporter.go:141 msg=arp
+time=2025-11-15T20:08:24.413+03:00 level=INFO source=node_exporter.go:141 msg=bcache
+time=2025-11-15T20:08:24.413+03:00 level=INFO source=node_exporter.go:141 msg=bonding
+time=2025-11-15T20:08:24.413+03:00 level=INFO source=node_exporter.go:141 msg=btrfs
+time=2025-11-15T20:08:24.413+03:00 level=INFO source=node_exporter.go:141 msg=conntrack
+time=2025-11-15T20:08:24.413+03:00 level=INFO source=node_exporter.go:141 msg=cpu
+time=2025-11-15T20:08:24.413+03:00 level=INFO source=node_exporter.go:141 msg=cpufreq
+time=2025-11-15T20:08:24.413+03:00 level=INFO source=node_exporter.go:141 msg=diskstats
+time=2025-11-15T20:08:24.413+03:00 level=INFO source=node_exporter.go:141 msg=dmi
+time=2025-11-15T20:08:24.413+03:00 level=INFO source=node_exporter.go:141 msg=edac
+time=2025-11-15T20:08:24.413+03:00 level=INFO source=node_exporter.go:141 msg=entropy
+time=2025-11-15T20:08:24.413+03:00 level=INFO source=node_exporter.go:141 msg=fibrechannel
+time=2025-11-15T20:08:24.413+03:00 level=INFO source=node_exporter.go:141 msg=filefd
+time=2025-11-15T20:08:24.413+03:00 level=INFO source=node_exporter.go:141 msg=filesystem
+time=2025-11-15T20:08:24.413+03:00 level=INFO source=node_exporter.go:141 msg=hwmon
+time=2025-11-15T20:08:24.413+03:00 level=INFO source=node_exporter.go:141 msg=infiniband
+time=2025-11-15T20:08:24.413+03:00 level=INFO source=node_exporter.go:141 msg=ipvs
+time=2025-11-15T20:08:24.413+03:00 level=INFO source=node_exporter.go:141 msg=loadavg
+time=2025-11-15T20:08:24.413+03:00 level=INFO source=node_exporter.go:141 msg=mdadm
+time=2025-11-15T20:08:24.413+03:00 level=INFO source=node_exporter.go:141 msg=meminfo
+time=2025-11-15T20:08:24.413+03:00 level=INFO source=node_exporter.go:141 msg=netclass
+time=2025-11-15T20:08:24.413+03:00 level=INFO source=node_exporter.go:141 msg=netdev
+time=2025-11-15T20:08:24.414+03:00 level=INFO source=node_exporter.go:141 msg=netstat
+time=2025-11-15T20:08:24.414+03:00 level=INFO source=node_exporter.go:141 msg=nfs
+time=2025-11-15T20:08:24.414+03:00 level=INFO source=node_exporter.go:141 msg=nfsd
+time=2025-11-15T20:08:24.414+03:00 level=INFO source=node_exporter.go:141 msg=nvme
+time=2025-11-15T20:08:24.414+03:00 level=INFO source=node_exporter.go:141 msg=os
+time=2025-11-15T20:08:24.414+03:00 level=INFO source=node_exporter.go:141 msg=powersupplyclass
+time=2025-11-15T20:08:24.414+03:00 level=INFO source=node_exporter.go:141 msg=pressure
+time=2025-11-15T20:08:24.414+03:00 level=INFO source=node_exporter.go:141 msg=rapl
+time=2025-11-15T20:08:24.414+03:00 level=INFO source=node_exporter.go:141 msg=schedstat
+time=2025-11-15T20:08:24.414+03:00 level=INFO source=node_exporter.go:141 msg=selinux
+time=2025-11-15T20:08:24.414+03:00 level=INFO source=node_exporter.go:141 msg=sockstat
+time=2025-11-15T20:08:24.414+03:00 level=INFO source=node_exporter.go:141 msg=softnet
+time=2025-11-15T20:08:24.414+03:00 level=INFO source=node_exporter.go:141 msg=stat
+time=2025-11-15T20:08:24.414+03:00 level=INFO source=node_exporter.go:141 msg=tapestats
+time=2025-11-15T20:08:24.414+03:00 level=INFO source=node_exporter.go:141 msg=textfile
+time=2025-11-15T20:08:24.414+03:00 level=INFO source=node_exporter.go:141 msg=thermal_zone
+time=2025-11-15T20:08:24.414+03:00 level=INFO source=node_exporter.go:141 msg=time
+time=2025-11-15T20:08:24.414+03:00 level=INFO source=node_exporter.go:141 msg=timex
+time=2025-11-15T20:08:24.414+03:00 level=INFO source=node_exporter.go:141 msg=udp_queues
+time=2025-11-15T20:08:24.414+03:00 level=INFO source=node_exporter.go:141 msg=uname
+time=2025-11-15T20:08:24.414+03:00 level=INFO source=node_exporter.go:141 msg=vmstat
+time=2025-11-15T20:08:24.414+03:00 level=INFO source=node_exporter.go:141 msg=watchdog
+time=2025-11-15T20:08:24.414+03:00 level=INFO source=node_exporter.go:141 msg=xfs
+time=2025-11-15T20:08:24.414+03:00 level=INFO source=node_exporter.go:141 msg=zfs
+time=2025-11-15T20:08:24.415+03:00 level=INFO source=tls_config.go:346 msg="Listening on" address=[::]:9100
+time=2025-11-15T20:08:24.415+03:00 level=INFO source=tls_config.go:349 msg="TLS is disabled." http2=false address=[::]:9100
+time=2025-11-17T19:46:39.121+03:00 level=INFO source=node_exporter.go:216 msg="Starting node_exporter" version="(version=1.10.2, branch=HEAD, revision=654f19dee6a0c41de78a8d6d870e8c742cdb43b9)"
+time=2025-11-17T19:46:39.163+03:00 level=INFO source=node_exporter.go:217 msg="Build context" build_context="(go=go1.25.3, platform=linux/amd64, user=root@b29b4019149a, date=20251025-20:05:32, tags=unknown)"
+time=2025-11-17T19:46:39.164+03:00 level=WARN source=node_exporter.go:219 msg="Node Exporter is running as root user. This exporter is designed to run as unprivileged user, root is not required."
+time=2025-11-17T19:46:39.169+03:00 level=INFO source=filesystem_common.go:265 msg="Parsed flag --collector.filesystem.mount-points-exclude" collector=filesystem flag=^/(dev|proc|run/credentials/.+|sys|var/lib/docker/.+|var/lib/containers/storage/.+)($|/)
+time=2025-11-17T19:46:39.169+03:00 level=INFO source=filesystem_common.go:294 msg="Parsed flag --collector.filesystem.fs-types-exclude" collector=filesystem flag=^(autofs|binfmt_misc|bpf|cgroup2?|configfs|debugfs|devpts|devtmpfs|fusectl|hugetlbfs|iso9660|mqueue|nsfs|overlay|proc|procfs|pstore|rpc_pipefs|securityfs|selinuxfs|squashfs|erofs|sysfs|tracefs)$
+time=2025-11-17T19:46:39.170+03:00 level=INFO source=diskstats_common.go:110 msg="Parsed flag --collector.diskstats.device-exclude" collector=diskstats flag=^(z?ram|loop|fd|(h|s|v|xv)d[a-z]|nvme\d+n\d+p)\d+$
+time=2025-11-17T19:46:39.171+03:00 level=INFO source=node_exporter.go:135 msg="Enabled collectors"
+time=2025-11-17T19:46:39.171+03:00 level=INFO source=node_exporter.go:141 msg=arp
+time=2025-11-17T19:46:39.171+03:00 level=INFO source=node_exporter.go:141 msg=bcache
+time=2025-11-17T19:46:39.171+03:00 level=INFO source=node_exporter.go:141 msg=bonding
+time=2025-11-17T19:46:39.171+03:00 level=INFO source=node_exporter.go:141 msg=btrfs
+time=2025-11-17T19:46:39.171+03:00 level=INFO source=node_exporter.go:141 msg=conntrack
+time=2025-11-17T19:46:39.171+03:00 level=INFO source=node_exporter.go:141 msg=cpu
+time=2025-11-17T19:46:39.171+03:00 level=INFO source=node_exporter.go:141 msg=cpufreq
+time=2025-11-17T19:46:39.171+03:00 level=INFO source=node_exporter.go:141 msg=diskstats
+time=2025-11-17T19:46:39.171+03:00 level=INFO source=node_exporter.go:141 msg=dmi
+time=2025-11-17T19:46:39.171+03:00 level=INFO source=node_exporter.go:141 msg=edac
+time=2025-11-17T19:46:39.171+03:00 level=INFO source=node_exporter.go:141 msg=entropy
+time=2025-11-17T19:46:39.171+03:00 level=INFO source=node_exporter.go:141 msg=fibrechannel
+time=2025-11-17T19:46:39.171+03:00 level=INFO source=node_exporter.go:141 msg=filefd
+time=2025-11-17T19:46:39.171+03:00 level=INFO source=node_exporter.go:141 msg=filesystem
+time=2025-11-17T19:46:39.171+03:00 level=INFO source=node_exporter.go:141 msg=hwmon
+time=2025-11-17T19:46:39.171+03:00 level=INFO source=node_exporter.go:141 msg=infiniband
+time=2025-11-17T19:46:39.171+03:00 level=INFO source=node_exporter.go:141 msg=ipvs
+time=2025-11-17T19:46:39.171+03:00 level=INFO source=node_exporter.go:141 msg=loadavg
+time=2025-11-17T19:46:39.171+03:00 level=INFO source=node_exporter.go:141 msg=mdadm
+time=2025-11-17T19:46:39.171+03:00 level=INFO source=node_exporter.go:141 msg=meminfo
+time=2025-11-17T19:46:39.171+03:00 level=INFO source=node_exporter.go:141 msg=netclass
+time=2025-11-17T19:46:39.171+03:00 level=INFO source=node_exporter.go:141 msg=netdev
+time=2025-11-17T19:46:39.171+03:00 level=INFO source=node_exporter.go:141 msg=netstat
+time=2025-11-17T19:46:39.171+03:00 level=INFO source=node_exporter.go:141 msg=nfs
+time=2025-11-17T19:46:39.171+03:00 level=INFO source=node_exporter.go:141 msg=nfsd
+time=2025-11-17T19:46:39.171+03:00 level=INFO source=node_exporter.go:141 msg=nvme
+time=2025-11-17T19:46:39.171+03:00 level=INFO source=node_exporter.go:141 msg=os
+time=2025-11-17T19:46:39.171+03:00 level=INFO source=node_exporter.go:141 msg=powersupplyclass
+time=2025-11-17T19:46:39.171+03:00 level=INFO source=node_exporter.go:141 msg=pressure
+time=2025-11-17T19:46:39.171+03:00 level=INFO source=node_exporter.go:141 msg=rapl
+time=2025-11-17T19:46:39.171+03:00 level=INFO source=node_exporter.go:141 msg=schedstat
+time=2025-11-17T19:46:39.171+03:00 level=INFO source=node_exporter.go:141 msg=selinux
+time=2025-11-17T19:46:39.171+03:00 level=INFO source=node_exporter.go:141 msg=sockstat
+time=2025-11-17T19:46:39.171+03:00 level=INFO source=node_exporter.go:141 msg=softnet
+time=2025-11-17T19:46:39.171+03:00 level=INFO source=node_exporter.go:141 msg=stat
+time=2025-11-17T19:46:39.171+03:00 level=INFO source=node_exporter.go:141 msg=tapestats
+time=2025-11-17T19:46:39.171+03:00 level=INFO source=node_exporter.go:141 msg=textfile
+time=2025-11-17T19:46:39.171+03:00 level=INFO source=node_exporter.go:141 msg=thermal_zone
+time=2025-11-17T19:46:39.171+03:00 level=INFO source=node_exporter.go:141 msg=time
+time=2025-11-17T19:46:39.171+03:00 level=INFO source=node_exporter.go:141 msg=timex
+time=2025-11-17T19:46:39.172+03:00 level=INFO source=node_exporter.go:141 msg=udp_queues
+time=2025-11-17T19:46:39.172+03:00 level=INFO source=node_exporter.go:141 msg=uname
+time=2025-11-17T19:46:39.172+03:00 level=INFO source=node_exporter.go:141 msg=vmstat
+time=2025-11-17T19:46:39.172+03:00 level=INFO source=node_exporter.go:141 msg=watchdog
+time=2025-11-17T19:46:39.172+03:00 level=INFO source=node_exporter.go:141 msg=xfs
+time=2025-11-17T19:46:39.172+03:00 level=INFO source=node_exporter.go:141 msg=zfs
+time=2025-11-17T19:46:39.173+03:00 level=INFO source=tls_config.go:346 msg="Listening on" address=[::]:9100
+time=2025-11-17T19:46:39.174+03:00 level=INFO source=tls_config.go:349 msg="TLS is disabled." http2=false address=[::]:9100
+time=2025-11-18T10:23:28.286+03:00 level=INFO source=node_exporter.go:216 msg="Starting node_exporter" version="(version=1.10.2, branch=HEAD, revision=654f19dee6a0c41de78a8d6d870e8c742cdb43b9)"
+time=2025-11-18T10:23:28.329+03:00 level=INFO source=node_exporter.go:217 msg="Build context" build_context="(go=go1.25.3, platform=linux/amd64, user=root@b29b4019149a, date=20251025-20:05:32, tags=unknown)"
+time=2025-11-18T10:23:28.329+03:00 level=WARN source=node_exporter.go:219 msg="Node Exporter is running as root user. This exporter is designed to run as unprivileged user, root is not required."
+time=2025-11-18T10:23:28.349+03:00 level=INFO source=filesystem_common.go:265 msg="Parsed flag --collector.filesystem.mount-points-exclude" collector=filesystem flag=^/(dev|proc|run/credentials/.+|sys|var/lib/docker/.+|var/lib/containers/storage/.+)($|/)
+time=2025-11-18T10:23:28.354+03:00 level=INFO source=filesystem_common.go:294 msg="Parsed flag --collector.filesystem.fs-types-exclude" collector=filesystem flag=^(autofs|binfmt_misc|bpf|cgroup2?|configfs|debugfs|devpts|devtmpfs|fusectl|hugetlbfs|iso9660|mqueue|nsfs|overlay|proc|procfs|pstore|rpc_pipefs|securityfs|selinuxfs|squashfs|erofs|sysfs|tracefs)$
+time=2025-11-18T10:23:28.355+03:00 level=INFO source=diskstats_common.go:110 msg="Parsed flag --collector.diskstats.device-exclude" collector=diskstats flag=^(z?ram|loop|fd|(h|s|v|xv)d[a-z]|nvme\d+n\d+p)\d+$
+time=2025-11-18T10:23:28.357+03:00 level=INFO source=node_exporter.go:135 msg="Enabled collectors"
+time=2025-11-18T10:23:28.357+03:00 level=INFO source=node_exporter.go:141 msg=arp
+time=2025-11-18T10:23:28.357+03:00 level=INFO source=node_exporter.go:141 msg=bcache
+time=2025-11-18T10:23:28.357+03:00 level=INFO source=node_exporter.go:141 msg=bonding
+time=2025-11-18T10:23:28.357+03:00 level=INFO source=node_exporter.go:141 msg=btrfs
+time=2025-11-18T10:23:28.357+03:00 level=INFO source=node_exporter.go:141 msg=conntrack
+time=2025-11-18T10:23:28.357+03:00 level=INFO source=node_exporter.go:141 msg=cpu
+time=2025-11-18T10:23:28.357+03:00 level=INFO source=node_exporter.go:141 msg=cpufreq
+time=2025-11-18T10:23:28.357+03:00 level=INFO source=node_exporter.go:141 msg=diskstats
+time=2025-11-18T10:23:28.357+03:00 level=INFO source=node_exporter.go:141 msg=dmi
+time=2025-11-18T10:23:28.357+03:00 level=INFO source=node_exporter.go:141 msg=edac
+time=2025-11-18T10:23:28.357+03:00 level=INFO source=node_exporter.go:141 msg=entropy
+time=2025-11-18T10:23:28.357+03:00 level=INFO source=node_exporter.go:141 msg=fibrechannel
+time=2025-11-18T10:23:28.357+03:00 level=INFO source=node_exporter.go:141 msg=filefd
+time=2025-11-18T10:23:28.357+03:00 level=INFO source=node_exporter.go:141 msg=filesystem
+time=2025-11-18T10:23:28.357+03:00 level=INFO source=node_exporter.go:141 msg=hwmon
+time=2025-11-18T10:23:28.357+03:00 level=INFO source=node_exporter.go:141 msg=infiniband
+time=2025-11-18T10:23:28.357+03:00 level=INFO source=node_exporter.go:141 msg=ipvs
+time=2025-11-18T10:23:28.357+03:00 level=INFO source=node_exporter.go:141 msg=loadavg
+time=2025-11-18T10:23:28.357+03:00 level=INFO source=node_exporter.go:141 msg=mdadm
+time=2025-11-18T10:23:28.357+03:00 level=INFO source=node_exporter.go:141 msg=meminfo
+time=2025-11-18T10:23:28.357+03:00 level=INFO source=node_exporter.go:141 msg=netclass
+time=2025-11-18T10:23:28.357+03:00 level=INFO source=node_exporter.go:141 msg=netdev
+time=2025-11-18T10:23:28.357+03:00 level=INFO source=node_exporter.go:141 msg=netstat
+time=2025-11-18T10:23:28.357+03:00 level=INFO source=node_exporter.go:141 msg=nfs
+time=2025-11-18T10:23:28.357+03:00 level=INFO source=node_exporter.go:141 msg=nfsd
+time=2025-11-18T10:23:28.357+03:00 level=INFO source=node_exporter.go:141 msg=nvme
+time=2025-11-18T10:23:28.357+03:00 level=INFO source=node_exporter.go:141 msg=os
+time=2025-11-18T10:23:28.357+03:00 level=INFO source=node_exporter.go:141 msg=powersupplyclass
+time=2025-11-18T10:23:28.358+03:00 level=INFO source=node_exporter.go:141 msg=pressure
+time=2025-11-18T10:23:28.358+03:00 level=INFO source=node_exporter.go:141 msg=rapl
+time=2025-11-18T10:23:28.358+03:00 level=INFO source=node_exporter.go:141 msg=schedstat
+time=2025-11-18T10:23:28.358+03:00 level=INFO source=node_exporter.go:141 msg=selinux
+time=2025-11-18T10:23:28.358+03:00 level=INFO source=node_exporter.go:141 msg=sockstat
+time=2025-11-18T10:23:28.358+03:00 level=INFO source=node_exporter.go:141 msg=softnet
+time=2025-11-18T10:23:28.358+03:00 level=INFO source=node_exporter.go:141 msg=stat
+time=2025-11-18T10:23:28.358+03:00 level=INFO source=node_exporter.go:141 msg=tapestats
+time=2025-11-18T10:23:28.358+03:00 level=INFO source=node_exporter.go:141 msg=textfile
+time=2025-11-18T10:23:28.358+03:00 level=INFO source=node_exporter.go:141 msg=thermal_zone
+time=2025-11-18T10:23:28.358+03:00 level=INFO source=node_exporter.go:141 msg=time
+time=2025-11-18T10:23:28.358+03:00 level=INFO source=node_exporter.go:141 msg=timex
+time=2025-11-18T10:23:28.358+03:00 level=INFO source=node_exporter.go:141 msg=udp_queues
+time=2025-11-18T10:23:28.358+03:00 level=INFO source=node_exporter.go:141 msg=uname
+time=2025-11-18T10:23:28.358+03:00 level=INFO source=node_exporter.go:141 msg=vmstat
+time=2025-11-18T10:23:28.358+03:00 level=INFO source=node_exporter.go:141 msg=watchdog
+time=2025-11-18T10:23:28.358+03:00 level=INFO source=node_exporter.go:141 msg=xfs
+time=2025-11-18T10:23:28.358+03:00 level=INFO source=node_exporter.go:141 msg=zfs
+time=2025-11-18T10:23:28.359+03:00 level=INFO source=tls_config.go:346 msg="Listening on" address=[::]:9100
+time=2025-11-18T10:23:28.359+03:00 level=INFO source=tls_config.go:349 msg="TLS is disabled." http2=false address=[::]:9100
+time=2025-11-19T16:47:32.805+03:00 level=INFO source=node_exporter.go:216 msg="Starting node_exporter" version="(version=1.10.2, branch=HEAD, revision=654f19dee6a0c41de78a8d6d870e8c742cdb43b9)"
+time=2025-11-19T16:47:32.855+03:00 level=INFO source=node_exporter.go:217 msg="Build context" build_context="(go=go1.25.3, platform=linux/amd64, user=root@b29b4019149a, date=20251025-20:05:32, tags=unknown)"
+time=2025-11-19T16:47:32.856+03:00 level=WARN source=node_exporter.go:219 msg="Node Exporter is running as root user. This exporter is designed to run as unprivileged user, root is not required."
+time=2025-11-19T16:47:32.869+03:00 level=INFO source=diskstats_common.go:110 msg="Parsed flag --collector.diskstats.device-exclude" collector=diskstats flag=^(z?ram|loop|fd|(h|s|v|xv)d[a-z]|nvme\d+n\d+p)\d+$
+time=2025-11-19T16:47:32.871+03:00 level=INFO source=filesystem_common.go:265 msg="Parsed flag --collector.filesystem.mount-points-exclude" collector=filesystem flag=^/(dev|proc|run/credentials/.+|sys|var/lib/docker/.+|var/lib/containers/storage/.+)($|/)
+time=2025-11-19T16:47:32.872+03:00 level=INFO source=filesystem_common.go:294 msg="Parsed flag --collector.filesystem.fs-types-exclude" collector=filesystem flag=^(autofs|binfmt_misc|bpf|cgroup2?|configfs|debugfs|devpts|devtmpfs|fusectl|hugetlbfs|iso9660|mqueue|nsfs|overlay|proc|procfs|pstore|rpc_pipefs|securityfs|selinuxfs|squashfs|erofs|sysfs|tracefs)$
+time=2025-11-19T16:47:32.875+03:00 level=INFO source=node_exporter.go:135 msg="Enabled collectors"
+time=2025-11-19T16:47:32.875+03:00 level=INFO source=node_exporter.go:141 msg=arp
+time=2025-11-19T16:47:32.875+03:00 level=INFO source=node_exporter.go:141 msg=bcache
+time=2025-11-19T16:47:32.875+03:00 level=INFO source=node_exporter.go:141 msg=bonding
+time=2025-11-19T16:47:32.875+03:00 level=INFO source=node_exporter.go:141 msg=btrfs
+time=2025-11-19T16:47:32.875+03:00 level=INFO source=node_exporter.go:141 msg=conntrack
+time=2025-11-19T16:47:32.875+03:00 level=INFO source=node_exporter.go:141 msg=cpu
+time=2025-11-19T16:47:32.875+03:00 level=INFO source=node_exporter.go:141 msg=cpufreq
+time=2025-11-19T16:47:32.875+03:00 level=INFO source=node_exporter.go:141 msg=diskstats
+time=2025-11-19T16:47:32.875+03:00 level=INFO source=node_exporter.go:141 msg=dmi
+time=2025-11-19T16:47:32.875+03:00 level=INFO source=node_exporter.go:141 msg=edac
+time=2025-11-19T16:47:32.875+03:00 level=INFO source=node_exporter.go:141 msg=entropy
+time=2025-11-19T16:47:32.875+03:00 level=INFO source=node_exporter.go:141 msg=fibrechannel
+time=2025-11-19T16:47:32.875+03:00 level=INFO source=node_exporter.go:141 msg=filefd
+time=2025-11-19T16:47:32.875+03:00 level=INFO source=node_exporter.go:141 msg=filesystem
+time=2025-11-19T16:47:32.875+03:00 level=INFO source=node_exporter.go:141 msg=hwmon
+time=2025-11-19T16:47:32.875+03:00 level=INFO source=node_exporter.go:141 msg=infiniband
+time=2025-11-19T16:47:32.875+03:00 level=INFO source=node_exporter.go:141 msg=ipvs
+time=2025-11-19T16:47:32.875+03:00 level=INFO source=node_exporter.go:141 msg=loadavg
+time=2025-11-19T16:47:32.875+03:00 level=INFO source=node_exporter.go:141 msg=mdadm
+time=2025-11-19T16:47:32.875+03:00 level=INFO source=node_exporter.go:141 msg=meminfo
+time=2025-11-19T16:47:32.875+03:00 level=INFO source=node_exporter.go:141 msg=netclass
+time=2025-11-19T16:47:32.875+03:00 level=INFO source=node_exporter.go:141 msg=netdev
+time=2025-11-19T16:47:32.875+03:00 level=INFO source=node_exporter.go:141 msg=netstat
+time=2025-11-19T16:47:32.875+03:00 level=INFO source=node_exporter.go:141 msg=nfs
+time=2025-11-19T16:47:32.875+03:00 level=INFO source=node_exporter.go:141 msg=nfsd
+time=2025-11-19T16:47:32.875+03:00 level=INFO source=node_exporter.go:141 msg=nvme
+time=2025-11-19T16:47:32.875+03:00 level=INFO source=node_exporter.go:141 msg=os
+time=2025-11-19T16:47:32.876+03:00 level=INFO source=node_exporter.go:141 msg=powersupplyclass
+time=2025-11-19T16:47:32.876+03:00 level=INFO source=node_exporter.go:141 msg=pressure
+time=2025-11-19T16:47:32.876+03:00 level=INFO source=node_exporter.go:141 msg=rapl
+time=2025-11-19T16:47:32.876+03:00 level=INFO source=node_exporter.go:141 msg=schedstat
+time=2025-11-19T16:47:32.876+03:00 level=INFO source=node_exporter.go:141 msg=selinux
+time=2025-11-19T16:47:32.876+03:00 level=INFO source=node_exporter.go:141 msg=sockstat
+time=2025-11-19T16:47:32.876+03:00 level=INFO source=node_exporter.go:141 msg=softnet
+time=2025-11-19T16:47:32.876+03:00 level=INFO source=node_exporter.go:141 msg=stat
+time=2025-11-19T16:47:32.876+03:00 level=INFO source=node_exporter.go:141 msg=tapestats
+time=2025-11-19T16:47:32.876+03:00 level=INFO source=node_exporter.go:141 msg=textfile
+time=2025-11-19T16:47:32.876+03:00 level=INFO source=node_exporter.go:141 msg=thermal_zone
+time=2025-11-19T16:47:32.876+03:00 level=INFO source=node_exporter.go:141 msg=time
+time=2025-11-19T16:47:32.876+03:00 level=INFO source=node_exporter.go:141 msg=timex
+time=2025-11-19T16:47:32.876+03:00 level=INFO source=node_exporter.go:141 msg=udp_queues
+time=2025-11-19T16:47:32.876+03:00 level=INFO source=node_exporter.go:141 msg=uname
+time=2025-11-19T16:47:32.876+03:00 level=INFO source=node_exporter.go:141 msg=vmstat
+time=2025-11-19T16:47:32.876+03:00 level=INFO source=node_exporter.go:141 msg=watchdog
+time=2025-11-19T16:47:32.876+03:00 level=INFO source=node_exporter.go:141 msg=xfs
+time=2025-11-19T16:47:32.876+03:00 level=INFO source=node_exporter.go:141 msg=zfs
+time=2025-11-19T16:47:32.877+03:00 level=INFO source=tls_config.go:346 msg="Listening on" address=[::]:9100
+time=2025-11-19T16:47:32.887+03:00 level=INFO source=tls_config.go:349 msg="TLS is disabled." http2=false address=[::]:9100

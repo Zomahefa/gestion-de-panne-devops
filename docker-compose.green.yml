@@ -1,0 +1,44 @@
+services:
+  backend-green:
+    image: zomahefaranaivo/django-backend-panne-staging:v9
+    container_name: backendGreen
+    restart: always
+    environment:
+      APP_ENV: ${APP_ENV}
+      DEBUG: ${DEBUG}
+      DJANGO_SECRET_KEY: ${DJANGO_SECRET_KEY}
+      DJANGO_ALLOWED_HOSTS: ${DJANGO_ALLOWED_HOSTS}
+      DB_HOST: ${DB_HOST}
+      DB_NAME: ${DB_NAME}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_PORT: ${DB_PORT}
+    volumes:
+      - django_static:/back/staticfiles
+      - django_media:/back/media
+    networks:
+      - panne-jirama-green
+
+  frontend-green:
+    image: zomahefaranaivo/react-frontend-nginx-panne-staging:v9
+    container_name: frontendGreen
+    restart: always
+    expose:
+      - "80"
+    depends_on:
+      backend-green:
+        condition: service_healthy
+    networks:
+      -  panne-jirama-green
+volumes:
+  django_static:
+    external: true
+    name: jirama-django-static
+  django_media:
+    external: true
+    name: jirama-django-media
+
+networks:
+  panne-jirama-green:
+    external: true
+    name: panne-jirama-green          
