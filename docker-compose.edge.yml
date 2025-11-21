@@ -4,9 +4,12 @@ services:
     container_name: edge
     restart: always
     ports:
-      - "80:80"   # en local, pas de HTTPS
+      - "80:80"  
+      - "443:443"
+
     volumes:
       - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - /etc/letsencrypt:/etc/letsencrypt:ro
       - django_static:/back/staticfiles
       - django_media:/back/media
     networks:

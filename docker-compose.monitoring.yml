@@ -6,7 +6,7 @@ services:
       - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
     command:
       - '--config.file=/etc/prometheus/prometheus.yml'
-      - '--web.external-url=http://localhost/prometheus/'
+      - '--web.external-url=https://signaler-panne-305.duckdns.org/prometheus/'
       - '--web.route-prefix=/prometheus'
     depends_on:
       - mysql-exporter
@@ -17,7 +17,7 @@ services:
     image: grafana/grafana
     container_name: grafana-monitoring
     environment:
-      - GF_SERVER_ROOT_URL=http://localhost/grafana/
+      - GF_SERVER_ROOT_URL=https://signaler-panne-305.duckdns.org/grafana/
       - GF_SERVER_SERVE_FROM_SUB_PATH=true
     volumes:
       - grafana_data:/var/lib/grafana
