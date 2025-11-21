@@ -9,7 +9,7 @@ scrape_configs:
 
   - job_name: 'node'
     static_configs:
-      - targets: ['192.168.1.99:9100']  # exporter node sur la machine physique
+      - targets: ['node-exporter:9100']  # exporter node sur la machine physique
 
   - job_name: 'mysql'
     metrics_path: /mysql-metrics

@@ -58,6 +58,15 @@ services:
     networks:
       - panne-jirama-blue
       - panne-jirama-green 
+  node-exporter:
+    image: prom/node-exporter
+    container_name: node-exporter-monitoring
+    ports:
+      - "9100:9100"
+    networks:
+      - panne-jirama-blue
+      - panne-jirama-green
+
 
 volumes:
   grafana_data:

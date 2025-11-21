@@ -1,6 +1,6 @@
 services:
   backend-green:
-    image: zomahefaranaivo/django-backend-panne-staging:v9
+    image: zomahefaranaivo/django-backend-panne-staging:v12
     container_name: backendGreen
     restart: always
     environment:
@@ -20,7 +20,7 @@ services:
       - panne-jirama-green
 
   frontend-green:
-    image: zomahefaranaivo/react-frontend-nginx-panne-staging:v9
+    image: zomahefaranaivo/react-frontend-nginx-panne-staging:v12
     container_name: frontendGreen
     restart: always
     expose:
