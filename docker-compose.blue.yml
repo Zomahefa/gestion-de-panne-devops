@@ -1,6 +1,6 @@
 services:
   backend-blue:
-    image: zomahefaranaivo/django-backend-panne-staging:v12
+    image: zomahefaranaivo/django-backend-panne-prod:latest
     container_name: backendBlue
     restart: always
     environment:
@@ -19,7 +19,7 @@ services:
     networks:
       - panne-jirama-blue
   frontend-blue:
-    image: zomahefaranaivo/react-frontend-nginx-panne-staging:v12
+    image: zomahefaranaivo/react-frontend-panne-prod:latest
     container_name: frontendBlue
     restart: always
     expose:
