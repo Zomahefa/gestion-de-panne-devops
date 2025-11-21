@@ -2,6 +2,7 @@
 .env
 *.env
 .env.global
+.my.cnf
 
 # 🗂️ Fichiers système
 .DS_Store
@@ -37,10 +38,3 @@ yarn-error.log*
 *.tar
 *.bak
 *.tmp
-
-# 🧠 Pourquoi ?
-# - .env : contient des mots de passe, clés secrètes
-# - .DS_Store, *.swp : fichiers créés par macOS ou éditeurs
-# - *.log, *.sqlite3 : fichiers générés localement, inutiles pour le repo
-# - __pycache__, *.pyc : fichiers compilés automatiquement
-# - media/** : évite de versionner les images, mais garde le dossier vide avec .gitkeep
