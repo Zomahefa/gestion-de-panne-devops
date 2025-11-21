@@ -3,38 +3,44 @@
 *.env
 .env.global
 .my.cnf
+Pipfile
+Pipfile.lock
 
 # 🗂️ Fichiers système
 .DS_Store
+Thumbs.db
 *.swp
 
 # 🧪 Fichiers de test ou de debug
 *.log
 *.sqlite3
-
-# 🐍 Environnements Python
-venv/
-env/
-ENV/
-*.egg-info/
+coverage/
+htmlcov/
 *.coverage
 
-# 📦 Fichiers compilés Python
+# 🐍 Python / Django
 __pycache__/
 *.pyc
 *.pyo
+*.egg-info/
+venv/
+env/
+ENV/
 
-# 📁 Dossier media (images backend)
-media/**
-!media/.gitkeep
+# 📁 Django media & static
+media/incident_images/**
+!media/incident_images/.gitkeep
+static/**
+!static/.gitkeep
 
-# 📦 Node.js
+# 📦 Node.js / React
 node_modules/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+.eslintcache
+.cache/
+build/
+dist/
 
-# 🐳 Docker
-*.tar
-*.bak
-*.tmp
+
