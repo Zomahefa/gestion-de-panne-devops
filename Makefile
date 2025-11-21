@@ -1,21 +1,27 @@
 # Makefile pour gestion de l'application Django + Docker
 # === Variables ===
-APP_ENV=dev
 COMPOSE_DEV=docker compose -f docker-compose.dev.yml --env-file .env -p panne-dev
-COMPOSE_STAGING=docker compose -f docker-compose.staging.yml --env-file .env.staging -p panne-staging
-COMPOSE_PROD=docker compose -f docker-compose.prod.yml --env-file .env.prod
+COMPOSE_BLUE=docker compose -f docker-compose.blue.yml --env-file .env.global -p panne-blue
+COMPOSE_GREEN=docker compose -f docker-compose.green.yml --env-file .env.global -p panne-green
+COMPOSE_DB=docker compose -f docker-compose.db.yml --env-file .env.global
+COMPOSE_MONITORING=docker compose -f docker-compose.monitoring.yml
+EDGE=docker compose -f docker-compose.edge.yml -p panne-staging
 DB_NAME=jirama_db
 DB_USER=django_user
 DB_PASSWORD=Django@2025!
 CONTAINER_DB_DEV=db
 CONTAINER_BACKEND_DEV=django-dev-panne
 CONTAINER_FRONTEND_DEV=django-dev-panne
-CONTAINER_DB_STAGING=db-staging
-CONTAINER_BACKEND_STAGING=backend-staging
-CONTAINER_FRONTEND_STAGING=frontend-staging
-CONTAINER_DB_PROD=db-prod
-CONTAINER_BACKEND_PROD=backend-prod
-CONTAINER_FRONTEND_PROD=frontend-prod
+CONTAINER_BACKEND_BLUE=backendBlue
+CONTAINER_FRONTEND_BLUE=frontendBlue
+CONTAINER_DB=db-global
+CONTAINER_BACKEND_GREEN=backendGreen
+CONTAINER_FRONTEND_GREEN=frontendGreen
+CONTAINER_PROMETHEUS=prometheus-monitoring
+CONTAINER_GRAFANA=grafana-monitoring
+CONTAINER_LOKI=loki-monitoring
+CONTAINER_PROMTAIL=promtail-monitoring
+CONTAINER_MYSQLEXPORTER=mysql-exporter-monitoring
 # === Développement ===
 dev-up:
 	$(COMPOSE_DEV) up -d
@@ -47,67 +53,114 @@ dev-backend-bash:
 	docker exec -it $(CONTAINER_BACKEND_DEV) bash
 dev-frontend-bash:
 	docker exec -it $(CONTAINER_FRONTEND_DEV) bash
-# === Staging ===
-staging-db:
-	docker exec -it $(CONTAINER_DB_STAGING) mysql -u$(DB_USER) -p$(DB_PASSWORD) $(DB_NAME)
-staging-up:
-	$(COMPOSE_STAGING) up -d
-staging-down:
-	$(COMPOSE_STAGING) down
-staging-down-all:
-	$(COMPOSE_STAGING) down -v
-staging-start:
-	$(COMPOSE_STAGING) start
-staging-stop:
-	$(COMPOSE_STAGING) stop
-staging-restart:
-	$(COMPOSE_STAGING) restart
-staging-build:
-	$(COMPOSE_STAGING) up -d --build
-backend-staging-logs:
-	docker container logs $(CONTAINER_BACKEND_STAGING)
-frontend-staging-logs:
-	docker container logs $(CONTAINER_FRONTEND_STAGING)
-db-staging-logs:
-	docker container logs $(CONTAINER_DB_STAGING)
-staging-logs:
-	$(COMPOSE_STAGING) logs -f
-staging-db-bash:
-	docker exec -it $(CONTAINER_DB_STAGING) mysql -u$(DB_USER) -p$(DB_PASSWORD) $(DB_NAME)
-staging-backend-bash:
-	docker exec -it $(CONTAINER_BACKEND_STAGING) bash
-staging-frontend-bash:
-	docker exec -it $(CONTAINER_FRONTEND_STAGING) bash
-staging-backend-shell:
-	$(COMPOSE_STAGING) exec backend python manage.py shell
-# === Production ===
-prod-up:
-	$(COMPOSE_PROD) up -d
-prod-down:
-	$(COMPOSE_PROD) down
-prod-down-all:
-	$(COMPOSE_PROD) down -v
-prod-build:
-	$(COMPOSE_PROD) up -d --build
-prod-start:
-	$(COMPOSE_PROD) start
-prod-stop:
-	$(COMPOSE_PROD) stop
-prod-restart:
-	$(COMPOSE_PROD) restart
-prod-logs:
-	$(COMPOSE_PROD) logs -f
-prod-db-bash:
-	docker exec -it $(CONTAINER_DB_PROD) mysql -u$(DB_USER) -p$(DB_PASSWORD) $(DB_NAME)
-prod-backend-bash:
-	docker exec -it $(CONTAINER_BACKEND_PROD) bash
-prod-frontend-bash:
-	docker exec -it $(CONTAINER_FRONTEND_PROD) bash
-backend-prod-logs:
-	docker container logs $(CONTAINER_BACKEND_PROD)
-frontend-prod-logs:
-	docker container logs $(CONTAINER_FRONTEND_PROD)
-db-prod-logs:
-	docker container logs $(CONTAINER_DB_PROD)
-prod-backend-shell:
-	$(COMPOSE_PROD) exec backend python manage.py shell
+# ===DB===
+db-up:
+	$(COMPOSE_DB) up -d
+db-down:
+	$(COMPOSE_DB) down
+db-down-all:
+	$(COMPOSE_DB) down -v
+db-start:
+	$(COMPOSE_DB) start
+db-stop:
+	$(COMPOSE_DB) stop
+db-restart:
+	$(COMPOSE_DB) restart
+db-bash:
+	docker exec -it $(CONTAINER_DB) mysql -u$(DB_USER) -p$(DB_PASSWORD) $(DB_NAME)
+db-logs:
+	docker container logs $(CONTAINER_DB)
+# ===green===
+green-up:
+	$(COMPOSE_GREEN) up -d
+green-down:
+	$(COMPOSE_GREEN) down
+green-down-all:
+	$(COMPOSE_GREEN) down -v
+green-start:
+	$(COMPOSE_GREEN) start
+green-stop:
+	$(COMPOSE_GREEN) stop
+green-restart:
+	$(COMPOSE_GREEN) restart
+green-build:
+	$(COMPOSE_GREEN) up -d --build
+green-backend-logs:
+	docker container logs $(CONTAINER_BACKEND_GREEN)
+green-frontend-logs:
+	docker container logs $(CONTAINER_FRONTEND_GREEN)
+green-logs:
+	$(COMPOSE_GREEN) logs -f
+green-backend-bash:
+	docker exec -it $(CONTAINER_BACKEND_GREEN) bash
+green-frontend-bash:
+	docker exec -it $(CONTAINER_FRONTEND_GREEN) bash
+green-backend-shell:
+	$(COMPOSE_GREEN) exec backend python manage.py shell
+# === blue ===
+blue-up:
+	$(COMPOSE_BLUE) up -d
+blue-down:
+	$(COMPOSE_BLUE) down
+blue-down-all:
+	$(COMPOSE_BLUE) down -v
+blue-start:
+	$(COMPOSE_BLUE) start
+blue-stop:
+	$(COMPOSE_BLUE) stop
+blue-restart:
+	$(COMPOSE_BLUE) restart
+blue-backend-logs:
+	docker container logs $(CONTAINER_BACKEND_BLUE)
+blue-frontend-logs:
+	docker container logs $(CONTAINER_FRONTEND_BLUE)
+blue-logs:
+	$(COMPOSE_BLUE) logs -f
+blue-backend-bash:
+	docker exec -it $(CONTAINER_BACKEND_BLUE) bash
+blue-frontend-bash:
+	docker exec -it $(CONTAINER_FRONTEND_BLUE) bash
+blue-backend-shell:
+	$(COMPOSE_BLUE) exec backend python manage.py shell
+
+#node exporter
+#node-exporter:
+#nohup ./node_exporter &
+#node-exporter-kill:
+#pkill -f node_exporter
+
+# ===edge proxy===
+reload-edge:
+	docker exec edge nginx -s reload
+edge-up:
+	$(EDGE) up -d
+edge-down:
+	$(EDGE) down
+edge-bash:
+	docker exec -it edge sh
+edge-restart:
+	$(EDGE) restart
+
+# ===monitoring===
+monitoring-up:
+	$(COMPOSE_MONITORING) up -d
+monitoring-down:
+	$(COMPOSE_MONITORING) down
+monitoring-down-all:
+	$(COMPOSE_MONITORING) down -v
+monitoring-start:
+	$(COMPOSE_MONITORING) start
+monitoring-stop:
+	$(COMPOSE_MONITORING) stop
+monitoring-restart:
+	$(COMPOSE_MONITORING) restart
+prometheus-bash:
+	docker exec -it $(CONTAINER_PROMETHEUS) bash
+grafana-bash:
+	docker exec -it $(CONTAINER_GRAFANA) bash
+loki-bash:
+	docker exec -it $(CONTAINER_LOKI) bash
+promtail-bash:
+	docker exec -it $(CONTAINER_PROMTAIL_BLUE) bash
+mysql-exporter-bash:
+	docker exec -it $(CONTAINER_MYSQLEXPORTER_BLUE) bash

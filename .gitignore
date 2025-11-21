@@ -1,7 +1,7 @@
 # 🔐 Fichiers sensibles
 .env
 *.env
-.env.staging
+.env.global
 
 # 🗂️ Fichiers système
 .DS_Store

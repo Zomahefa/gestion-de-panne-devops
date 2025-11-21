@@ -1,0 +1,33 @@
+services:
+  db:
+    image: mysql:8.0
+    container_name: db-global
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${DB_NAME}
+      MYSQL_USER: ${DB_USER}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-p${MYSQL_ROOT_PASSWORD}"]
+      interval: 30s
+      timeout: 10s
+      retries: 10
+      start_period: 40s
+    volumes:
+      - mysql_data_staging:/var/lib/mysql
+    networks:
+      - panne-jirama-blue
+      - panne-jirama-green 
+
+volumes:
+  mysql_data_staging:
+    external: true
+    name: mysql-panne-jirama
+networks:
+  panne-jirama-blue:
+    external: true
+    name: panne-jirama-blue  
+  panne-jirama-green:
+    external: true
+    name: panne-jirama-green

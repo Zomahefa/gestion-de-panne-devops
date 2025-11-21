@@ -1,0 +1,32 @@
+services:
+  edge:
+    image: nginx:1.25-alpine
+    container_name: edge
+    restart: always
+    ports:
+      - "80:80"  
+      - "443:443"
+
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - /etc/letsencrypt:/etc/letsencrypt:ro
+      - django_static:/back/staticfiles
+      - django_media:/back/media
+    networks:
+      - panne-jirama-blue
+      - panne-jirama-green 
+volumes:
+  django_media:
+    external: true
+    name: jirama-django-media
+  django_static:
+    external: true
+    name: jirama-django-static
+
+networks:
+  panne-jirama-blue:
+    external: true
+    name: panne-jirama-blue  
+  panne-jirama-green:
+    external: true
+    name: panne-jirama-green
