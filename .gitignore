@@ -28,8 +28,8 @@ env/
 ENV/
 
 # 📁 Django media & static
-media/incident_images/**
-!media/incident_images/.gitkeep
+backend/media/incident_images/**
+!backend/media/incident_images/.gitkeep
 static/**
 !static/.gitkeep
 

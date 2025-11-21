@@ -222,7 +222,7 @@ jobs:
           push: true
           build-args: |
             REACT_APP_API_URL=${{ vars.REACT_APP_API_URL }}
-          tags: ${{ vars.DOCKERHUB_USERNAME }}/react-frontend-nginx-panne-staging:v${{ github.run_number }}
+          tags: ${{ vars.DOCKERHUB_USERNAME }}/react-frontend-panne-prod:v${{ github.run_number }}
 
       - name: Build & Push Backend
         uses: docker/build-push-action@v6
@@ -230,7 +230,7 @@ jobs:
           context: ./backend
           file: ./backend/Dockerfile
           push: true
-          tags: ${{ vars.DOCKERHUB_USERNAME }}/django-backend-panne-staging:v${{ github.run_number }}
+          tags: ${{ vars.DOCKERHUB_USERNAME }}/django-backend-panne-prod:v${{ github.run_number }}
   Deploy:
     name: Déploiement blue/green 
     runs-on: ubuntu-latest
