@@ -247,12 +247,13 @@ jobs:
 
     - name: Synchroniser projet (exclure secrets)
       run: |
-        rsync -az --delete \
-          --exclude='.env.global' \
-          --exclude='.my.cnf' \
-          -e "ssh -o StrictHostKeyChecking=no" \
-          ./ \
-          ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:${{ secrets.VPS_PROJECT_DIR }}/
+        rsync -avz --delete \
+        --exclude='.env.global' \
+        --exclude='.my.cnf' \
+        -e "ssh -o StrictHostKeyChecking=no" \
+        $GITHUB_WORKSPACE/ \
+        ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:${{ secrets.VPS_PROJECT_DIR }}
+
     - name: Vérifier fichiers copiés
       run: ssh -o StrictHostKeyChecking=no ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} "ls -l ${{ secrets.VPS_PROJECT_DIR }}"
 
