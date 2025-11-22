@@ -13,9 +13,6 @@ services:
       DB_USER: ${DB_USER}
       DB_PASSWORD: ${DB_PASSWORD}
       DB_PORT: ${DB_PORT}
-    depends_on:
-      db:
-        condition: service_healthy
     volumes:
       - django_static:/back/staticfiles
       - django_media:/back/media
