@@ -157,14 +157,14 @@ l'astuce c'est juste= **make + commande dans Makefile par exemple si il y a db-s
 
 ## 🧠 3. Avantages du Makefile 
 
-> “Le Makefile permet d’automatiser et de simplifier les commandes Docker Compose pour chaque environnement (développement, staging, production).  
-> Il offre une interface cohérente (`make dev-up`, `make prod-logs`, etc.) qui réduit les erreurs humaines, accélère l’onboarding des développeurs, et améliore la maintenabilité du projet.  
-> Grâce au Makefile, les développeurs n’ont pas besoin de mémoriser les noms de fichiers Compose, les variables d’environnement ou les noms de conteneurs.  
-> Cette approche est conforme aux bonnes pratiques DevOps : automatisation, reproductibilité, et documentation claire des workflows.”
+“Le Makefile permet d’automatiser et de simplifier les commandes Docker Compose pour chaque environnement (développement, staging, production).  
+ Il offre une interface cohérente (`make dev-up`, `make prod-logs`, etc.) qui réduit les erreurs humaines, accélère l’onboarding des développeurs, et améliore la maintenabilité du projet.  
+ Grâce au Makefile, les développeurs n’ont pas besoin de mémoriser les noms de fichiers Compose, les variables d’environnement ou les noms de conteneurs.  
+Cette approche est conforme aux bonnes pratiques DevOps : automatisation, reproductibilité, et documentation claire des workflows.”
 
 ---
 
-## 📘 4. Guide pour les développeurs (à inclure dans ton README ou mémoire)
+ 📘 4. Guide pour les développeurs (à inclure dans ton README ou mémoire)
 
 ### 🔧 Installation
 
