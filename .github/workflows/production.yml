@@ -253,6 +253,9 @@ jobs:
           -e "ssh -o StrictHostKeyChecking=no" \
           ./ \
           ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:${{ secrets.VPS_PROJECT_DIR }}/
+    - name: Vérifier fichiers copiés
+      run: ssh -o StrictHostKeyChecking=no ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} "ls -l ${{ secrets.VPS_PROJECT_DIR }}"
+
 
     - name: Déployer couleur inactive, tester, basculer
       run: |
