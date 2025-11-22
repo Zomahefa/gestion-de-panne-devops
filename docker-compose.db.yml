@@ -23,7 +23,7 @@ services:
 volumes:
   mysql_data_staging:
     external: true
-    name: mysql-panne-jirama
+    name: mysql-data
 networks:
   panne-jirama-blue:
     external: true
