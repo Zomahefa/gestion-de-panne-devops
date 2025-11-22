@@ -293,23 +293,23 @@ jobs:
         echo "Couleur active: $ACTIVE_COLOR ; Inactive à déployer: $TARGET_COLOR"
         
         # --- Démarrage des services statiques (DB et Monitoring) ---
-        docker compose -f docker-compose.db.yml -f docker-compose.monitoring.yml -f docker-compose.edge.yml up -d --no-recreate
+        docker compose -f docker-compose.db.yml -f docker-compose.monitoring.yml -f docker-compose.edge.yml up -d -p panne-prod --no-recreate
         
         # --- Déploiement de la nouvelle couleur ---
         # Correction de l'erreur "unhealthy" avec --wait
-        docker compose -f $TARGET_COMPOSE up -d --wait
+        docker compose -f $TARGET_COMPOSE up -d -p panne-prod --wait
         
         # --- Tests de santé de la nouvelle couleur ---
-        docker compose -f docker-compose.edge.yml exec -T edge sh -c "apk add --no-cache curl >/dev/null 2>&1 || true"
-        docker compose -f $TARGET_COMPOSE exec -T $INACTIVE_BE curl -sSf http://localhost:8000/health/ | grep -q "ok"
-        docker compose -f $TARGET_COMPOSE exec -T $INACTIVE_FE curl -sSf http://localhost/ | head -n 1 >/dev/null
+        docker compose -f docker-compose.edge.yml -p panne-prod exec -T edge sh -c "apk add --no-cache curl >/dev/null 2>&1 || true"
+        docker compose -f $TARGET_COMPOSE -p panne-prod exec -T $INACTIVE_BE curl -sSf http://localhost:8000/health/ | grep -q "ok"
+        docker compose -f $TARGET_COMPOSE -p panne-prod exec -T $INACTIVE_FE curl -sSf http://localhost/ | head -n 1 >/dev/null
         
         # --- Bascule: modification de Nginx et reload ---
         sed -i "s/set \\$active_frontend \".*\";/set \\$active_frontend \"$INACTIVE_FE\";/" nginx.conf
         sed -i "s/set \\$active_backend \".*\";/set \\$active_backend \"$INACTIVE_BE\";/" nginx.conf
         
-        docker compose -f docker-compose.edge.yml exec -T edge nginx -t --quiet
-        docker compose -f docker-compose.edge.yml exec -T edge nginx -s reload
+        docker compose -f docker-compose.edge.yml -p panne-prod exec -T edge nginx -t --quiet
+        docker compose -f docker-compose.edge.yml -p panne-prod exec -T edge nginx -s reload
         
         echo "$TARGET_COLOR" > active_color.txt
         
@@ -329,8 +329,8 @@ jobs:
           # Rollback
           sed -i "s/set \\$active_frontend \".*\";/set \\$active_frontend \"$PREVIOUS_FE\";/" nginx.conf
           sed -i "s/set \\$active_backend \".*\";/set \\$active_backend \"$PREVIOUS_BE\";/" nginx.conf
-          docker compose -f docker-compose.edge.yml exec -T edge nginx -t --quiet
-          docker compose -f docker-compose.edge.yml exec -T edge nginx -s reload
+          docker compose -f docker-compose.edge.yml -p panne-prod exec -T edge nginx -t --quiet
+          docker compose -f docker-compose.edge.yml -p panne-prod exec -T edge nginx -s reload
           echo "$ACTIVE_COLOR" > active_color.txt
           echo "Rollback vers $ACTIVE_COLOR effectué. Le déploiement a échoué."
           exit 1
@@ -340,6 +340,6 @@ jobs:
         
         # --- Nettoyage ---
         echo "Arrêt et suppression de l'ancienne couleur ($ACTIVE_COLOR)..."
-        docker compose -f docker-compose.${ACTIVE_COLOR}.yml down --remove-orphans
+        docker compose -f docker-compose.${ACTIVE_COLOR}.yml -p panne-prod down --remove-orphans
         
         EOF
