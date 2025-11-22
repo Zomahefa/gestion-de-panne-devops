@@ -3,7 +3,6 @@ services:
     image: mysql:8.0
     container_name: db-global
     restart: always
-    command: --initialize-insecure
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
       MYSQL_DATABASE: ${DB_NAME}

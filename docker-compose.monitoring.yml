@@ -63,6 +63,7 @@ services:
     container_name: node-exporter-monitoring
     ports:
       - "9100:9100"
+    privileged: true
     networks:
       - panne-jirama-blue
       - panne-jirama-green
