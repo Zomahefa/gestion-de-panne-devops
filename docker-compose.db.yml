@@ -3,6 +3,7 @@ services:
     image: mysql:8.0
     container_name: db-global
     restart: always
+    command: --initialize-insecure
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
       MYSQL_DATABASE: ${DB_NAME}
@@ -15,15 +16,13 @@ services:
       retries: 10
       start_period: 40s
     volumes:
-      - mysql_data_staging:/var/lib/mysql
+      - mysql_data_prod:/var/lib/mysql
     networks:
       - panne-jirama-blue
       - panne-jirama-green 
 
 volumes:
-  mysql_data_staging:
-    external: true
-    name: mysql-data
+  mysql_data_prod:       
 networks:
   panne-jirama-blue:
     external: true
