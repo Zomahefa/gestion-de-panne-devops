@@ -1,11 +1,21 @@
 #!/bin/bash
 
+# Définir une limite de temps pour l'attente (par exemple, 30 secondes)
+TIMEOUT=30
+COUNT=0
+
 echo "Attente de la base de données..."
 until nc -z db 3306; do
-  echo "En attente de la base à db:3306..."
+  if [ $COUNT -ge $TIMEOUT ]; then
+    echo "Erreur: La base de données n'est pas disponible après $TIMEOUT secondes."
+    exit 1
+  fi
+  echo "En attente de la base à db:3306... ($COUNT/$TIMEOUT)"
   sleep 2
+  COUNT=$((COUNT + 2))
 done
 
+echo "Base de données disponible. Démarrage des opérations..."
 echo "🚀 Migrations Django..."
 python manage.py migrate --noinput
 

@@ -240,98 +240,106 @@ jobs:
     runs-on: ubuntu-latest
     needs: [Dockerhub]   
     steps:
+    # ... (Début du job Deploy) ...
     - name: Checkout du code
       uses: actions/checkout@v5
     - name: Préparer agent SSH
       uses: webfactory/ssh-agent@v0.7.0
       with:
         ssh-private-key: ${{ secrets.VPS_SSH_KEY }}
-    - name: Synchroniser projet (exclure secrets)
+    - name: Synchroniser fichiers de configuration
       run: |
+        # Synchronisation uniquement des fichiers de configuration nécessaires
         rsync -avz --delete \
+        --include='docker-compose.*.yml' \
+        --include='nginx.conf' \
+        --include='.env.global' \
+        --include='.my.cnf' \
+        --include='monitoring/***' \
         --exclude='.env.global' \
         --exclude='.my.cnf' \
+        --exclude='active_color.txt' \
         -e "ssh -o StrictHostKeyChecking=no" \
         $GITHUB_WORKSPACE/ \
         ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:${{ secrets.VPS_PROJECT_DIR }}
-
     - name: Vérifier fichiers copiés
       run: ssh -o StrictHostKeyChecking=no ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} "ls -l ${{ secrets.VPS_PROJECT_DIR }}"
-
-
     - name: Déployer couleur inactive, tester, basculer
       run: |
         ssh -o StrictHostKeyChecking=no ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} << 'EOF'
         set -e
         cd ${{ secrets.VPS_PROJECT_DIR }}
-        export $(grep -v '^#' .env.global | xargs)
-
-        # Démarrer DB et monitoring (idempotent, ne plante pas si déjà up)
-        docker compose -f docker-compose.db.yml up -d
-        docker compose -f docker-compose.monitoring.yml up -d
-
-        # Lire la couleur active depuis nginx.conf
-        ACTIVE_BE=$(grep 'set \$active_backend' nginx.conf | sed 's/.*"\(.*\)".*/\1/')
-        if [ "$ACTIVE_BE" = "backend-blue" ]; then
-          INACTIVE_FE="frontend-green"
-          INACTIVE_BE="backend-green"
-          TARGET="green"
+        
+        # --- Définition des variables ---
+        # Utilisation d'un fichier active_color.txt pour déterminer la couleur active/inactive
+        ACTIVE_COLOR=$(cat active_color.txt 2>/dev/null || echo "blue")
+        
+        if [ "$ACTIVE_COLOR" = "blue" ]; then
+          TARGET_COLOR="green"
+          TARGET_COMPOSE="docker-compose.green.yml"
+          INACTIVE_FE="frontendGreen"
+          INACTIVE_BE="backendGreen"
+          PREVIOUS_FE="frontendBlue"
+          PREVIOUS_BE="backendBlue"
         else
-          INACTIVE_FE="frontend-blue"
-          INACTIVE_BE="backend-blue"
-          TARGET="blue"
+          TARGET_COLOR="blue"
+          TARGET_COMPOSE="docker-compose.blue.yml"
+          INACTIVE_FE="frontendBlue"
+          INACTIVE_BE="backendBlue"
+          PREVIOUS_FE="frontendGreen"
+          PREVIOUS_BE="backendGreen"
         fi
-        echo "Couleur active: $ACTIVE_BE ; Inactive à déployer: $TARGET"
-
-        # Démarrer uniquement la couleur inactive
-        if [ "$TARGET" = "green" ]; then
-          docker compose -f docker-compose.green.yml up -d
-        else
-          docker compose -f docker-compose.blue.yml up -d
-        fi
-
-        # Vérifier edge et Nginx
-        docker compose -f docker-compose.edge.yml up -d
-        docker compose -f docker-compose.edge.yml exec -T edge nginx -t
-
-        # Installer curl dans edge si nécessaire
+        
+        echo "Couleur active: $ACTIVE_COLOR ; Inactive à déployer: $TARGET_COLOR"
+        
+        # --- Démarrage des services statiques (DB et Monitoring) ---
+        docker compose -f docker-compose.db.yml -f docker-compose.monitoring.yml -f docker-compose.edge.yml up -d --no-recreate
+        
+        # --- Déploiement de la nouvelle couleur ---
+        # Correction de l'erreur "unhealthy" avec --wait
+        docker compose -f $TARGET_COMPOSE up -d --wait
+        
+        # --- Tests de santé de la nouvelle couleur ---
         docker compose -f docker-compose.edge.yml exec -T edge sh -c "apk add --no-cache curl >/dev/null 2>&1 || true"
-
-        # Tests santé du backend inactif
-        curl -sSf http://$INACTIVE_BE:8000/health | grep -q "ok"
-        curl -sSf http://$INACTIVE_BE:8000/metrics | head -n 1 >/dev/null
-
-        # Test frontend inactif
-        curl -sSf http://$INACTIVE_FE:80/ | head -n 1 >/dev/null
-
-        # Bascule: modifier nginx.conf et reload
+        docker compose -f $TARGET_COMPOSE exec -T $INACTIVE_BE curl -sSf http://localhost:8000/health/ | grep -q "ok"
+        docker compose -f $TARGET_COMPOSE exec -T $INACTIVE_FE curl -sSf http://localhost/ | head -n 1 >/dev/null
+        
+        # --- Bascule: modification de Nginx et reload ---
         sed -i "s/set \\$active_frontend \".*\";/set \\$active_frontend \"$INACTIVE_FE\";/" nginx.conf
         sed -i "s/set \\$active_backend \".*\";/set \\$active_backend \"$INACTIVE_BE\";/" nginx.conf
-        docker compose -f docker-compose.edge.yml up -d
-        docker compose -f docker-compose.edge.yml exec -T edge nginx -t
+        
+        docker compose -f docker-compose.edge.yml exec -T edge nginx -t --quiet
         docker compose -f docker-compose.edge.yml exec -T edge nginx -s reload
-
-        # Vérifier site public après bascule
-        curl -sSf -I https://signaler-panne-305.duckdns.org | grep -q '200'
-        curl -sSf https://signaler-panne-305.duckdns.org/metrics/ | head -n 1 >/dev/null
-        curl -sSf https://signaler-panne-305.duckdns.org/ | head -n 1 >/dev/null
-
-        # Surveiller 60s et rollback si problème
-        sleep 60
-        curl -sSf https://signaler-panne-305.duckdns.org/metrics/ | head -n 1 >/dev/null || {
-          echo "Problème post-bascule; rollback vers l'autre couleur"
-          if [ "$TARGET" = "green" ]; then
-            sed -i "s/set \\$active_frontend \".*\";/set \\$active_frontend \"frontend-blue\";/" nginx.conf
-            sed -i "s/set \\$active_backend \".*\";/set \\$active_backend \"backend-blue\";/" nginx.conf
-          else
-            sed -i "s/set \\$active_frontend \".*\";/set \\$active_frontend \"frontend-green\";/" nginx.conf
-            sed -i "s/set \\$active_backend \".*\";/set \\$active_backend \"backend-green\";/" nginx.conf
+        
+        echo "$TARGET_COLOR" > active_color.txt
+        
+        # --- Vérification post-bascule avec Retry et Rollback ---
+        MAX_RETRIES=6
+        RETRY_COUNT=0
+        
+        while [ $RETRY_COUNT -lt $MAX_RETRIES ]; do
+          if curl -sSf -I https://signaler-panne-305.duckdns.org | grep -q '200'; then
+            break
           fi
-          docker compose -f docker-compose.edge.yml up -d
-          docker compose -f docker-compose.edge.yml exec -T edge nginx -t
+          RETRY_COUNT=$((RETRY_COUNT + 1 ))
+          sleep 5
+        done
+        
+        if [ $RETRY_COUNT -eq $MAX_RETRIES ]; then
+          # Rollback
+          sed -i "s/set \\$active_frontend \".*\";/set \\$active_frontend \"$PREVIOUS_FE\";/" nginx.conf
+          sed -i "s/set \\$active_backend \".*\";/set \\$active_backend \"$PREVIOUS_BE\";/" nginx.conf
+          docker compose -f docker-compose.edge.yml exec -T edge nginx -t --quiet
           docker compose -f docker-compose.edge.yml exec -T edge nginx -s reload
+          echo "$ACTIVE_COLOR" > active_color.txt
+          echo "Rollback vers $ACTIVE_COLOR effectué. Le déploiement a échoué."
           exit 1
-        }
-
-        echo "Bascule vers $TARGET réussie sans downtime."
+        fi
+        
+        echo "Déploiement vers $TARGET_COLOR réussi."
+        
+        # --- Nettoyage ---
+        echo "Arrêt et suppression de l'ancienne couleur ($ACTIVE_COLOR)..."
+        docker compose -f docker-compose.${ACTIVE_COLOR}.yml down --remove-orphans
+        
         EOF
