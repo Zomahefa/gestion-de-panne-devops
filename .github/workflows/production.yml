@@ -292,14 +292,15 @@ jobs:
         echo "Couleur active: $ACTIVE_COLOR ; Inactive à déployer: $TARGET_COLOR"
         
         # --- Démarrage des services statiques (DB et Monitoring) ---
-        docker compose --project-name panne-prod -f docker-compose.db.yml -f docker-compose.monitoring.yml -f docker-compose.edge.yml --env-file .env.global up -d --no-recreate
+        docker compose --project-name panne-prod -f docker-compose.db.yml --env-file .env.global up -d --no-recreate
+        docker compose --project-name panne-prod -f docker-compose.monitoring.yml up -d --no-recreate
         
         # --- Déploiement de la nouvelle couleur ---
         # Correction de l'erreur "unhealthy" avec --wait
         # Forcer la mise à jour des images latest
         docker compose --project-name panne-prod -f $TARGET_COMPOSE --env-file .env.global pull
         docker compose --project-name panne-prod -f $TARGET_COMPOSE --env-file .env.global up -d --wait
-        
+        docker compose --project-name panne-prod -f docker-compose.edge.yml up -d --no-recreate
         # --- Tests de santé de la nouvelle couleur ---
         docker compose --project-name panne-prod -f docker-compose.edge.yml --env-file .env.global exec -T edge sh -c "apk add --no-cache curl >/dev/null 2>&1 || true"
         docker compose --project-name panne-prod -f $TARGET_COMPOSE --env-file .env.global exec -T $INACTIVE_BE curl -sSf http://localhost:8000/health/ | grep -q "ok"
