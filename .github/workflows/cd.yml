@@ -86,15 +86,19 @@ jobs:
         docker exec $INACTIVE_BE curl -sSf http://localhost:8000/health/ | grep -q "ok" || exit 1
         
         # Test frontend  
-        docker exec $INACTIVE_FE curl -sSf http://localhost/ | head -n 1 >/dev/null || exit 1
+        docker exec $INACTIVE_FE curl -sSf http://localhost/ | grep -q '<div id="root">' || exit 1
+
         
-        # --- Bascule: modification de Nginx CORRIGÉE ---
+        # --- Bascule: modification de Nginx---
         sed -i 's|set[[:space:]]\+\$active_frontend[[:space:]]\+".*"|set $active_frontend "'"$SERVICE_INACTIVE_FE"'"|' nginx.conf
         sed -i 's|set[[:space:]]\+\$active_backend[[:space:]]\+".*"|set $active_backend "'"$SERVICE_INACTIVE_BE"'"|' nginx.conf
+        grep 'set $active_backend' nginx.conf
+        grep 'set $active_frontend' nginx.conf
 
 
         
         # --- Rechargement Nginx ---
+        sleep 5
         docker exec edge nginx -t
         docker exec edge nginx -s reload
         
