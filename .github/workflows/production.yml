@@ -238,6 +238,7 @@ jobs:
   Deploy:
     name: Déploiement blue/green 
     runs-on: ubuntu-latest 
+    needs: [Dockerhub]
     steps:
     - name: Checkout du code
       uses: actions/checkout@v5
