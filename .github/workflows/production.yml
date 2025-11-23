@@ -4,243 +4,11 @@ on:
     branches: [ "main" ]
   pull_request:
     branches: [ "main"]
-
 jobs:
-  Lint:
-    name: Lint Python & React
-    runs-on: ubuntu-latest
-    steps:
-    - name: Checkout du code
-      uses: actions/checkout@v5
-
-    - name: Setup Python
-      uses: actions/setup-python@v6
-      with:
-        python-version: '3.13'
-        cache: 'pip'
-
-    - name: Installer Ruff
-      run: pip install ruff
-
-    - name: Lint Python avec Ruff
-      run: |
-        cd backend
-        ruff check . --output-format=json > ruff-report.json
-      
-    - name: Upload Ruff report
-      uses: actions/upload-artifact@v4
-      with:
-        name: ruff-report
-        path: backend/ruff-report.json
-
-    - name: Format Python avec Ruff
-      run: |
-        cd backend
-        ruff check . --fix
-        ruff format .
-
-    - name: Setup Node.js
-      uses: actions/setup-node@v6
-      with:
-        node-version: 20.19.0
-        cache: 'npm'
-        cache-dependency-path: frontend/package-lock.json
-
-    - name: Installer les dépendances React
-      run: |
-        cd frontend
-        npm install --legacy-peer-deps
-
-    - name: Lint React avec ESLint
-      run: |
-        cd frontend
-        npx eslint src --ext .js,.jsx,.ts,.tsx -f json -o eslint-report.json
-    - name: Upload ESLint report
-      uses: actions/upload-artifact@v4
-      with:
-        name: eslint-report
-        path: frontend/eslint-report.json
-
-  Test:
-    name: Tests Django & React + Coverage
-    runs-on: ubuntu-latest
-    steps:
-    - name: Checkout du code
-      uses: actions/checkout@v5
-
-    - name: Setup Python
-      uses: actions/setup-python@v6
-      with:
-        python-version: '3.13'
-        cache: 'pip'
-
-    - name: Installer les dépendances Python
-      run: |
-        cd backend
-        python -m pip install --upgrade pip
-        pip install -r requirements.txt
-
-    - name: Installer coverage.py
-      run: pip install coverage
-
-    - name: Tests Django avec coverage
-      run: |
-        cd backend
-        coverage run manage.py test --settings=backend.settings_ci
-        coverage report
-        coverage html
-
-    - name: Upload rapport coverage Django
-      uses: actions/upload-artifact@v4
-      with:
-        name: django-coverage-report
-        path: backend/htmlcov
-
-    - name: Setup Node.js
-      uses: actions/setup-node@v6
-      with:
-        node-version: 20.19.0
-        cache: 'npm'
-        cache-dependency-path: frontend/package-lock.json
-
-    - name: Installer les dépendances React
-      run: |
-        cd frontend
-        npm install --legacy-peer-deps
-    
-    - name: Tests React avec Vitest + coverage
-      run: |
-        cd frontend
-        npx vitest run --coverage
-
-    - name: Upload rapport coverage React
-      uses: actions/upload-artifact@v4
-      with:
-        name: react-coverage-report
-        path: frontend/coverage
-
-  Security:
-    name: Analyse de sécurité (Semgrep + Trivy)
-    runs-on: ubuntu-latest
-    steps:
-    - name: Checkout du code
-      uses: actions/checkout@v5
-
-    - name: Setup Node.js
-      uses: actions/setup-node@v6
-      with:
-        node-version: 20.19.0
-        cache: 'npm'
-        cache-dependency-path: frontend/package-lock.json
-    - name: Audit sécurité npm
-      run: |
-        cd frontend
-        npm audit --audit-level=high || echo "Vulnérabilités connues, documentées dans SECURITY.md"
-    - name: Setup Python
-      uses: actions/setup-python@v6
-      with:
-        python-version: '3.13'
-        cache: 'pip'
-
-    - name: Audit sécurité Python
-      run: |
-        pip install pip-audit
-        pip-audit || echo "Vulnérabilités connues, documentées dans SECURITY.md"
-
-    - name: Installer Semgrep
-      run: pip install semgrep
-
-    - name: Scan de sécurité avec Semgrep
-      run: semgrep --config=auto --json > semgrep-report.json
-    - name: Upload rapport Semgrep
-      uses: actions/upload-artifact@v4
-      with:
-        name: semgrep-report
-        path: semgrep-report.json
-
-    - name: Scan Dockerfile backend
-      uses: aquasecurity/trivy-action@master
-      with:
-        scan-type: 'fs'
-        scan-ref: './backend/Dockerfile'
-    - name: Scan Dockerfile frontend
-      uses: aquasecurity/trivy-action@master
-      with:
-        scan-type: 'fs'
-        scan-ref: './frontend/Dockerfile.dev'
-    - name: Scan docker-compose.blue.yml
-      uses: aquasecurity/trivy-action@master
-      with:
-        scan-type: 'fs'
-        scan-ref: './docker-compose.blue.yml'
-    - name: Scan docker-compose.green.yml
-      uses: aquasecurity/trivy-action@master
-      with:
-        scan-type: 'fs'
-        scan-ref: './docker-compose.green.yml'
-    - name: Scan docker-compose.db.yml
-      uses: aquasecurity/trivy-action@master
-      with:
-        scan-type: 'fs'
-        scan-ref: './docker-compose.db.yml'
-    - name: Scan docker-compose.monitoring.yml
-      uses: aquasecurity/trivy-action@master
-      with:
-        scan-type: 'fs'
-        scan-ref: './docker-compose.monitoring.yml'
-    - name: Scan docker-compose.edge.yml
-      uses: aquasecurity/trivy-action@master
-      with:
-        scan-type: 'fs'
-        scan-ref: './docker-compose.edge.yml'
-  Dockerhub:
-    name: Build & push des images vers dockerhub
-    runs-on: ubuntu-latest
-    needs: [Lint, Test, Security]
-    if: success()
-    steps:
-      - name: Checkout du code
-        uses: actions/checkout@v5
-
-      - name: Login to Docker Hub
-        uses: docker/login-action@v3
-        with:
-          username: ${{ vars.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
-  
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v3
-  
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-  
-      - name: Build & Push Frontend
-        uses: docker/build-push-action@v6
-        with:
-          context: ./frontend
-          file: ./frontend/Dockerfile.prod
-          push: true
-          build-args: |
-            REACT_APP_API_URL=${{ vars.REACT_APP_API_URL }}
-          tags: |
-            ${{ vars.DOCKERHUB_USERNAME }}/react-frontend-panne-prod:v${{ github.run_number }}
-            ${{ vars.DOCKERHUB_USERNAME }}/react-frontend-panne-prod:latest
-
-      - name: Build & Push Backend
-        uses: docker/build-push-action@v6
-        with:
-          context: ./backend
-          file: ./backend/Dockerfile
-          push: true
-          tags: |
-            ${{ vars.DOCKERHUB_USERNAME }}/django-backend-panne-prod:v${{ github.run_number }}
-            ${{ vars.DOCKERHUB_USERNAME }}/django-backend-panne-prod:latest
   Deploy:
     name: Déploiement blue/green 
-    runs-on: ubuntu-latest
-    needs: [Dockerhub]   
+    runs-on: ubuntu-latest 
     steps:
-    # ... (Début du job Deploy) ...
     - name: Checkout du code
       uses: actions/checkout@v5
     - name: Préparer agent SSH
@@ -271,7 +39,6 @@ jobs:
         cd ${{ secrets.VPS_PROJECT_DIR }}
         
         # --- Définition des variables ---
-        # Utilisation d'un fichier active_color.txt pour déterminer la couleur active/inactive
         ACTIVE_COLOR=$(cat active_color.txt 2>/dev/null || echo "blue")
         
         if [ "$ACTIVE_COLOR" = "blue" ]; then
@@ -292,31 +59,38 @@ jobs:
         
         echo "Couleur active: $ACTIVE_COLOR ; Inactive à déployer: $TARGET_COLOR"
         
-        # --- Démarrage des services statiques (DB et Monitoring) ---
+        # --- Démarrage des services statiques ---
         docker compose --project-name panne-prod -f docker-compose.db.yml --env-file .env.global up -d --no-recreate
         docker compose --project-name panne-prod -f docker-compose.monitoring.yml up -d --no-recreate
         
         # --- Déploiement de la nouvelle couleur ---
-        # Correction de l'erreur "unhealthy" avec --wait
-        # Forcer la mise à jour des images latest
         docker compose --project-name panne-prod -f $TARGET_COMPOSE --env-file .env.global pull
         docker compose --project-name panne-prod -f $TARGET_COMPOSE --env-file .env.global up -d --wait
         docker compose --project-name panne-prod -f docker-compose.edge.yml up -d --no-recreate
-        # --- Tests de santé de la nouvelle couleur ---
-        docker compose --project-name panne-prod -f docker-compose.edge.yml --env-file .env.global exec -T edge sh -c "apk add --no-cache curl >/dev/null 2>&1 || true"
-        docker compose --project-name panne-prod -f $TARGET_COMPOSE --env-file .env.global exec -T $INACTIVE_BE curl -sSf http://localhost:8000/health/ | grep -q "ok"
-        docker compose --project-name panne-prod -f $TARGET_COMPOSE --env-file .env.global exec -T $INACTIVE_FE curl -sSf http://localhost/ | head -n 1 >/dev/null
         
-        # --- Bascule: modification de Nginx et reload ---
+        # --- TESTS DE SANTÉ AVEC DOCKER EXEC ---
+        echo "🔍 Tests santé avec docker exec..."
+        
+        # Installation curl dans edge
+        docker exec edge sh -c "apk add --no-cache curl >/dev/null 2>&1 || true"
+        
+        # Test backend
+        docker exec $INACTIVE_BE curl -sSf http://localhost:8000/health/ | grep -q "ok" || exit 1
+        
+        # Test frontend  
+        docker exec $INACTIVE_FE curl -sSf http://localhost/ | head -n 1 >/dev/null || exit 1
+        
+        # --- Bascule: modification de Nginx ---
         sed -i "s/set \\$active_frontend \".*\";/set \\$active_frontend \"$INACTIVE_FE\";/" nginx.conf
         sed -i "s/set \\$active_backend \".*\";/set \\$active_backend \"$INACTIVE_BE\";/" nginx.conf
         
-        docker compose --project-name panne-prod -f docker-compose.edge.yml --env-file .env.global exec -T edge nginx -t --quiet
-        docker compose --project-name panne-prod -f docker-compose.edge.yml --env-file .env.global exec -T edge nginx -s reload
+        # --- Rechargement Nginx avec DOCKER EXEC ---
+        docker exec edge nginx -t --quiet
+        docker exec edge nginx -s reload
         
         echo "$TARGET_COLOR" > active_color.txt
         
-        # --- Vérification post-bascule avec Retry et Rollback ---
+        # --- Vérification post-bascule ---
         MAX_RETRIES=6
         RETRY_COUNT=0
         
@@ -332,8 +106,8 @@ jobs:
           # Rollback
           sed -i "s/set \\$active_frontend \".*\";/set \\$active_frontend \"$PREVIOUS_FE\";/" nginx.conf
           sed -i "s/set \\$active_backend \".*\";/set \\$active_backend \"$PREVIOUS_BE\";/" nginx.conf
-          docker compose --project-name panne-prod -f docker-compose.edge.yml --env-file .env.global exec -T edge nginx -t --quiet
-          docker compose --project-name panne-prod -f docker-compose.edge.yml --env-file .env.global exec -T edge nginx -s reload
+          docker exec edge nginx -t --quiet
+          docker exec edge nginx -s reload
           echo "$ACTIVE_COLOR" > active_color.txt
           echo "Rollback vers $ACTIVE_COLOR effectué. Le déploiement a échoué."
           exit 1

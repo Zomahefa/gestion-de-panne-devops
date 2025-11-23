@@ -52,9 +52,9 @@ services:
     container_name: mysql-exporter-monitoring
     restart: always
     command:
-      - '--config.my-cnf=/etc/.my.cnf'
+      - '--config.my-cnf=/etc/my-exporter.cnf'
     volumes:
-      - ./.my.cnf:/etc/.my.cnf:ro
+      - ./my-exporter.cnf:/etc/my-exporter.cnf:ro
     networks:
       - panne-jirama-blue
       - panne-jirama-green 
