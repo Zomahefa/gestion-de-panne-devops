@@ -1,0 +1,123 @@
+name: CD blue/green
+on:
+  workflow_run:
+    workflows: ["CI Pipeline"]
+    types: [completed]           
+jobs:
+  Deploy:
+    name: Déploiement blue/green 
+    runs-on: ubuntu-latest 
+    steps:
+    - name: Checkout du code
+      uses: actions/checkout@v5
+    - name: Préparer agent SSH
+      uses: webfactory/ssh-agent@v0.7.0
+      with:
+        ssh-private-key: ${{ secrets.VPS_SSH_KEY }}
+    - name: Synchroniser fichiers de configuration
+      run: |
+        # Synchronisation uniquement des fichiers de configuration nécessaires
+        rsync -avz --delete \
+          --include='docker-compose.*.yml' \
+          --include='nginx.conf' \
+          --include='monitoring/' \
+          --include='monitoring/**' \
+          --exclude='.env.global' \
+          --exclude='.my.cnf' \
+          --exclude='active_color.txt' \
+          --exclude='*' \
+          -e "ssh -o StrictHostKeyChecking=no" \
+          $GITHUB_WORKSPACE/ \
+          ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:${{ secrets.VPS_PROJECT_DIR }}
+    - name: Vérifier fichiers copiés
+      run: ssh -o StrictHostKeyChecking=no ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} "ls -l ${{ secrets.VPS_PROJECT_DIR }}"
+    
+    - name: Déployer couleur inactive, tester, basculer
+      run: |
+        ssh -o StrictHostKeyChecking=no ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} << 'EOF'
+        set -e
+        cd ${{ secrets.VPS_PROJECT_DIR }}
+        
+        # --- Définition des variables ---
+        ACTIVE_COLOR=$(cat active_color.txt 2>/dev/null || echo "blue")
+        
+        if [ "$ACTIVE_COLOR" = "blue" ]; then
+          TARGET_COLOR="green"
+          TARGET_COMPOSE="docker-compose.green.yml"
+          INACTIVE_FE="frontendGreen"
+          INACTIVE_BE="backendGreen"
+          PREVIOUS_FE="frontendBlue"
+          PREVIOUS_BE="backendBlue"
+        else
+          TARGET_COLOR="blue"
+          TARGET_COMPOSE="docker-compose.blue.yml"
+          INACTIVE_FE="frontendBlue"
+          INACTIVE_BE="backendBlue"
+          PREVIOUS_FE="frontendGreen"
+          PREVIOUS_BE="backendGreen"
+        fi
+        
+        echo "Couleur active: $ACTIVE_COLOR ; Inactive à déployer: $TARGET_COLOR"
+        
+        # --- Démarrage des services statiques ---
+        docker compose -f docker-compose.db.yml --env-file .env.global up -d --no-recreate
+        docker compose -f docker-compose.monitoring.yml up -d --no-recreate
+        
+        # --- Déploiement de la nouvelle couleur ---
+        docker compose -f $TARGET_COMPOSE --env-file .env.global pull
+        docker compose -f $TARGET_COMPOSE --env-file .env.global up -d --wait
+        docker compose -f docker-compose.edge.yml up -d --no-recreate
+        
+        # --- TESTS DE SANTÉ AVEC DOCKER EXEC ---
+        echo "🔍 Tests santé avec docker exec..."
+        
+        # Installation curl dans edge
+        docker exec edge sh -c "apk add --no-cache curl >/dev/null 2>&1 || true"
+        
+        # Test backend
+        docker exec $INACTIVE_BE curl -sSf http://localhost:8000/health/ | grep -q "ok" || exit 1
+        
+        # Test frontend  
+        docker exec $INACTIVE_FE curl -sSf http://localhost/ | head -n 1 >/dev/null || exit 1
+        
+        # --- Bascule: modification de Nginx CORRIGÉE ---
+        sed -i "s/set \\$active_frontend \"[^\"]*\"/set \\$active_frontend \"$INACTIVE_FE\"/" nginx.conf
+        sed -i "s/set \\$active_backend \"[^\"]*\"/set \\$active_backend \"$INACTIVE_BE\"/" nginx.conf
+        
+        # --- Rechargement Nginx ---
+        docker exec edge nginx -t
+        docker exec edge nginx -s reload
+        
+        echo "$TARGET_COLOR" > active_color.txt
+        
+        # --- Vérification post-bascule ---
+        MAX_RETRIES=6
+        RETRY_COUNT=0
+        
+        while [ $RETRY_COUNT -lt $MAX_RETRIES ]; do
+          if curl -sSf -I https://signaler-panne-305.duckdns.org | grep -q '200'; then
+            break
+          fi
+          RETRY_COUNT=$((RETRY_COUNT + 1 ))
+          sleep 5
+        done
+        
+        if [ $RETRY_COUNT -eq $MAX_RETRIES ]; then
+          # Rollback CORRIGÉ
+          sed -i "s/set \\$active_frontend \"[^\"]*\"/set \\$active_frontend \"$PREVIOUS_FE\"/" nginx.conf
+          sed -i "s/set \\$active_backend \"[^\"]*\"/set \\$active_backend \"$PREVIOUS_BE\"/" nginx.conf
+          docker exec edge nginx -t  # SUPPRIMÉ --quiet
+          docker exec edge nginx -s reload
+          echo "$ACTIVE_COLOR" > active_color.txt
+          echo "Rollback vers $ACTIVE_COLOR effectué. Le déploiement a échoué."
+          exit 1
+        fi
+        
+        echo "Déploiement vers $TARGET_COLOR réussi."
+        
+        # --- Nettoyage ---
+        echo "Arrêt et suppression de l'ancienne couleur ($ACTIVE_COLOR)..."
+        docker compose -f docker-compose.${ACTIVE_COLOR}.yml --env-file .env.global down
+        
+        EOF
+    
