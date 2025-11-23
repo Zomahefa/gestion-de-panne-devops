@@ -138,3 +138,8 @@ def notify_admin(request):
 @require_GET
 def health_check(request):
     return JsonResponse({'status': 'ok'})
+
+def status_check(request):
+    return JsonResponse({
+        "status": "ok be",
+    })

@@ -113,15 +113,20 @@ form button:hover {
     height: 40px;
   }
 
+  /* Correction : garder les boutons horizontaux */
   .client-nav {
-    flex-direction: column;
-    align-items: stretch;
+    flex-direction: row;
+    justify-content: space-between;
+    gap: 0.3rem;
+    flex-wrap: nowrap;
   }
 
   .client-nav .btn {
-    width: 100%;
-    font-size: 0.85rem;
-    padding: 0.5rem 0.8rem;
+    flex: 1 1 auto;
+    min-width: 0;
+    font-size: 0.75rem;
+    padding: 0.4rem 0.6rem;
+    text-align: center;
   }
 
   form input,
