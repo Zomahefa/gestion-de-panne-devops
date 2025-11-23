@@ -85,7 +85,7 @@ jobs:
         sed -i "s/set \\$active_backend \".*\";/set \\$active_backend \"$INACTIVE_BE\";/" nginx.conf
         
         # --- Rechargement Nginx avec DOCKER EXEC ---
-        docker exec edge nginx -t --quiet
+        docker exec edge nginx -t
         docker exec edge nginx -s reload
         
         echo "$TARGET_COLOR" > active_color.txt
