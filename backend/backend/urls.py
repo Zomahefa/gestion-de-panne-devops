@@ -13,12 +13,12 @@ from todo.views import status_check
 
 urlpatterns = [
     path('api/admin/', admin.site.urls),
-    path('api/health/', health_check),
-    path('api/status/', status_check),
+    path('health/', health_check),
     path('api/', include('todo.urls')),
     path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),  # ✅ login
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),  # ✅ refresh
     path('metrics/', ExportToDjangoView),
+    path('api/status/', status_check),
 ]
 
 
