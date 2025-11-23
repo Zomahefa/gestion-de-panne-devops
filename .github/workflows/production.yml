@@ -263,6 +263,7 @@ jobs:
           ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:${{ secrets.VPS_PROJECT_DIR }}
     - name: Vérifier fichiers copiés
       run: ssh -o StrictHostKeyChecking=no ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} "ls -l ${{ secrets.VPS_PROJECT_DIR }}"
+    
     - name: Déployer couleur inactive, tester, basculer
       run: |
         ssh -o StrictHostKeyChecking=no ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} << 'EOF'
@@ -311,11 +312,11 @@ jobs:
         # Test frontend  
         docker exec $INACTIVE_FE curl -sSf http://localhost/ | head -n 1 >/dev/null || exit 1
         
-        # --- Bascule: modification de Nginx ---
-        sed -i "s/set \\$active_frontend \".*\";/set \\$active_frontend \"$INACTIVE_FE\";/" nginx.conf
-        sed -i "s/set \\$active_backend \".*\";/set \\$active_backend \"$INACTIVE_BE\";/" nginx.conf
+        # --- Bascule: modification de Nginx CORRIGÉE ---
+        sed -i "s/set \\$active_frontend \"[^\"]*\"/set \\$active_frontend \"$INACTIVE_FE\"/" nginx.conf
+        sed -i "s/set \\$active_backend \"[^\"]*\"/set \\$active_backend \"$INACTIVE_BE\"/" nginx.conf
         
-        # --- Rechargement Nginx avec DOCKER EXEC ---
+        # --- Rechargement Nginx ---
         docker exec edge nginx -t
         docker exec edge nginx -s reload
         
@@ -334,10 +335,10 @@ jobs:
         done
         
         if [ $RETRY_COUNT -eq $MAX_RETRIES ]; then
-          # Rollback
-          sed -i "s/set \\$active_frontend \".*\";/set \\$active_frontend \"$PREVIOUS_FE\";/" nginx.conf
-          sed -i "s/set \\$active_backend \".*\";/set \\$active_backend \"$PREVIOUS_BE\";/" nginx.conf
-          docker exec edge nginx -t --quiet
+          # Rollback CORRIGÉ
+          sed -i "s/set \\$active_frontend \"[^\"]*\"/set \\$active_frontend \"$PREVIOUS_FE\"/" nginx.conf
+          sed -i "s/set \\$active_backend \"[^\"]*\"/set \\$active_backend \"$PREVIOUS_BE\"/" nginx.conf
+          docker exec edge nginx -t  # SUPPRIMÉ --quiet
           docker exec edge nginx -s reload
           echo "$ACTIVE_COLOR" > active_color.txt
           echo "Rollback vers $ACTIVE_COLOR effectué. Le déploiement a échoué."
@@ -348,5 +349,6 @@ jobs:
         
         # --- Nettoyage ---
         echo "Arrêt et suppression de l'ancienne couleur ($ACTIVE_COLOR)..."
-        docker compose -f docker-compose.${ACTIVE_COLOR}.yml --env-file .env.global down --remove-orphans
+        docker compose -f docker-compose.${ACTIVE_COLOR}.yml --env-file .env.global down
+        
         EOF
