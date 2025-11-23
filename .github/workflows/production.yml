@@ -251,16 +251,17 @@ jobs:
       run: |
         # Synchronisation uniquement des fichiers de configuration nécessaires
         rsync -avz --delete \
-        --include='docker-compose.*.yml' \
-        --include='nginx.conf' \
-        --include='monitoring/***' \
-        --exclude='.env.global' \
-        --exclude='.my.cnf' \
-        --exclude='active_color.txt' \
-        --exclude='*' \
-        -e "ssh -o StrictHostKeyChecking=no" \
-        $GITHUB_WORKSPACE/ \
-        ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:${{ secrets.VPS_PROJECT_DIR }}
+          --include='docker-compose.*.yml' \
+          --include='nginx.conf' \
+          --include='monitoring/' \
+          --include='monitoring/**' \
+          --exclude='.env.global' \
+          --exclude='.my.cnf' \
+          --exclude='active_color.txt' \
+          --exclude='*' \
+          -e "ssh -o StrictHostKeyChecking=no" \
+          $GITHUB_WORKSPACE/ \
+          ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:${{ secrets.VPS_PROJECT_DIR }}
     - name: Vérifier fichiers copiés
       run: ssh -o StrictHostKeyChecking=no ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} "ls -l ${{ secrets.VPS_PROJECT_DIR }}"
     - name: Déployer couleur inactive, tester, basculer

@@ -1,6 +1,6 @@
 services:
   db:
-    image: mysql:8.0
+    image: mariadb:10.11
     container_name: db-global
     restart: always
     environment:
@@ -15,13 +15,14 @@ services:
       retries: 10
       start_period: 40s
     volumes:
-      - mysql_data_prod:/var/lib/mysql
+      - mysql_data_production:/var/lib/mysql
     networks:
       - panne-jirama-blue
       - panne-jirama-green 
 
 volumes:
-  mysql_data_prod:       
+  mysql_data_production:  
+    name: mysql_data_production     
 networks:
   panne-jirama-blue:
     external: true
