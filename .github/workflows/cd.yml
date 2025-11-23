@@ -48,6 +48,10 @@ jobs:
           INACTIVE_BE="backendGreen"
           PREVIOUS_FE="frontendBlue"
           PREVIOUS_BE="backendBlue"
+          SERVICE_INACTIVE_FE="frontend-green"
+          SERVICE_INACTIVE_BE="backend-green"
+          SERVICE_ACTIVE_FE="frontend-blue"
+          SERVICE_ACTIVE_BE="backend-blue"
         else
           TARGET_COLOR="blue"
           TARGET_COMPOSE="docker-compose.blue.yml"
@@ -55,6 +59,10 @@ jobs:
           INACTIVE_BE="backendBlue"
           PREVIOUS_FE="frontendGreen"
           PREVIOUS_BE="backendGreen"
+          SERVICE_INACTIVE_FE="frontend-blue"
+          SERVICE_INACTIVE_BE="backend-blue"
+          SERVICE_ACTIVE_FE="frontend-green"
+          SERVICE_ACTIVE_BE="backend-green"
         fi
         
         echo "Couleur active: $ACTIVE_COLOR ; Inactive à déployer: $TARGET_COLOR"
@@ -81,8 +89,8 @@ jobs:
         docker exec $INACTIVE_FE curl -sSf http://localhost/ | head -n 1 >/dev/null || exit 1
         
         # --- Bascule: modification de Nginx CORRIGÉE ---
-        sed -i 's|set[[:space:]]\+\$active_frontend[[:space:]]\+".*"|set $active_frontend "'"$INACTIVE_FE"'"|' nginx.conf
-        sed -i 's|set[[:space:]]\+\$active_backend[[:space:]]\+".*"|set $active_backend "'"$INACTIVE_BE"'"|' nginx.conf
+        sed -i 's|set[[:space:]]\+\$active_frontend[[:space:]]\+".*"|set $active_frontend "'"$SERVICE_INACTIVE_FE"'"|' nginx.conf
+        sed -i 's|set[[:space:]]\+\$active_backend[[:space:]]\+".*"|set $active_backend "'"$SERVICE_INACTIVE_BE"'"|' nginx.conf
 
 
         
@@ -106,8 +114,8 @@ jobs:
         
         if [ $RETRY_COUNT -eq $MAX_RETRIES ]; then
           # Rollback CORRIGÉ
-          sed -i 's|set[[:space:]]\+\$active_frontend[[:space:]]\+".*"|set $active_frontend "'"$PREVIOUS_FE"'"|' nginx.conf
-          sed -i 's|set[[:space:]]\+\$active_backend[[:space:]]\+".*"|set $active_backend "'"$PREVIOUS_BE"'"|' nginx.conf
+          sed -i 's|set[[:space:]]\+\$active_frontend[[:space:]]\+".*"|set $active_frontend "'"$SERVICE_ACTIVE_FE"'"|' nginx.conf
+          sed -i 's|set[[:space:]]\+\$active_backend[[:space:]]\+".*"|set $active_backend "'"$SERVICE_ACTIVE_BE"'"|' nginx.conf
           docker exec edge nginx -s reload
           echo "$ACTIVE_COLOR" > active_color.txt
           echo "Rollback vers $ACTIVE_COLOR effectué. Le déploiement a échoué."
