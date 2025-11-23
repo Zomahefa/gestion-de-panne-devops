@@ -118,10 +118,10 @@ jobs:
         
         if [ $RETRY_COUNT -eq $MAX_RETRIES ]; then
           # Rollback CORRIGÉ
-          sed -i 's|set[[:space:]]\+\$active_frontend[[:space:]]\+".*"|set $active_frontend "'"$SERVICE_ACTIVE_FE"'"|' nginx.conf
-          sed -i 's|set[[:space:]]\+\$active_backend[[:space:]]\+".*"|set $active_backend "'"$SERVICE_ACTIVE_BE"'"|' nginx.conf
+          #sed -i 's|set[[:space:]]\+\$active_frontend[[:space:]]\+".*"|set $active_frontend "'"$SERVICE_ACTIVE_FE"'"|' nginx.conf
+          #sed -i 's|set[[:space:]]\+\$active_backend[[:space:]]\+".*"|set $active_backend "'"$SERVICE_ACTIVE_BE"'"|' nginx.conf
           docker exec edge nginx -s reload
-          echo "$ACTIVE_COLOR" > active_color.txt
+          #echo "$ACTIVE_COLOR" > active_color.txt
           echo "Rollback vers $ACTIVE_COLOR effectué. Le déploiement a échoué."
           exit 1
         fi
