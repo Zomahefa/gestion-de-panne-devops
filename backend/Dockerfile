@@ -42,7 +42,7 @@ USER zoappuser
 
 EXPOSE 8000
 
-HEALTHCHECK --interval=10s --timeout=5s --start-period=10s --retries=3 \
+HEALTHCHECK --interval=10s --timeout=3s --start-period=20s --retries=3 \
   CMD curl -f http://localhost:8000/api/health/ || exit 1
 
 STOPSIGNAL SIGTERM

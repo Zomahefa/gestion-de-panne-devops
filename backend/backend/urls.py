@@ -16,7 +16,6 @@ urlpatterns = [
     path('api/health/', health_check),
     path('api/status/', status_check),
     path('api/', include('todo.urls')),
-    path('api/', include('rest_framework.urls')),
     path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),  # ✅ login
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),  # ✅ refresh
     path('metrics/', ExportToDjangoView),
