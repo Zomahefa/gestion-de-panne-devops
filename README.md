@@ -1,4 +1,4 @@
-# 🚀 Gestion de Panne – DevOps Django + React +mysql fullstack
+# 🚀 Gestion de Panne – DevOps Django + React +mysql
 
 # 🎯 Objectif
 Application web conteneurisée avec CI/CD, DevSecOps, et déploiement automatisé.
