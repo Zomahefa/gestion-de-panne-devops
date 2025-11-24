@@ -22,6 +22,8 @@ jobs:
           --include='nginx.conf' \
           --include='monitoring/' \
           --include='monitoring/**' \
+          --include='conf.d/' \
+          --include='conf.d/**' \
           --exclude='.env.global' \
           --exclude='.my.cnf' \
           --exclude='active_color.txt' \
@@ -77,7 +79,7 @@ jobs:
         docker compose -f docker-compose.edge.yml up -d --no-recreate
         
         # --- TESTS DE SANTÉ AVEC DOCKER EXEC ---
-        echo "🔍 Tests santé avec docker exec..."
+        echo "Tests santé avec docker exec..."
         
         # Installation curl dans edge
         docker exec edge sh -c "apk add --no-cache curl >/dev/null 2>&1 || true"
@@ -89,19 +91,18 @@ jobs:
         docker exec $INACTIVE_FE curl -sSf http://localhost/ | grep -q '<div id="root">' || exit 1
 
         
-        # --- Bascule: modification de Nginx---
-        sed -i 's|set[[:space:]]\+\$active_frontend[[:space:]]\+".*"|set $active_frontend "'"$SERVICE_INACTIVE_FE"'"|' nginx.conf
-        sed -i 's|set[[:space:]]\+\$active_backend[[:space:]]\+".*"|set $active_backend "'"$SERVICE_INACTIVE_BE"'"|' nginx.conf
-        grep 'set $active_backend' nginx.conf
-        grep 'set $active_frontend' nginx.conf
+        # --- Bascule: modification des fichiers upstream ---
+        echo "server $SERVICE_INACTIVE_FE:80;" > conf.d/frontend_active.conf
+        echo "server $SERVICE_INACTIVE_BE:8000;" > conf.d/backend_active.conf
 
+        # Vérification
+        cat conf.d/frontend_active.conf
+        cat conf.d/backend_active.conf
 
-        
         # --- Rechargement Nginx ---
         sleep 5
         docker exec edge nginx -t
         docker exec edge nginx -s reload
-        
         echo "$TARGET_COLOR" > active_color.txt
         
         # --- Vérification post-bascule ---
@@ -117,9 +118,9 @@ jobs:
         done
         
         if [ $RETRY_COUNT -eq $MAX_RETRIES ]; then
-          # Rollback CORRIGÉ
-          #sed -i 's|set[[:space:]]\+\$active_frontend[[:space:]]\+".*"|set $active_frontend "'"$SERVICE_ACTIVE_FE"'"|' nginx.conf
-          #sed -i 's|set[[:space:]]\+\$active_backend[[:space:]]\+".*"|set $active_backend "'"$SERVICE_ACTIVE_BE"'"|' nginx.conf
+          # Rollback
+          echo "server $SERVICE_ACTIVE_FE:80;" > conf.d/frontend_active.conf
+          echo "server $SERVICE_ACTIVE_BE:8000;" > conf.d/backend_active.conf
           docker exec edge nginx -s reload
           #echo "$ACTIVE_COLOR" > active_color.txt
           echo "Rollback vers $ACTIVE_COLOR effectué. Le déploiement a échoué."
@@ -127,7 +128,6 @@ jobs:
         fi
         
         echo "Déploiement vers $TARGET_COLOR réussi."
-        
         # --- Nettoyage ---
         echo "Arrêt et suppression de l'ancienne couleur ($ACTIVE_COLOR)..."
         docker compose -f docker-compose.${ACTIVE_COLOR}.yml --env-file .env.global down
