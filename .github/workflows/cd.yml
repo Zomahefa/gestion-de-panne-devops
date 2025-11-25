@@ -24,6 +24,8 @@ jobs:
           --include='monitoring/**' \
           --include='conf.d/' \
           --include='conf.d/**' \
+          --include='nginx-secure/' \
+          --include='nginx-secure/**' \
           --exclude='.env.global' \
           --exclude='.my.cnf' \
           --exclude='active_color.txt' \
