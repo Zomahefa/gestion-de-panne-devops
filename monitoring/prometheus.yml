@@ -7,27 +7,28 @@ scrape_configs:
     scheme: https
     static_configs:
       - targets: ['signaler-panne-305.duckdns.org']
-        labels:
-          color: active
-          instance: backend
     relabel_configs:
-      - source_labels: [__address__]
-        target_label: __param_target
       - target_label: instance
-        replacement: backend
+        replacement: backend   # 🏷️ Remplace l'instance (qui serait le nom de domaine) par "backend"
+      - target_label: color
+        replacement: active 
 
   - job_name: 'mysql'
     metrics_path: /mysql-metrics/
     scheme: https
     static_configs:
       - targets: ['signaler-panne-305.duckdns.org']
-        labels:
-          color: active
-          instance: mysql
+    relabel_configs:
+      - target_label: instance
+        replacement: mysql
+      - target_label: color
+        replacement: active
 
   - job_name: 'node'
     static_configs:
       - targets: ['node-exporter:9100']
-        labels:
-          color: host
-          instance: node
+    relabel_configs:
+      - target_label: instance
+        replacement: serveur
+      - target_label: color
+        replacement: host

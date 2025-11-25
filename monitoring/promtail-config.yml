@@ -1,36 +1,50 @@
-server:
-  http_listen_port: 9080
-  grpc_listen_port: 0
-
-positions:
-  filename: /tmp/positions.yaml
-
-clients:
-  - url: http://loki:3100/loki/api/v1/push
-
 scrape_configs:
+  # 🔍 COLLECTE DES LOGS DOCKER
   - job_name: docker
     docker_sd_configs:
-      - host: unix:///var/run/docker.sock
+      - host: unix:///var/run/docker.sock  # 📞 Communication avec Docker
     relabel_configs:
+      # 🏷️ IDENTIFICATION DES SERVICES
       - source_labels: [__meta_docker_container_name]
         regex: (frontendBlue|frontendGreen|backendBlue|backendGreen)
-        target_label: service
+        target_label: service  # 🏷️ Ajoute le label 'service'
+      
+      # 🎨 DÉTECTION BLUE/GREEN
       - source_labels: [__meta_docker_container_name]
         regex: .*Blue
         target_label: color
-        replacement: blue
+        replacement: blue  # 🔵 Version blue
       - source_labels: [__meta_docker_container_name]
         regex: .*Green
         target_label: color
-        replacement: green
+        replacement: green  # 🟢 Version green
+      
+      # 📊 CATÉGORISATION DES APPLICATIONS
       - source_labels: [__meta_docker_container_name]
         regex: (frontend.*)
         target_label: job
-        replacement: react-frontend
+        replacement: react-frontend  # 🖥️ Frontend React
       - source_labels: [__meta_docker_container_name]
         regex: (backend.*)
         target_label: job
-        replacement: django-backend
+        replacement: django-backend  # 🐍 Backend Django
+      
+      # 📁 CHEMIN DES FICHIERS DE LOG
+      - source_labels: [__meta_docker_container_id]
+        target_label: __path__
+        replacement: /var/lib/docker/containers/${1}/*.log  # 🗂️ Logs Docker
     pipeline_stages:
-      - docker: {}
+      - docker: {}  # 🔄 Parsing des logs Docker
+
+  # 🔍 COLLECTE DES LOGS NGINX
+  - job_name: edge
+    static_configs:
+      - targets: [localhost]
+        labels:
+          job: edge
+          service: nginx
+          color: active
+          __path__: /var/log/nginx/*.log  # 🗂️ Logs Nginx
+    pipeline_stages:
+      - regex:
+          expression: '.*'  # 📝 Capture toutes les lignes de log

@@ -13,6 +13,7 @@ services:
       - /etc/letsencrypt:/etc/letsencrypt:ro
       - django_static:/back/staticfiles
       - django_media:/back/media
+      - ./nginx-secure:/etc/nginx/secure:ro
     networks:
       - panne-jirama-blue
       - panne-jirama-green 

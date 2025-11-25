@@ -2,23 +2,34 @@ services:
   prometheus:
     image: prom/prometheus
     container_name: prometheus-monitoring
+    ports:
+      - "9090:9090"  # 🔓 ACCÈS DIRECT: Permet l'accès via IP:9090 si Nginx est down
     volumes:
       - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
+      - ./monitoring/web.yml:/etc/prometheus/web.yml  # 🔐 NOUVEAU: Fichier d'authentification
     command:
       - '--config.file=/etc/prometheus/prometheus.yml'
-      - '--web.external-url=https://signaler-panne-305.duckdns.org/prometheus/'
-      - '--web.route-prefix=/prometheus'
+      - '--web.external-url=https://signaler-panne-305.duckdns.org/prometheus/'  # 🌐 URL publique
+      - '--web.route-prefix=/prometheus'  # 📍 Préfixe pour le routing Nginx
+      - '--web.config.file=/etc/prometheus/web.yml'  # 🔐 NOUVEAU: Active l'authentification
+      - '--web.enable-lifecycle'  # 🔄 Permet de recharger la config sans redémarrer
     depends_on:
       - mysql-exporter
     networks:
       - panne-jirama-blue
       - panne-jirama-green 
+
   grafana:
     image: grafana/grafana
     container_name: grafana-monitoring
+    ports:
+      - "3000:3000"  # 🔓 ACCÈS DIRECT: Permet l'accès via IP:3000 si Nginx est down
     environment:
-      - GF_SERVER_ROOT_URL=https://signaler-panne-305.duckdns.org/grafana/
-      - GF_SERVER_SERVE_FROM_SUB_PATH=true
+      - GF_SERVER_ROOT_URL=https://signaler-panne-305.duckdns.org/grafana/  # 🌐 URL publique
+      - GF_SERVER_SERVE_FROM_SUB_PATH=true  # 📍 Support des sous-chemins
+      - GF_SECURITY_ADMIN_PASSWORD=Admin123!  # 🔐 NOUVEAU: Mot de passe admin
+      - GF_USERS_ALLOW_SIGN_UP=false  # 🔐 Désactive l'inscription publique
+      - GF_AUTH_ANONYMOUS_ENABLED=false  # 🔐 Désactive l'accès anonyme
     volumes:
       - grafana_data:/var/lib/grafana
     depends_on:
@@ -27,6 +38,7 @@ services:
     networks:
       - panne-jirama-blue
       - panne-jirama-green 
+
   loki:
     image: grafana/loki:2.9.4
     container_name: loki-monitoring
@@ -34,12 +46,13 @@ services:
     networks:
       - panne-jirama-blue
       - panne-jirama-green 
+
   promtail:
     image: grafana/promtail:2.9.4
     container_name: promtail-monitoring
     volumes:
-      - /var/lib/docker/containers:/var/lib/docker/containers:ro
-      - /var/log:/var/log:ro
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro  # 📖 Lecture seule des logs Docker
+      - /var/log:/var/log:ro  # 📖 Lecture seule des logs système
       - ./monitoring/promtail-config.yml:/etc/promtail/config.yml
     command: -config.file=/etc/promtail/config.yml
     depends_on:
@@ -47,6 +60,7 @@ services:
     networks:
       - panne-jirama-blue
       - panne-jirama-green 
+
   mysql-exporter:
     image: prom/mysqld-exporter
     container_name: mysql-exporter-monitoring
@@ -58,19 +72,19 @@ services:
     networks:
       - panne-jirama-blue
       - panne-jirama-green 
+
   node-exporter:
     image: prom/node-exporter
     container_name: node-exporter-monitoring
     ports:
       - "9100:9100"
-    privileged: true
+    privileged: true  # ⚠️ Nécessaire pour accéder aux métriques système
     networks:
       - panne-jirama-blue
       - panne-jirama-green
 
-
 volumes:
-  grafana_data:
+  grafana_data:  # 💾 Stockage persistant pour Grafana
 
 networks:
   panne-jirama-blue:
@@ -78,4 +92,4 @@ networks:
     name: panne-jirama-blue  
   panne-jirama-green:
     external: true
-    name: panne-jirama-green           
+    name: panne-jirama-green
