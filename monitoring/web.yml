@@ -1,8 +1,2 @@
-# 🔐 CONFIGURATION DE SÉCURITÉ PROMETHEUS
-# Fichier pour l'authentification basic auth
-
 basic_auth_users:
-  # 👤 Utilisateur: prometheus-user
-  # 🔑 Mot de passe: SecurePass123! (hashé avec bcrypt)
-  # 💡 COMMANDE POUR GÉNÉRER: htpasswd -nB prometheus-user
-  prometheus-user: "$2y$12$V6M1bJcC3p9J8p2pNk5p5eB5v5j5v5j5v5j5v5j5v5j5v5j5v5j5u"
+  mahefa: "$2y$05$ShRUek7HOF2c.oEewfHOUu7haElcuj1i1y7m6RuwuRp9KlazH8P0C"
