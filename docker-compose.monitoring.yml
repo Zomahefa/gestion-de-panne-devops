@@ -6,19 +6,16 @@ services:
       - "9090:9090"  # 🔓 ACCÈS DIRECT: Permet l'accès via IP:9090 si Nginx est down
     volumes:
       - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
-      - ./monitoring/web.yml:/etc/prometheus/web.yml  # 🔐 NOUVEAU: Fichier d'authentification
     command:
       - '--config.file=/etc/prometheus/prometheus.yml'
       - '--web.external-url=https://signaler-panne-305.duckdns.org/prometheus/'  # 🌐 URL publique
       - '--web.route-prefix=/prometheus'  # 📍 Préfixe pour le routing Nginx
-      - '--web.config.file=/etc/prometheus/web.yml'  # 🔐 NOUVEAU: Active l'authentification
       - '--web.enable-lifecycle'  # 🔄 Permet de recharger la config sans redémarrer
     depends_on:
       - mysql-exporter
     networks:
       - panne-jirama-blue
       - panne-jirama-green 
-
   grafana:
     image: grafana/grafana
     container_name: grafana-monitoring
@@ -48,19 +45,19 @@ services:
       - panne-jirama-green 
 
   promtail:
-    image: grafana/promtail:2.9.4
+    image: grafana/promtail:3.5.8
     container_name: promtail-monitoring
     volumes:
-      - /var/lib/docker/containers:/var/lib/docker/containers:ro  # 📖 Lecture seule des logs Docker
+      - /var/lib/docker/vfs/containers:/var/lib/docker/vfs/containers:ro
       - /var/log:/var/log:ro  # 📖 Lecture seule des logs système
       - ./monitoring/promtail-config.yml:/etc/promtail/config.yml
+      - /var/run/docker.sock:/var/run/docker.sock:ro
     command: -config.file=/etc/promtail/config.yml
     depends_on:
       - loki
     networks:
       - panne-jirama-blue
       - panne-jirama-green 
-
   mysql-exporter:
     image: prom/mysqld-exporter
     container_name: mysql-exporter-monitoring
@@ -76,8 +73,6 @@ services:
   node-exporter:
     image: prom/node-exporter
     container_name: node-exporter-monitoring
-    ports:
-      - "9100:9100"
     privileged: true  # ⚠️ Nécessaire pour accéder aux métriques système
     networks:
       - panne-jirama-blue
