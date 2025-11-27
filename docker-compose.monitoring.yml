@@ -78,6 +78,21 @@ services:
       - panne-jirama-blue
       - panne-jirama-green
 
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor:latest
+    container_name: cadvisor-monitoring
+    ports:
+      - "8080:8080" 
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:ro
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+    networks:
+      - panne-jirama-blue
+      - panne-jirama-green
+
+
 volumes:
   grafana_data:  # 💾 Stockage persistant pour Grafana
 
