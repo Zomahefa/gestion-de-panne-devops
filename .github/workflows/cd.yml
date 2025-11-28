@@ -73,7 +73,7 @@ jobs:
         
         echo "Démarrage des services statiques ---"
         docker compose -f docker-compose.db.yml --env-file .env.global up -d --no-recreate
-        docker compose -f docker-compose.monitoring.yml up -d --no-recreate
+        docker compose -f docker-compose.monitoring.yml up -d 
         
         echo "Démarrage de la nouvelle couleur ---"
         docker compose -f $TARGET_COMPOSE --env-file .env.global pull

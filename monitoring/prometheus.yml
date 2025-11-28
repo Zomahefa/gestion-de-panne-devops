@@ -35,12 +35,23 @@ scrape_configs:
     static_configs:
       - targets: ['cadvisor:8080']
     relabel_configs:
-      - source_labels: [container_label_com_docker_compose_service]
-        target_label: service
-      - source_labels: [container_label_com_docker_compose_project]
-        target_label: project
-      - source_labels: [container_label_com_docker_compose_container_number]
-        target_label: container_number
       - target_label: instance
         replacement: cadvisor
+
+  - job_name: 'docker-metrics'
+    metrics_path: /metrics
+    static_configs:
+      - targets: ['cadvisor:8080']
+    relabel_configs:
+      - target_label: instance
+        replacement: docker-metrics
+
+  - job_name: 'prometheus'
+    metrics_path: prometheus/metrics
+    static_configs:
+      - targets: ['prometheus:9090']
+    relabel_configs:
+      - target_label: instance
+        replacement: prometheus
+
 
