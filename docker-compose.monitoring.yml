@@ -73,20 +73,15 @@ services:
   node-exporter:
     image: prom/node-exporter
     container_name: node-exporter-monitoring
-    privileged: true  # ⚠️ Nécessaire pour accéder aux métriques système
-    networks:
-      - panne-jirama-blue
-      - panne-jirama-green
-
-  cadvisor:
-    image: gcr.io/cadvisor/cadvisor:latest
-    container_name: cadvisor-monitoring
+    privileged: true
     volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
       - /:/rootfs:ro
-      - /var/run:/var/run:ro
-      - /sys:/sys:ro
-      - /var/lib/docker/:/var/lib/docker:ro
-      - /var/run/docker.sock:/var/run/docker.sock:ro
+    command:
+      - '--path.procfs=/host/proc'
+      - '--path.sysfs=/host/sys'
+      - '--collector.filesystem.ignored-mount-points="^/(sys|proc|host|etc|dev|tmp|var/lib/docker/.+)($|/)"'
     networks:
       - panne-jirama-blue
       - panne-jirama-green

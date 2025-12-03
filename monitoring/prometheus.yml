@@ -30,13 +30,10 @@ scrape_configs:
       - target_label: color
         replacement: host
 
-  - job_name: 'cadvisor'
-    metrics_path: /metrics
+  - job_name: 'docker-engine'
     static_configs:
-      - targets: ['cadvisor:8080']
-    relabel_configs:
-      - target_label: instance
-        replacement: cadvisor
+      - targets: ['host.docker.internal:9323']
+
 
   - job_name: 'docker-metrics'
     metrics_path: /metrics
