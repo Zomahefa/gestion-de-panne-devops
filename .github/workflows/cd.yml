@@ -92,7 +92,6 @@ jobs:
         echo "Test frontend ($INACTIVE_FE):"
         docker exec $INACTIVE_FE curl -sSf http://localhost/ | head -n 1 || exit 1
 
-
         echo "Bascule: modification des fichiers upstream---"
         echo "server $SERVICE_INACTIVE_FE:80;" > conf.d/frontend_active.conf
         echo "server $SERVICE_INACTIVE_BE:8000;" > conf.d/backend_active.conf
@@ -126,6 +125,8 @@ jobs:
           #echo "$ACTIVE_COLOR" > active_color.txt
           echo "Rollback vers $ACTIVE_COLOR effectué. Le déploiement a échoué."
           exit 1
+        else
+          echo "Toute est OK,roolback annulé"
         fi
         
         echo "Déploiement vers $TARGET_COLOR réussi."

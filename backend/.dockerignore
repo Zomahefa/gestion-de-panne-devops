@@ -1,43 +1,43 @@
-# 🐍 Fichiers Python compilés et caches
+#Fichiers Python compilés et caches
 __pycache__/
 *.pyc
 *.pyo
 *.pyd
 
-# 🔐 Fichiers d'environnement et secrets
+#Fichiers d'environnement et secrets
 .env
 .env.*
 secrets/
 
-# 📦 Gestion de version et dépendances
+#Gestion de version et dépendances
 .git
 .gitignore
 *.egg-info/
 env/
 venv/
 
-# 🗃️ Fichiers de base de données et logs
+#Fichiers de base de données et logs
 *.sqlite3
 *.log
 
-# 🧱 Fichiers statiques (générés par collectstatic)
+#Fichiers statiques (générés par collectstatic)
 static/
 
-# 🧪 Tests et couverture
+#Tests et couverture
 .coverage
 htmlcov/
 
-# 🧠 Fichiers liés à l'IDE et au système
+#Fichiers liés à l'IDE et au système
 .vscode/
 .idea/
 *.swp
 .DS_Store
 
-# 🐳 Fichiers liés à Docker
+#Fichiers liés à Docker
 Dockerfile
 .dockerignore
 
-# 📁 Dossier media (exclure les fichiers, garder le dossier)
+#Dossier media (exclure les fichiers, garder le dossier)
 media/*
 !media/.gitkeep
 

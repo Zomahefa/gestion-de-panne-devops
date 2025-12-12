@@ -18,7 +18,6 @@ services:
       - django_media:/back/media
     networks:
       - panne-jirama-green
-
   frontend-green:
     image: zomahefaranaivo/react-frontend-panne-prod:latest
     container_name: frontendGreen

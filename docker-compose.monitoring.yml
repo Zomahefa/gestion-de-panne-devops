@@ -2,15 +2,13 @@ services:
   prometheus:
     image: prom/prometheus
     container_name: prometheus-monitoring
-    ports:
-      - "9090:9090"  # 🔓 ACCÈS DIRECT: Permet l'accès via IP:9090 si Nginx est down
     volumes:
       - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
     command:
       - '--config.file=/etc/prometheus/prometheus.yml'
-      - '--web.external-url=https://signaler-panne-305.duckdns.org/prometheus/'  # 🌐 URL publique
-      - '--web.route-prefix=/prometheus'  # 📍 Préfixe pour le routing Nginx
-      - '--web.enable-lifecycle'  # 🔄 Permet de recharger la config sans redémarrer
+      - '--web.external-url=https://signaler-panne-305.duckdns.org/prometheus/'  # URL publique
+      - '--web.route-prefix=/prometheus'  #  Préfixe pour le routing Nginx
+      - '--web.enable-lifecycle'  # Permet de recharger la config sans redémarrer
     depends_on:
       - mysql-exporter
     networks:
@@ -20,13 +18,13 @@ services:
     image: grafana/grafana
     container_name: grafana-monitoring
     ports:
-      - "3000:3000"  # 🔓 ACCÈS DIRECT: Permet l'accès via IP:3000 si Nginx est down
+      - "3000:3000"  #  ACCÈS DIRECT: Permet l'accès via IP:3000 si Nginx est down
     environment:
-      - GF_SERVER_ROOT_URL=https://signaler-panne-305.duckdns.org/grafana/  # 🌐 URL publique
-      - GF_SERVER_SERVE_FROM_SUB_PATH=true  # 📍 Support des sous-chemins
-      - GF_SECURITY_ADMIN_PASSWORD=Admin123!  # 🔐 NOUVEAU: Mot de passe admin
-      - GF_USERS_ALLOW_SIGN_UP=false  # 🔐 Désactive l'inscription publique
-      - GF_AUTH_ANONYMOUS_ENABLED=false  # 🔐 Désactive l'accès anonyme
+      - GF_SERVER_ROOT_URL=https://signaler-panne-305.duckdns.org/grafana/  #  URL publique
+      - GF_SERVER_SERVE_FROM_SUB_PATH=true  #  Support des sous-chemins
+      - GF_SECURITY_ADMIN_PASSWORD=Admin123!  #  NOUVEAU: Mot de passe admin
+      - GF_USERS_ALLOW_SIGN_UP=false  #  Désactive l'inscription publique
+      - GF_AUTH_ANONYMOUS_ENABLED=false  #  Désactive l'accès anonyme
     volumes:
       - grafana_data:/var/lib/grafana
     depends_on:
@@ -49,7 +47,7 @@ services:
     container_name: promtail-monitoring
     volumes:
       - /var/lib/docker/vfs/containers:/var/lib/docker/vfs/containers:ro
-      - /var/log:/var/log:ro  # 📖 Lecture seule des logs système
+      - /var/log:/var/log:ro  # Lecture seule des logs système
       - ./monitoring/promtail-config.yml:/etc/promtail/config.yml
       - /var/run/docker.sock:/var/run/docker.sock:ro
     command: -config.file=/etc/promtail/config.yml
@@ -86,9 +84,8 @@ services:
       - panne-jirama-blue
       - panne-jirama-green
 
-
 volumes:
-  grafana_data:  # 💾 Stockage persistant pour Grafana
+  grafana_data:  #Stockage persistant pour Grafana
 
 networks:
   panne-jirama-blue:

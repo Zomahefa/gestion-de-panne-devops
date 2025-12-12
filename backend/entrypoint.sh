@@ -1,14 +1,12 @@
 #!/bin/bash
-
 echo "Attente de la base de données..."
 until nc -z db 3306; do
   echo "En attente de la base à db:3306..."
   sleep 5
 done
 
-echo "🚀 Migrations Django..."
+echo "Migrations Django..."
 python manage.py migrate --noinput
-
 echo "Vérification du superadmin..."
 python manage.py shell <<EOF
 from django.contrib.auth import get_user_model
@@ -21,7 +19,6 @@ echo "Vérification de l'admin applicatif..."
 python manage.py shell <<EOF
 from todo.models import Admin
 from django.contrib.auth.hashers import make_password
-
 if not Admin.objects.exists():
     Admin.objects.create(
         full_name="Admin Principal",

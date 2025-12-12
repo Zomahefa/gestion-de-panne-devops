@@ -1,6 +1,6 @@
 services:
   db:
-    image: mysql:8.0
+    image: mariadb:10.11
     container_name: db
     restart: unless-stopped
     environment:
@@ -20,7 +20,6 @@ services:
       - mysql_data:/var/lib/mysql
     networks:
       - panne_jirama
-
   backend:
     build:
       context: ./backend
@@ -48,8 +47,6 @@ services:
         condition: service_healthy
     networks:
       - panne_jirama
-
-
   frontend:
     build:
       context: ./frontend
@@ -68,9 +65,7 @@ services:
         condition: service_healthy
     networks:
       - panne_jirama
-
 volumes:
   mysql_data:
-
 networks:
   panne_jirama:

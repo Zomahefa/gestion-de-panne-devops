@@ -29,7 +29,7 @@ services:
         condition: service_healthy
     networks:
       - panne-jirama-blue
-
+      
 volumes:
   django_static:
     external: true

@@ -1,4 +1,4 @@
-# 🔐 Fichiers sensibles
+# Fichiers sensibles
 .env
 *.env
 .env.global
@@ -6,19 +6,19 @@
 Pipfile
 Pipfile.lock
 
-# 🗂️ Fichiers système
+# Fichiers système
 .DS_Store
 Thumbs.db
 *.swp
 
-# 🧪 Fichiers de test ou de debug
+#Fichiers de test ou de debug
 *.log
 *.sqlite3
 coverage/
 htmlcov/
 *.coverage
 
-# 🐍 Python / Django
+# ython / Django
 __pycache__/
 *.pyc
 *.pyo
@@ -27,13 +27,13 @@ venv/
 env/
 ENV/
 
-# 📁 Django media & static
+# Django media & static
 backend/media/incident_images/**
 !backend/media/incident_images/.gitkeep
 static/**
 !static/.gitkeep
 
-# 📦 Node.js / React
+#Node.js / React
 node_modules/
 npm-debug.log*
 yarn-debug.log*

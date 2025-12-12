@@ -119,16 +119,9 @@ blue-logs:
 blue-backend-bash:
 	docker exec -it $(CONTAINER_BACKEND_BLUE) bash
 blue-frontend-bash:
-	docker exec -it $(CONTAINER_FRONTEND_BLUE) bash
+	docker exec -it $(CONTAINER_FRONTEND_BLUE) bash+
 blue-backend-shell:
 	$(COMPOSE_BLUE) exec backend python manage.py shell
-
-#node exporter
-#node-exporter:
-#nohup ./node_exporter &
-#node-exporter-kill:
-#pkill -f node_exporter
-
 # ===edge proxy===
 reload-edge:
 	docker exec edge nginx -s reload
@@ -140,6 +133,8 @@ edge-bash:
 	docker exec -it edge sh
 edge-restart:
 	$(EDGE) restart
+edge-start:
+	$(EDGE) start
 
 # ===monitoring===
 monitoring-up:

@@ -124,7 +124,6 @@ jobs:
     steps:
     - name: Checkout du code
       uses: actions/checkout@v5
-
     - name: Setup Node.js
       uses: actions/setup-node@v6
       with:
@@ -140,15 +139,12 @@ jobs:
       with:
         python-version: '3.13'
         cache: 'pip'
-
     - name: Audit sécurité Python
       run: |
         pip install pip-audit
         pip-audit || echo "Vulnérabilités connues, documentées dans SECURITY.md"
-
     - name: Installer Semgrep
       run: pip install semgrep
-
     - name: Scan de sécurité avec Semgrep
       run: semgrep --config=auto --json > semgrep-report.json
     - name: Upload rapport Semgrep
@@ -156,7 +152,6 @@ jobs:
       with:
         name: semgrep-report
         path: semgrep-report.json
-
     - name: Scan Dockerfile backend
       uses: aquasecurity/trivy-action@master
       with:
