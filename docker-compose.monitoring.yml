@@ -83,7 +83,7 @@ services:
 volumes:
   grafana_data: 
     external: true
-    name: panne-jirama-blue
+    name: panne-2025_grafana_data
 networks:
   panne-jirama-blue:
     external: true
