@@ -4,7 +4,6 @@ until nc -z db 3306; do
   echo "En attente de la base à db:3306..."
   sleep 5
 done
-
 echo "Migrations Django..."
 python manage.py migrate --noinput
 echo "Vérification du superadmin..."
@@ -14,7 +13,6 @@ User = get_user_model()
 if not User.objects.filter(is_superuser=True).exists():
     User.objects.create_superuser('admin', 'admin@example.com', 'adminpass123')
 EOF
-
 echo "Vérification de l'admin applicatif..."
 python manage.py shell <<EOF
 from todo.models import Admin
@@ -32,6 +30,5 @@ if not Admin.objects.exists():
 else:
     print("Admin déjà présent en base, aucune création.")
 EOF
-
 echo "Initialisation terminée"
 exec "$@"

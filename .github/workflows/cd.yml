@@ -41,10 +41,8 @@ jobs:
         ssh -o StrictHostKeyChecking=no ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} << 'EOF'
         set -e
         cd ${{ secrets.VPS_PROJECT_DIR }}
-        
         # --- Définition des variables ---
         ACTIVE_COLOR=$(cat active_color.txt 2>/dev/null || echo "blue")
-        
         if [ "$ACTIVE_COLOR" = "blue" ]; then
           TARGET_COLOR="green"
           TARGET_COMPOSE="docker-compose.green.yml"
@@ -68,48 +66,36 @@ jobs:
           SERVICE_ACTIVE_FE="frontend-green"
           SERVICE_ACTIVE_BE="backend-green"
         fi
-        
         echo "Couleur active: $ACTIVE_COLOR ; Inactive à déployer: $TARGET_COLOR"
-        
         echo "Démarrage des services statiques ---"
         docker compose -f docker-compose.db.yml --env-file .env.global up -d --no-recreate
         docker compose -f docker-compose.monitoring.yml up -d --no-recreate
-        
         echo "Démarrage de la nouvelle couleur ---"
         docker compose -f $TARGET_COMPOSE --env-file .env.global pull
         docker compose -f $TARGET_COMPOSE --env-file .env.global up -d --wait
         docker compose -f docker-compose.edge.yml up -d --no-recreate
-        
         # --- TESTS DE SANTÉ AVEC DOCKER EXEC ---
         echo "Tests santé avec docker exec..."
-        
         # Installation curl dans edge
         docker exec edge sh -c "apk add --no-cache curl >/dev/null 2>&1 || true"
-        
         echo "Test backend ($INACTIVE_BE):"
         docker exec $INACTIVE_BE curl -sSf http://localhost:8000/health/ || exit 1
-        
         echo "Test frontend ($INACTIVE_FE):"
         docker exec $INACTIVE_FE curl -sSf http://localhost/ | head -n 1 || exit 1
-
         echo "Bascule: modification des fichiers upstream---"
         echo "server $SERVICE_INACTIVE_FE:80;" > conf.d/frontend_active.conf
         echo "server $SERVICE_INACTIVE_BE:8000;" > conf.d/backend_active.conf
-
         echo "Vérification des fichiers modifiés"
         cat conf.d/frontend_active.conf
         cat conf.d/backend_active.conf
-
         echo "Rechargement de Nginx ---"
         sleep 5
         docker exec edge nginx -t
         docker exec edge nginx -s reload
         echo "$TARGET_COLOR" > active_color.txt
-        
         echo "Vérification post-bascule ---"
         MAX_RETRIES=6
         RETRY_COUNT=0
-        
         while [ $RETRY_COUNT -lt $MAX_RETRIES ]; do
           if curl -sSf -I https://signaler-panne-305.duckdns.org | grep -q '200'; then
             break
@@ -127,8 +113,7 @@ jobs:
           exit 1
         else
           echo "Toute est OK,roolback annulé"
-        fi
-        
+        fi     
         echo "Déploiement vers $TARGET_COLOR réussi."
         echo "Nettoyage:Arrêt et suppression de l'ancienne couleur ($ACTIVE_COLOR)..."
         docker compose -f docker-compose.${ACTIVE_COLOR}.yml --env-file .env.global down

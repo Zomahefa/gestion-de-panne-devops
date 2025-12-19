@@ -23,7 +23,6 @@ volumes:
   django_static:
     external: true
     name: jirama-django-static
-
 networks:
   panne-jirama-blue:
     external: true

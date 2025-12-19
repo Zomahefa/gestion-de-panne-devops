@@ -10,47 +10,39 @@ jobs:
     steps:
     - name: Checkout du code
       uses: actions/checkout@v5
-
     - name: Setup Python
       uses: actions/setup-python@v6
       with:
         python-version: '3.13'
         cache: 'pip'
-
     - name: Installer Ruff
       run: pip install ruff
-
     - name: Lint Python avec Ruff
       continue-on-error: true
       run: |
         cd backend
-        ruff check . --output-format=json > ruff-report.json
-      
+        ruff check . --output-format=json > ruff-report.json  
     - name: Upload Ruff report
       uses: actions/upload-artifact@v4
       with:
         name: ruff-report
         path: backend/ruff-report.json
-
     - name: Format Python avec Ruff
       continue-on-error: true
       run: |
         cd backend
         ruff check . --fix
         ruff format .
-
     - name: Setup Node.js
       uses: actions/setup-node@v6
       with:
         node-version: 20.19.0
         cache: 'npm'
         cache-dependency-path: frontend/package-lock.json
-
     - name: Installer les dépendances React
       run: |
         cd frontend
         npm install --legacy-peer-deps
-
     - name: Lint React avec ESLint
       run: |
         cd frontend
@@ -67,22 +59,18 @@ jobs:
     steps:
     - name: Checkout du code
       uses: actions/checkout@v5
-
     - name: Setup Python
       uses: actions/setup-python@v6
       with:
         python-version: '3.13'
         cache: 'pip'
-
     - name: Installer les dépendances Python
       run: |
         cd backend
         python -m pip install --upgrade pip
         pip install -r requirements.txt
-
     - name: Installer coverage.py
       run: pip install coverage
-
     - name: Tests Django avec coverage
       continue-on-error: true
       run: |
@@ -95,7 +83,6 @@ jobs:
       with:
         name: django-coverage-report
         path: backend/htmlcov
-
     - name: Setup Node.js
       uses: actions/setup-node@v6
       with:
@@ -125,7 +112,6 @@ jobs:
     steps:
     - name: Checkout du code
       uses: actions/checkout@v5
-
     - name: Setup Node.js
       uses: actions/setup-node@v6
       with:
@@ -141,15 +127,12 @@ jobs:
       with:
         python-version: '3.13'
         cache: 'pip'
-
     - name: Audit sécurité Python
       run: |
         pip install pip-audit
         pip-audit || echo "Vulnérabilités connues, documentées dans SECURITY.md"
-
     - name: Installer Semgrep
       run: pip install semgrep
-
     - name: Scan de sécurité avec Semgrep
       continue-on-error: true
       run: semgrep --config=auto --json > semgrep-report.json
@@ -158,7 +141,6 @@ jobs:
       with:
         name: semgrep-report
         path: semgrep-report.json
-
     - name: Scan Dockerfile backend
       continue-on-error: true
       uses: aquasecurity/trivy-action@master

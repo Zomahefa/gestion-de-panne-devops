@@ -28,8 +28,7 @@ services:
       backend-blue:
         condition: service_healthy
     networks:
-      - panne-jirama-blue
-      
+      - panne-jirama-blue    
 volumes:
   django_static:
     external: true
@@ -37,7 +36,6 @@ volumes:
   django_media:
     external: true
     name: jirama-django-media
-
 networks:
   panne-jirama-blue :
     external: true

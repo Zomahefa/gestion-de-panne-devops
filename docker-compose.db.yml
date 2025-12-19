@@ -19,7 +19,6 @@ services:
     networks:
       - panne-jirama-blue
       - panne-jirama-green 
-
 volumes:
   mysql_data_production:  
     name: mysql_data_production     
