@@ -28,6 +28,7 @@ jobs:
           --include='nginx-secure/**' \
           --exclude='.env.global' \
           --exclude='.my.cnf' \
+          --exclude='my-exporter.cnf' \
           --exclude='active_color.txt' \
           --exclude='*' \
           -e "ssh -o StrictHostKeyChecking=no" \
@@ -108,7 +109,7 @@ jobs:
           echo "server $SERVICE_ACTIVE_FE:80;" > conf.d/frontend_active.conf
           echo "server $SERVICE_ACTIVE_BE:8000;" > conf.d/backend_active.conf
           docker exec edge nginx -s reload
-          #echo "$ACTIVE_COLOR" > active_color.txt
+          echo "$ACTIVE_COLOR" > active_color.txt
           echo "Rollback vers $ACTIVE_COLOR effectué. Le déploiement a échoué."
           exit 1
         else
