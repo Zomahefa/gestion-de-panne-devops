@@ -68,11 +68,12 @@ jobs:
           SERVICE_ACTIVE_FE="frontend-green"
           SERVICE_ACTIVE_BE="backend-green"
         fi
-        echo "-------------------------------------------------------------------------------------"
         echo "Couleur active: $ACTIVE_COLOR ; Inactive à déployer: $TARGET_COLOR"
+        echo "-------------------------------------------------------------------------------------"
         echo "Démarrage des services statiques ---"
         docker compose -f docker-compose.db.yml --env-file .env.global up -d --no-recreate
         docker compose -f docker-compose.monitoring.yml up -d --no-recreate
+        echo "-------------------------------------------------------------------------------------"
         echo "Démarrage de la nouvelle couleur ---"
         docker compose -f $TARGET_COMPOSE --env-file .env.global pull
         docker compose -f $TARGET_COMPOSE --env-file .env.global up -d --wait
