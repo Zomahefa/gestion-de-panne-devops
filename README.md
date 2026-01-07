@@ -1,7 +1,7 @@
 # 🚀 Gestion de Panne – Fullstack/DevOps Django + React +mysql avec déploiement
 
 # 🎯 
-Application web conteneurisée avec CI/CD, DevSecOps, et déploiement automatisé.
+Application web conteneurisée avec CI/CD, DevSecOps, et déploiement automatiséOK OKOKOK
 
 ## 🗂️ Branches Git
 

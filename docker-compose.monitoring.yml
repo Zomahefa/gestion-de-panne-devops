@@ -6,7 +6,7 @@ services:
       - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
     command:
       - '--config.file=/etc/prometheus/prometheus.yml'
-      - '--web.external-url=https://signaler-panne-305.duckdns.org/prometheus/'  # URL publique
+      - '--web.external-url=https://ambohimahasoa-panne.duckdns.org/prometheus/'  # URL publique
       - '--web.route-prefix=/prometheus'  #  Préfixe pour le routing Nginx
       - '--web.enable-lifecycle'  # Permet de recharger la config sans redémarrer
     depends_on:
@@ -20,7 +20,7 @@ services:
     ports:
       - "3000:3000"  #  ACCÈS DIRECT: Permet l'accès via IP:3000 si Nginx est down
     environment:
-      - GF_SERVER_ROOT_URL=https://signaler-panne-305.duckdns.org/grafana/  #  URL publique
+      - GF_SERVER_ROOT_URL=https://ambohimahasoa-panne.duckdns.org/grafana/  #  URL publique
       - GF_SERVER_SERVE_FROM_SUB_PATH=true  #  Support des sous-chemins
       - GF_SECURITY_ADMIN_PASSWORD=Admin123!  #  NOUVEAU: Mot de passe admin
       - GF_USERS_ALLOW_SIGN_UP=false  #  Désactive l'inscription publique
@@ -44,7 +44,7 @@ services:
     image: grafana/promtail:3.5.8
     container_name: promtail-monitoring
     volumes:
-      - /var/lib/docker/vfs/containers:/var/lib/docker/vfs/containers:ro
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
       - /var/log:/var/log:ro  # Lecture seule des logs système
       - ./monitoring/promtail-config.yml:/etc/promtail/config.yml
       - /var/run/docker.sock:/var/run/docker.sock:ro
