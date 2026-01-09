@@ -89,7 +89,7 @@ const ClientForm = () => {
         <img src={logoJirama} alt="Logo JIRAMA" className="logo" /><br />
         <div className="client-nav mb-4">
           <Link to="/login" className="btn btn-outline-secondary">🔧 Accès technicien</Link>
-          <Link to="/suivi" className="btn btn-outline-warning">📊 Suivi des pannes</Link>
+          <Link to="/suivi" className="btn btn-outline-warning">📊 Suivi</Link>
           <Link to="/admin-login" className="btn btn-outline-dark">🛠️ Admin</Link>
         </div>
       </div>
