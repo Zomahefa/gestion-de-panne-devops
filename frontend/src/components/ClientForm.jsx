@@ -94,7 +94,7 @@ const ClientForm = () => {
         </div>
       </div>
 
-      <h2>📢 signaler</h2>
+      <h2>📢 signaler demo</h2>
 
       <form onSubmit={handleSubmit}>
         <label>Nom du client</label>
