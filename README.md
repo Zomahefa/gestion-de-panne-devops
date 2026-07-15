@@ -1,9 +1,9 @@
-# 🚀 Gestion de Panne – Fullstack/DevOps Django + React +mysql avec déploiement
+#  Gestion de Panne – Fullstack/DevOps Django + React +mysql avec déploiement
 
-# 🎯 
+# 
 Application web conteneurisée avec CI/CD, DevSecOps, et déploiement automatiséOK OKOKOK
 
-## 🗂️ Branches Git
+##  Branches Git
 
 | Branche | Rôle |
 |--------|------|
@@ -13,7 +13,7 @@ Application web conteneurisée avec CI/CD, DevSecOps, et déploiement automatis�
 
 ---
 
-## 🛠️ Technologies
+##  Technologies
 
 - Django, React
 - Docker, Docker Compose
@@ -24,7 +24,7 @@ Application web conteneurisée avec CI/CD, DevSecOps, et déploiement automatis�
 
 ---
 
-## 📁 Structure du projet
+##  Structure du projet
 gestion-de-panne/ 
 ├── backend/ 
 ├── frontend/ 
@@ -35,9 +35,9 @@ gestion-de-panne/
 
 ---
 
-## 🔐 Fichier `.env` à créer
+## Fichier `.env` à créer
 
-Crée un fichier `.env` à la racine avec :
+Crée un fichier `.env` à la racine avec comme example :
 
 ```env
 APP_ENV=dev
@@ -46,7 +46,7 @@ DEBUG=1
 DJANGO_SECRET_KEY=SuperSecretKeyForDev
 DJANGO_ALLOWED_HOSTS=localhost,127.0.0.1
 DB_HOST=db
-DB_NAME=jirama_db
+DB_NAME=exemple_db
 DB_USER=django_user
 DB_PASSWORD=Django@2025!
 MYSQL_ROOT_PASSWORD=rootpass123
@@ -54,7 +54,7 @@ DB_PORT=3306
 FRONT_PORT=3000
 BACK_PORT=8000
 
-et un autre .env dans fonrtend pour react pour l'url api:
+et un autre .env dans frontend pour react pour l'url api:
 REACT_APP_API_URL=l'url de l'api backend
 
 🐳 Commandes Docker Compose utiles
@@ -77,35 +77,10 @@ Créer un superuser pour créer l'admin dans db
 	python manage.py createsuperuser
 	va sur http://localhost:8000/admin et créer un admin
 
-🧼 Fichiers à ignorer dans .gitignore
-gitignore
-# 🔐 Fichiers sensibles
-.env
-*.env
-
-# 🗂️ Fichiers système
-.DS_Store
-*.swp
-
-# 🧪 Fichiers de test ou de debug
-*.log
-*.sqlite3
-
-# 📁 Dossiers à ignorer
-/media/
-venv/
-👉 Justification :
-
-.env : contient des secrets
-
-media/ : fichiers uploadés, générés dynamiquement
-
-venv/ : environnement Python local
-
-.DS_Store, *.swp : fichiers système inutiles
 
 
-## 🧰 2. Liste complète des commandes disponibles dans ton Makefile
+
+## 2. Liste complète des commandes disponibles dans ton Makefile
 
 Voici un tableau clair avec **chaque commande**, son usage, et ce qu’elle fait :
 
@@ -155,7 +130,7 @@ Voici un tableau clair avec **chaque commande**, son usage, et ce qu’elle fait
 l'astuce c'est juste= **make + commande dans Makefile par exemple si il y a db-staging-logs:
 	docker container logs $(CONTAINER_DB_STAGING) dedans vous regardez juste le tableau d'explication çi_dessus et vous pouvez l'utilisez selon vos bésoin.N'hésitez pas à me demandez si il y a des commandes personnels que vous aimeriez ajoutez dedans pour faciliser la mémoire et rendre le dev encore plus rapide
 
-## 🧠 3. Avantages du Makefile 
+##  3. Avantages du Makefile 
 
 “Le Makefile permet d’automatiser et de simplifier les commandes Docker Compose pour chaque environnement (développement, staging, production).  
  Il offre une interface cohérente (`make dev-up`, `make prod-logs`, etc.) qui réduit les erreurs humaines, accélère l’onboarding des développeurs, et améliore la maintenabilité du projet.  
@@ -164,15 +139,15 @@ Cette approche est conforme aux bonnes pratiques DevOps : automatisation, reprod
 
 ---
 
- 📘 4. Guide pour les développeurs (à inclure dans ton README ou mémoire)
+  4. Guide pour les développeurs
 
-### 🔧 Installation
+### Installation
 
 1. Cloner le projet
 2. Installer Docker et Docker Compose
 3. Vérifier que le fichier `Makefile` est présent à la racine
 
-### 🚀 Démarrer le projet
+### Démarrer le projet
 
 ```bash
 make dev-up          # Démarrer l’environnement de développement
@@ -189,6 +164,6 @@ make dev-logs        # Suivre les logs en temps réel
 
 
 
-👤 Auteur
+Auteur
 Zo mahefa Ranaivo – DevOps & Fullstack Developer Projet soutenu en octobre 2025
-# Test CI
+
