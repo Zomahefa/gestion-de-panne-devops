@@ -1,15 +1,15 @@
-import React, { useState } from 'react';
-import { Navigate } from 'react-router-dom';
-import axios from 'axios';
-import './LoginTechnician.css';
-import logoJirama from './logo-jirama.png';
-import { Link } from 'react-router-dom';
+import React, { useState } from "react";
+import { Navigate } from "react-router-dom";
+import axios from "axios";
+import "./LoginTechnician.css";
+import logoPanne from "./icone-panne.jpeg";
+import { Link } from "react-router-dom";
 
 const LoginTechnician = () => {
   const [authenticated, setAuthenticated] = useState(false);
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
 
   const handleLogin = async () => {
@@ -18,11 +18,11 @@ const LoginTechnician = () => {
         username,
         password,
       });
-      localStorage.setItem('token', res.data.access);
-      localStorage.setItem('username', username);
+      localStorage.setItem("token", res.data.access);
+      localStorage.setItem("username", username);
       setAuthenticated(true);
     } catch (err) {
-      setError('Nom ou mot de passe incorrect');
+      setError("Nom ou mot de passe incorrect");
       console.log(err.response?.data);
     }
   };
@@ -33,8 +33,10 @@ const LoginTechnician = () => {
 
   return (
     <div className="login-container">
-      <Link to="/ClientForm" className="btn btn-outline-primary mb-3">🔙</Link>
-      <img src={logoJirama} alt="Logo JIRAMA" className="logo-jirama" />
+      <Link to="/ClientForm" className="btn btn-outline-primary mb-3">
+        🔙
+      </Link>
+      <img src={logoPanne} alt="Logo Panne" className="logo" />
       <h2>🔐 Connexion Technicien</h2>
       <input
         type="text"
@@ -48,7 +50,7 @@ const LoginTechnician = () => {
       />
       <div className="password-wrapper">
         <input
-          type={showPassword ? 'text' : 'password'}
+          type={showPassword ? "text" : "password"}
           name="password"
           autoComplete="new-password"
           className="form-control"
@@ -62,7 +64,7 @@ const LoginTechnician = () => {
           className="password-toggle"
           onClick={() => setShowPassword(!showPassword)}
         >
-          {showPassword ? '🙈' : '👁️'}
+          {showPassword ? "🙈" : "👁️"}
         </button>
       </div>
 
