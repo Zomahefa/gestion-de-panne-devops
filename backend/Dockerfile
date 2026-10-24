@@ -42,14 +42,10 @@ USER zoappuser
 
 EXPOSE 8000
 
-HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=5 \
-  CMD-SHELL curl -f http://localhost:${PORT:-8000}/health/ || exit 1
+HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=5 CMD curl -f http://localhost:${PORT:-8000}/health/ || exit 1
 
 STOPSIGNAL SIGTERM
 
 ENTRYPOINT ["/entrypoint.sh"]
 
-CMD ["sh", "-c", "if [ \"$DJANGO_ENV\" = \"prod\" ]; then \
-    gunicorn backend.wsgi:application --bind 0.0.0.0:${PORT:-8000} --workers ${WEB_CONCURRENCY:-2} --threads 2 --timeout 60; \
-    else \
-    python manage.py runserver 0.0.0.0:8000; fi"]
+CMD ["sh", "-c", "if [ \"$DJANGO_ENV\" = \"prod\" ]; then gunicorn backend.wsgi:application --bind 0.0.0.0:${PORT:-8000} --workers ${WEB_CONCURRENCY:-2} --threads 2 --timeout 60; else python manage.py runserver 0.0.0.0:8000; fi"]
