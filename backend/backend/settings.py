@@ -13,6 +13,11 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 from pathlib import Path
 import os
 
+try:
+    import dj_database_url
+except ImportError:  # Permet de lancer le projet en local sans cette dépendance
+    dj_database_url = None
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -21,12 +26,23 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-u_9lo&4u_^y4a5^43eby50nq8k9a@cdcjne7ljnzx5g2_sm$b^'
+SECRET_KEY = os.environ.get(
+    "DJANGO_SECRET_KEY",
+    "dev-only-insecure-key-change-me",
+)
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+# En production (Render), définir DEBUG=0.
+DEBUG = os.environ.get("DEBUG", "0").lower() in ("1", "true", "yes", "on")
 
-ALLOWED_HOSTS = os.environ.get('DJANGO_ALLOWED_HOSTS', '').split(',')
+ALLOWED_HOSTS = [
+    host.strip()
+    for host in os.environ.get(
+        "DJANGO_ALLOWED_HOSTS",
+        "localhost,127.0.0.1",
+    ).split(",")
+    if host.strip()
+]
 
 
 # Application definition
@@ -44,6 +60,14 @@ INSTALLED_APPS = [
     'todo',
 ]
 
+# Cloudinary est utilisé uniquement pour les médias (photos de pannes).
+# Les fichiers statiques Django restent servis par WhiteNoise.
+if os.environ.get("CLOUDINARY_URL"):
+    INSTALLED_APPS += [
+        'cloudinary_storage',
+        'cloudinary',
+    ]
+
 MIDDLEWARE = [
     'django_prometheus.middleware.PrometheusBeforeMiddleware',
     'django.middleware.security.SecurityMiddleware',
@@ -56,6 +80,14 @@ MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
     'django_prometheus.middleware.PrometheusAfterMiddleware',
 ]
+
+# WhiteNoise sert les fichiers statiques de Django en production.
+try:
+    import whitenoise  # noqa: F401
+
+    MIDDLEWARE.insert(2, 'whitenoise.middleware.WhiteNoiseMiddleware')
+except ImportError:
+    pass
 
 ROOT_URLCONF = 'backend.urls'
 
@@ -81,33 +113,29 @@ WSGI_APPLICATION = 'backend.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
-#DATABASES = {
-    #'default': {
-       # 'ENGINE': 'django.db.backends.mysql',
-      #  'NAME': 'jirama_db',
-     #   'USER': 'django_user',
-    #    'PASSWORD': 'Django@2025!',
-   #     'HOST': 'localhost',
-  #      'PORT': '3306',
- #   }
-#}
-#utilise le .env
+DATABASE_URL = os.environ.get("DATABASE_URL")
 
-
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': os.environ.get('DB_NAME', 'jirama_db'),
-        'USER': os.environ.get('DB_USER', 'django_user'),
-        'PASSWORD': os.environ.get('DB_PASSWORD', 'Django@2025!'),
-        'HOST': os.environ.get('DB_HOST', 'db'),
-        'PORT': int(os.environ.get('DB_PORT', 3306)),
+if DATABASE_URL and dj_database_url:
+    # Render + Neon : la connexion est fournie par DATABASE_URL.
+    DATABASES = {
+        'default': dj_database_url.parse(
+            DATABASE_URL,
+            conn_max_age=600,
+            conn_health_checks=True,
+        )
     }
-}
-
-
-
-
+else:
+    # Fallback local / Docker Compose : MySQL ou MariaDB.
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.mysql',
+            'NAME': os.environ.get('DB_NAME', 'jirama_db'),
+            'USER': os.environ.get('DB_USER', 'django_user'),
+            'PASSWORD': os.environ.get('DB_PASSWORD', 'Django@2025!'),
+            'HOST': os.environ.get('DB_HOST', 'db'),
+            'PORT': int(os.environ.get('DB_PORT', 3306)),
+        }
+    }
 
 
 # Password validation
@@ -147,20 +175,52 @@ USE_TZ = True
 STATIC_URL = '/django-static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
+# Fichiers médias (photos uploadées).
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
+
+# Crée le dossier media si absent.
+if not os.path.exists(MEDIA_ROOT):
+    os.makedirs(MEDIA_ROOT)
+
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-CORS_ORIGIN_WHITELIST = [
-     'http://localhost:3000'
+# CORS : le frontend Render doit être autorisé explicitement.
+CORS_ALLOWED_ORIGINS = [
+    origin.strip()
+    for origin in os.environ.get(
+        "CORS_ALLOWED_ORIGINS",
+        "http://localhost:3000,http://127.0.0.1:3000",
+    ).split(",")
+    if origin.strip()
 ]
-AUTH_USER_MODEL = 'todo.Technician'
-# Media files (uploaded images)
-MEDIA_URL = '/media/'
-MEDIA_ROOT = BASE_DIR / 'media'
+CORS_ALLOW_ALL_ORIGINS = os.environ.get("CORS_ALLOW_ALL_ORIGINS", "0") == "1"
 
-# Crée le dossier media si absent
-if not os.path.exists(MEDIA_ROOT):
-    os.makedirs(MEDIA_ROOT)
+# Django admin et formulaires derrière le proxy HTTPS de Render.
+CSRF_TRUSTED_ORIGINS = [
+    origin.strip()
+    for origin in os.environ.get("CSRF_TRUSTED_ORIGINS", "").split(",")
+    if origin.strip()
+]
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+
+# Stockage des fichiers : Cloudinary pour les médias, WhiteNoise pour le statique.
+STORAGES = {
+    "default": {
+        "BACKEND": "django.core.files.storage.FileSystemStorage",
+    },
+    "staticfiles": {
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+    },
+}
+
+if os.environ.get("CLOUDINARY_URL"):
+    STORAGES["default"] = {
+        "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage",
+    }
+
+AUTH_USER_MODEL = 'todo.Technician'

@@ -1,8 +1,8 @@
-name: CD blue/green
+name: CD blue/green (manuel, VPS)
+# Déploiement VPS conservé pour référence.
+# Il n'est plus déclenché automatiquement depuis le passage à Render.
 on:
-  workflow_run:
-    workflows: ["CI Pipeline"]
-    types: [completed]           
+  workflow_dispatch:
 jobs:
   Deploy:
     name: Déploiement blue/green 

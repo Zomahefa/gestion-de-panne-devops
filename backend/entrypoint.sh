@@ -1,34 +1,26 @@
 #!/bin/bash
-echo "Attente de la base de données..."
-until nc -z db 3306; do
-  echo "En attente de la base à db:3306..."
-  sleep 5
+set -e
+
+echo "Application des migrations Django..."
+for i in $(seq 1 30); do
+  if python manage.py migrate --noinput; then
+    echo "Migrations appliquées."
+    break
+  fi
+
+  if [ "$i" -eq 30 ]; then
+    echo "Base de données inaccessible après 30 tentatives."
+    exit 1
+  fi
+
+  echo "Nouvelle tentative dans 2s ($i/30)..."
+  sleep 2
 done
-echo "Migrations Django..."
-python manage.py migrate --noinput
-echo "Vérification du superadmin..."
-python manage.py shell <<EOF
-from django.contrib.auth import get_user_model
-User = get_user_model()
-if not User.objects.filter(is_superuser=True).exists():
-    User.objects.create_superuser('admin', 'admin@example.com', 'adminpass123')
-EOF
-echo "Vérification de l'admin applicatif..."
-python manage.py shell <<EOF
-from todo.models import Admin
-from django.contrib.auth.hashers import make_password
-if not Admin.objects.exists():
-    Admin.objects.create(
-        full_name="Admin Principal",
-        matricule="CH-01",
-        role="aadmin&chef jirama",
-        contact="0331234567",
-        email="mahefa@gmail.com",
-        username="mahefa",
-        password=make_password("jirama+/2025")
-    )
-else:
-    print("Admin déjà présent en base, aucune création.")
-EOF
-echo "Initialisation terminée"
+
+if [ "${SEED_DEMO:-0}" = "1" ]; then
+  echo "Création / vérification des données de démonstration..."
+  python manage.py seed_demo
+fi
+
+echo "Initialisation terminée."
 exec "$@"
