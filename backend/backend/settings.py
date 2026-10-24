@@ -115,15 +115,26 @@ WSGI_APPLICATION = 'backend.wsgi.application'
 
 DATABASE_URL = os.environ.get("DATABASE_URL")
 
+# Neon met le compute en veille après 5 min d'inactivité (300 s).
+# On garde donc CONN_MAX_AGE sous cette valeur pour éviter les
+# "SSL SYSCALL error: EOF detected" sur une connexion recyclée.
+DB_CONN_MAX_AGE = int(os.environ.get("DB_CONN_MAX_AGE", "60"))
+
 if DATABASE_URL and dj_database_url:
-    # Render + Neon : la connexion est fournie par DATABASE_URL.
+    # Render + Neon : la connexion est fournie par DATABASE_URL
+    # (ex: postgresql://user:pass@ep-xxx.eu-central-1.aws.neon.tech/neondb?sslmode=require).
     DATABASES = {
         'default': dj_database_url.parse(
             DATABASE_URL,
-            conn_max_age=600,
+            conn_max_age=DB_CONN_MAX_AGE,
             conn_health_checks=True,
         )
     }
+    # Recommandé par Neon/Django : évite les curseurs côté serveur,
+    # inutiles ici et incompatibles avec certains poolers (PgBouncer).
+    DATABASES['default']['DISABLE_SERVER_SIDE_CURSORS'] = True
+    # Neon impose TLS.
+    DATABASES['default'].setdefault('OPTIONS', {}).setdefault('sslmode', 'require')
 else:
     # Fallback local / Docker Compose : MySQL ou MariaDB.
     DATABASES = {
