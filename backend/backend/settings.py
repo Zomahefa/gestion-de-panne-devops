@@ -60,14 +60,6 @@ INSTALLED_APPS = [
     'todo',
 ]
 
-# Cloudinary est utilisé uniquement pour les médias (photos de pannes).
-# Les fichiers statiques Django restent servis par WhiteNoise.
-if os.environ.get("CLOUDINARY_URL"):
-    INSTALLED_APPS += [
-        'cloudinary_storage',
-        'cloudinary',
-    ]
-
 MIDDLEWARE = [
     'django_prometheus.middleware.PrometheusBeforeMiddleware',
     'django.middleware.security.SecurityMiddleware',
@@ -230,6 +222,16 @@ STORAGES = {
 }
 
 if os.environ.get("CLOUDINARY_URL"):
+    # On utilise uniquement la classe de stockage de django-cloudinary-storage.
+    #
+    # IMPORTANT : on n'ajoute volontairement PAS 'cloudinary_storage' ni
+    # 'cloudinary' à INSTALLED_APPS. Ce paquet (dernière version : 2021) n'est
+    # pas compatible avec Django >= 5.1 : il surcharge la commande
+    # `collectstatic` et lit `settings.STATICFILES_STORAGE`, supprimé au profit
+    # de `STORAGES`. Résultat : `manage.py collectstatic` plante avec
+    # "AttributeError: 'Settings' object has no attribute 'STATICFILES_STORAGE'".
+    # Or cette app n'est utile que pour collectstatic et les widgets d'admin,
+    # dont nous n'avons pas besoin ici (WhiteNoise sert le statique).
     STORAGES["default"] = {
         "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage",
     }
