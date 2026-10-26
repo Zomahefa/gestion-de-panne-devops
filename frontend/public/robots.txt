@@ -1,3 +1,14 @@
-# https://www.robotstxt.org/robotstxt.html
+# robots.txt — Signaleo
 User-agent: *
-Disallow:
+Allow: /
+
+# Espaces prives : inutile de les indexer
+Disallow: /login
+Disallow: /technicien
+Disallow: /admin-login
+Disallow: /admin-dashboard
+Disallow: /admin-technicians
+Disallow: /admin-profile
+Disallow: /admin-chart
+
+Sitemap: https://signaleo.onrender.com/sitemap.xml

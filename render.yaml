@@ -1,7 +1,7 @@
 services:
   - type: web
     runtime: docker
-    name: gestion-panne-api
+    name: signaleo-api
     region: frankfurt
     plan: free
     dockerfilePath: ./backend/Dockerfile
@@ -34,7 +34,7 @@ services:
 
   - type: web
     runtime: static
-    name: gestion-panne-web
+    name: signaleo
     buildCommand: cd frontend && npm install --legacy-peer-deps && CI=false npm run build
     staticPublishPath: ./frontend/build
     autoDeployTrigger: commit
