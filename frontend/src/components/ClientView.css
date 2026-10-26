@@ -1,61 +1,257 @@
-.client-view {
-  max-width: 800px;
-  margin: auto;
-  padding: 2rem;
-  background: linear-gradient(to bottom right, #ffbd53, #ffe0b2);
-  border-radius: 12px;
-  font-family: 'Segoe UI', sans-serif;
-}
+/* Page « Suivi des pannes » — styles spécifiques uniquement. */
 
-.header {
+.cv-refresh {
   display: flex;
-  justify-content: space-between;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+}
+
+.cv-refresh__label {
+  font-size: 0.78rem;
+  color: var(--sig-ink-faint);
+}
+
+/* --- Compteurs par statut ------------------------------------------------ */
+
+.cv-stats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+  margin-bottom: 26px;
+}
+
+.cv-stat {
+  display: flex;
   align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  background: var(--sig-surface);
+  border: 1px solid var(--sig-line);
+  border-radius: var(--sig-radius-sm);
+  box-shadow: var(--sig-shadow-sm);
+}
+
+.cv-stat__icon {
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  flex: 0 0 38px;
+  border-radius: 11px;
+}
+
+.cv-stat__body {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.15;
+  min-width: 0;
+}
+
+.cv-stat__value {
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: var(--sig-navy-900);
+}
+
+.cv-stat__label {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--sig-ink-faint);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.cv-stat--pending .cv-stat__icon {
+  background: var(--sig-pending-bg);
+  color: var(--sig-pending);
+}
+.cv-stat--route .cv-stat__icon {
+  background: var(--sig-route-bg);
+  color: var(--sig-route);
+}
+.cv-stat--progress .cv-stat__icon {
+  background: var(--sig-progress-bg);
+  color: var(--sig-progress);
+}
+.cv-stat--resolved .cv-stat__icon {
+  background: var(--sig-resolved-bg);
+  color: var(--sig-resolved);
+}
+
+/* --- Grille de pannes ---------------------------------------------------- */
+
+.cv-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+  align-items: start;
+}
+
+.cv-card {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 20px 22px;
+  transition: box-shadow 0.18s ease, transform 0.18s ease;
+}
+
+.cv-card:hover {
+  box-shadow: var(--sig-shadow-md);
+}
+
+.cv-card__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
   flex-wrap: wrap;
-  gap: 1rem;
 }
 
-.logo {
-  height: 60px;
+.cv-card__date {
+  font-size: 0.78rem;
+  color: var(--sig-ink-faint);
+  font-variant-numeric: tabular-nums;
 }
 
-.incident-list .card {
-  background-color: #ffffff;
-  border-left: 5px solid #ff9800;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-  padding: 1rem;
-  margin-bottom: 1rem;
-  border-radius: 8px;
+.cv-card__title {
+  margin: 0;
+  font-size: 1.08rem;
+  font-weight: 700;
+  color: var(--sig-navy-900);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
 }
 
-.incident-list .card h5 {
-  margin-bottom: 0.5rem;
-  color: #003366;
+.cv-card__place {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.83rem;
+  font-weight: 500;
+  color: var(--sig-ink-soft);
 }
 
-.incident-list .card p {
-  margin: 0.3rem 0;
-  font-size: 0.95rem;
+.cv-card__desc {
+  margin: 0;
+  font-size: 0.93rem;
+  color: var(--sig-ink);
+  line-height: 1.55;
 }
 
-@media (max-width: 768px) {
-  .client-view {
-    padding: 1rem;
+.cv-card__meta {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px 16px;
+  margin: 0;
+  padding: 12px 14px;
+  background: #f8fafc;
+  border: 1px solid var(--sig-line);
+  border-radius: var(--sig-radius-sm);
+}
+
+.cv-card__meta dt {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--sig-ink-faint);
+  margin: 0 0 2px;
+}
+
+.cv-card__meta dd {
+  margin: 0;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--sig-ink);
+  overflow-wrap: anywhere;
+}
+
+.cv-card__note {
+  display: flex;
+  gap: 9px;
+  margin: 0;
+  padding: 12px 14px;
+  background: var(--sig-accent-050);
+  border-left: 3px solid var(--sig-accent);
+  border-radius: 0 var(--sig-radius-sm) var(--sig-radius-sm) 0;
+  font-size: 0.88rem;
+  color: #6b4a12;
+}
+
+.cv-card__note svg {
+  flex: 0 0 auto;
+  margin-top: 2px;
+}
+
+.cv-card__note strong {
+  display: block;
+  font-size: 0.74rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #a35f00;
+  margin-bottom: 2px;
+}
+
+.cv-card__figure {
+  margin: 0;
+}
+
+.cv-card__figure figcaption {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--sig-ink-faint);
+  margin-bottom: 7px;
+}
+
+.cv-card__figure img {
+  display: block;
+  width: 100%;
+  max-height: 280px;
+  object-fit: cover;
+  border-radius: var(--sig-radius-sm);
+  border: 1px solid var(--sig-line);
+}
+
+/* --- Responsive ---------------------------------------------------------- */
+
+@media (max-width: 1000px) {
+  .cv-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 900px) {
+  .cv-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
-  .logo {
-    height: 40px;
-  }
-
-  .incident-list .card {
-    padding: 0.8rem;
-  }
-
-  .header {
-    flex-direction: column;
+  .cv-refresh {
     align-items: flex-start;
   }
 }
-img {
-  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+
+@media (max-width: 560px) {
+  .cv-card {
+    padding: 16px;
+  }
+
+  .cv-card__meta {
+    grid-template-columns: 1fr;
+  }
+
+  .cv-stat {
+    padding: 12px;
+    gap: 10px;
+  }
 }

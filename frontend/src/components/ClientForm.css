@@ -1,149 +1,55 @@
-.client-form-container {
-  max-width: 600px;
-  margin: auto;
-  padding: 2rem;
-  background: linear-gradient(to bottom right, #fff8e1, #ffe0b2);
-  border-radius: 12px;
-  box-shadow: 0 0 12px rgba(0, 0, 0, 0.1);
-  font-family: 'Segoe UI', sans-serif;
+/* Page « Signaler une panne » — styles spécifiques uniquement.
+   Le socle commun vit dans src/styles/theme.css */
+
+.cf-hero {
+  margin-bottom: 28px;
 }
 
-.header {
-  display: block;
-  margin-bottom: 1rem;
+.cf-form__note {
+  font-size: 0.8rem;
+  color: var(--sig-ink-faint);
 }
 
-.logo {
-  height: 60px;
-  display: block;
-  margin-bottom: 1rem;
+.cf-form__banner {
+  margin-top: 18px;
 }
 
-.client-nav {
+.cf-hint--error {
+  color: var(--sig-danger);
+  font-weight: 600;
+}
+
+.cf-actions {
   display: flex;
-  justify-content: space-between;
-  gap: 0.5rem;
-  margin-bottom: 2rem;
-}
-
-.client-nav .btn {
-  flex: 1 1 30%;
-  min-width: 100px;
-  max-width: 160px;
-  padding: 0.5rem 0.8rem;
-  font-size: 0.85rem;
-  font-weight: bold;
-  text-align: center;
-}
-
-form label {
-  font-weight: bold;
-  margin-top: 1rem;
-  display: block;
-  color: #003366;
-}
-
-form input,
-form textarea {
-  width: 100%;
-  padding: 0.8rem;
-  margin-top: 0.3rem;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-  font-size: 1rem;
-}
-
-form button {
-  background-color: #ff9800;
-  color: white;
-  border: none;
-  padding: 0.9rem 1.4rem;
-  border-radius: 6px;
-  cursor: pointer;
-  font-weight: bold;
-  transition: background-color 0.3s ease;
-}
-
-form button:hover {
-  background-color: #e68900;
-}
-
-.success-message {
-  color: green;
-  margin-top: 1rem;
-  font-weight: bold;
-}
-
-.error-message {
-  color: red;
-  margin-top: 1rem;
-  font-weight: bold;
-}
-
-.form-actions {
-  display: flex;
-  justify-content: space-between;
   align-items: center;
-  margin-top: 2rem;
-  gap: 1rem;
+  justify-content: flex-end;
+  gap: 12px;
   flex-wrap: wrap;
+  margin-top: 28px;
+  padding-top: 22px;
+  border-top: 1px solid var(--sig-line);
 }
 
-.form-actions .btn {
-  flex: 1 1 48%;
-  font-weight: bold;
-  padding: 0.8rem 1.2rem;
+.cf-submit {
+  min-width: 280px;
 }
 
-.aide-btn {
-  background-color: transparent;
-  border: none;
-  font-size: 1.6rem;
-  color: #17a2b8;
-  cursor: pointer;
-  padding: 0.6rem;
-}
-
-@media (max-width: 768px) {
-  .client-form-container {
-    padding: 1rem;
+@media (max-width: 720px) {
+  .cf-hero {
+    margin-bottom: 20px;
   }
 
-  .logo {
-    height: 40px;
+  .cf-actions {
+    flex-direction: column-reverse;
+    align-items: stretch;
   }
 
-  /* Correction : garder les boutons horizontaux */
-  .client-nav {
-    flex-direction: row;
-    justify-content: space-between;
-    gap: 0.3rem;
-    flex-wrap: nowrap;
-  }
-
-  .client-nav .btn {
-    flex: 1 1 auto;
+  .cf-submit {
     min-width: 0;
-    font-size: 0.75rem;
-    padding: 0.4rem 0.6rem;
-    text-align: center;
-  }
-
-  form input,
-  form textarea,
-  form button {
-    font-size: 1rem;
-  }
-
-  .form-actions {
-    flex-direction: column;
-  }
-
-  .form-actions .btn {
     width: 100%;
   }
 
-  .aide-btn {
-    align-self: flex-end;
+  .cf-actions .sig-btn {
+    width: 100%;
   }
 }

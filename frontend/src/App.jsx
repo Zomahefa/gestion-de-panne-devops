@@ -7,6 +7,7 @@ import TechnicianDashboard from './components/TechnicianDashboard.jsx';
 import AdminLogin from './components/AdminLogin.jsx';
 import AdminDashboard from './components/AdminDashboard.jsx';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import './styles/theme.css';
 import AdminTechnicianManager from './components/AdminTechnicianManager.jsx';
 import HelpPage from './components/HelpPage.jsx';
 import AdminProfile from './components/AdminProfile.jsx';
