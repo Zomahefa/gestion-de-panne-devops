@@ -16,7 +16,6 @@ import {
   Wrench,
   Zap,
 } from "lucide-react";
-import SignaleoLogo from "./SignaleoLogo.jsx";
 import StatusBadge from "./StatusBadge.jsx";
 import { STATUS_ORDER, getStatus } from "../utils/status";
 import "./ClientView.css";
@@ -26,6 +25,7 @@ const ClientView = () => {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [lastUpdate, setLastUpdate] = useState(null);
+  const [statusFilter, setStatusFilter] = useState("all");
 
   const fetchIncidents = useCallback(async (manual = false) => {
     if (manual) setRefreshing(true);
@@ -61,25 +61,47 @@ const ClientView = () => {
       <header className="sig-header">
         <div className="sig-header__inner">
           <Link to="/" className="sig-brand" aria-label="Signaleo, accueil">
-            <SignaleoLogo size={30} />
+            <img 
+              src="/apple-touch-icon.png" 
+              alt="Signaleo logo" 
+              width="30" 
+              height="30" 
+              style={{ display: "block", borderRadius: "8px" }}
+            />
           </Link>
 
           <nav className="sig-nav" aria-label="Navigation principale">
-            <Link to="/" className="sig-nav__link">
+            <Link to="/" className={
+              window.location.pathname === "/"
+                ? "sig-nav__link sig-nav__link--strong"
+                : "sig-nav__link"
+            }>
               <Plus size={17} aria-hidden="true" />
               Signaler
             </Link>
-            <Link to="/help" className="sig-nav__link">
+            <Link to="/help" className={
+              window.location.pathname === "/help"
+                ? "sig-nav__link sig-nav__link--strong"
+                : "sig-nav__link"
+            }>
               <CircleHelp size={17} aria-hidden="true" />
               Aide
             </Link>
-            <Link to="/login" className="sig-nav__link">
+            <Link to="/login" className={
+              window.location.pathname === "/login"
+                ? "sig-nav__link sig-nav__link--strong"
+                : "sig-nav__link"
+            }>
               <Wrench size={17} aria-hidden="true" />
               Technicien
             </Link>
             <Link
               to="/admin-login"
-              className="sig-nav__link sig-nav__link--strong"
+              className={
+                window.location.pathname === "/admin-login"
+                  ? "sig-nav__link sig-nav__link--strong"
+                  : "sig-nav__link sig-nav__link--strong"
+              }
             >
               <ShieldCheck size={17} aria-hidden="true" />
               Admin
@@ -102,12 +124,37 @@ const ClientView = () => {
             </p>
           </div>
 
-          <div className="cv-refresh">
-            <span className="cv-refresh__label">
-              {lastUpdate
-                ? `Actualisé à ${lastUpdate.toLocaleTimeString("fr-FR")}`
-                : "Chargement…"}
-            </span>
+          <div className="cv-controls">
+            <div className="cv-filter">
+              <label htmlFor="status-filter" className="sig-label">
+                Afficher : <span className="sig-label__optional">(tous)</span>
+              </label>
+              <select
+                id="status-filter"
+                className="sig-input"
+                onChange={(e) => {
+                  const filter = e.target.value;
+                  if (filter === "all") {
+                    fetchIncidents();
+                  } else {
+                    const filtered = incidents.filter((inc) => inc.status === filter);
+                    setIncidents(filtered);
+                  }
+                }}
+                defaultValue="all"
+              >
+                <option value="all">Tous les statuts</option>
+                {STATUS_ORDER.map((key) => {
+                  const { short } = getStatus(key);
+                  return (
+                    <option key={key} value={key}>
+                      {short}
+                    </option>
+                  );
+                })}
+              </select>
+            </div>
+
             <button
               type="button"
               className="sig-btn sig-btn--ghost sig-btn--sm"
@@ -123,23 +170,6 @@ const ClientView = () => {
             </button>
           </div>
         </div>
-
-        <section className="cv-stats" aria-label="Répartition par statut">
-          {STATUS_ORDER.map((key) => {
-            const { Icon, short, tone } = getStatus(key);
-            return (
-              <div className={`cv-stat cv-stat--${tone}`} key={key}>
-                <span className="cv-stat__icon">
-                  <Icon size={18} aria-hidden="true" />
-                </span>
-                <span className="cv-stat__body">
-                  <span className="cv-stat__value">{counts[key] || 0}</span>
-                  <span className="cv-stat__label">{short}</span>
-                </span>
-              </div>
-            );
-          })}
-        </section>
 
         {loading ? (
           <div className="sig-card sig-empty">

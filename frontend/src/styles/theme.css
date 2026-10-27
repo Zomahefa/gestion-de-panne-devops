@@ -13,6 +13,8 @@
   --sig-accent: #ff9800;
   --sig-accent-600: #ef8c00;
   --sig-accent-050: #fff6ea;
+  --sig-accent-soft: #ffb74d;
+  --sig-accent-light: #ffe0b2;
 
   /* Neutres */
   --sig-bg: #f4f6fa;
@@ -336,6 +338,17 @@ body {
   box-shadow: 0 0 0 3px rgba(26, 95, 168, 0.14);
 }
 
+.sig-input--error,
+.sig-textarea--error {
+  border-color: var(--sig-danger);
+  background: #fdf1f1;
+}
+
+.sig-input--error:focus,
+.sig-textarea--error:focus {
+  box-shadow: 0 0 0 3px rgba(192, 57, 43, 0.15);
+}
+
 .sig-textarea {
   min-height: 118px;
   resize: vertical;
@@ -412,6 +425,15 @@ body {
   display: block;
   font-size: 0.79rem;
   color: var(--sig-ink-faint);
+}
+
+/* --------------------------------------------------------------------------
+   Navigation
+   -------------------------------------------------------------------------- */
+
+.sig-nav__link.active {
+  background: var(--sig-navy-800);
+  color: #fff;
 }
 
 /* --------------------------------------------------------------------------
@@ -692,5 +714,71 @@ body {
 @media (prefers-reduced-motion: reduce) {
   .sig-spin {
     animation: none;
+  }
+}
+
+/* Notification styles */
+.sig-notification {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  padding: 12px 16px;
+  border-radius: var(--sig-radius-sm);
+  box-shadow: var(--sig-shadow-md);
+  z-index: 1000;
+  animation: sig-notification-slide 0.3s ease;
+  max-width: 400px;
+  word-wrap: break-word;
+}
+
+.sig-notification--success {
+  background: var(--sig-resolved-bg);
+  border: 1px solid var(--sig-resolved);
+  color: var(--sig-resolved);
+}
+
+.sig-notification--error {
+  background: var(--sig-danger-bg);
+  border: 1px solid var(--sig-danger);
+  color: var(--sig-danger);
+}
+
+.sig-notification--info {
+  background: var(--sig-route-bg);
+  border: 1px solid var(--sig-route);
+  color: var(--sig-route);
+}
+
+.sig-notification__content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.sig-notification__close {
+  background: none;
+  border: none;
+  color: currentColor;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sig-notification__close:hover {
+  background: rgba(0, 0, 0, 0.1);
+}
+
+@keyframes sig-notification-slide {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
   }
 }

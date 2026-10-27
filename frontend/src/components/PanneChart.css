@@ -1,0 +1,49 @@
+/* Statistiques */
+
+.pc-total {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 13px;
+  border-radius: 999px;
+  background: var(--sig-navy-100);
+  color: var(--sig-navy-800);
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.pc-card {
+  overflow: hidden;
+}
+
+.pc-card__head {
+  padding: 18px 22px 14px;
+  margin-bottom: 0;
+}
+
+.pc-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.pc-legend__item {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--sig-ink-soft);
+}
+
+.pc-chart {
+  height: 420px;
+  padding: 18px 22px 24px;
+}
+
+@media (max-width: 720px) {
+  .pc-chart {
+    height: 320px;
+    padding: 14px 14px 18px;
+  }
+}

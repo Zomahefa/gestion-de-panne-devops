@@ -1,76 +1,192 @@
-.help-page {
-  max-width: 800px;
-  margin: auto;
-  padding: 2rem;
-  background-color: #fff8e1;
-  border-radius: 12px;
-  box-shadow: 0 0 10px rgba(0,0,0,0.1);
-  font-family: 'Segoe UI', sans-serif;
+/* Centre d'aide */
+
+.hp-head {
+  margin-bottom: 24px;
 }
 
-.help-tabs {
+.hp-tabs {
   display: flex;
-  border-bottom: 2px solid #ccc;
-  margin-bottom: 1.5rem;
-  overflow-x: auto;
+  gap: 8px;
+  margin-bottom: 18px;
+  flex-wrap: wrap;
 }
 
-.help-tabs button {
-  background: none;
-  border: none;
-  padding: 0.8rem 1.2rem;
-  font-weight: bold;
+.hp-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  border-radius: 999px;
+  border: 1px solid var(--sig-line-strong);
+  background: #fff;
+  font-family: inherit;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--sig-ink-soft);
   cursor: pointer;
-  border-bottom: 3px solid transparent;
-  transition: border-color 0.3s, background-color 0.3s;
-  font-size: 1rem;
-  color: #333;
+  transition: background-color 0.15s ease, color 0.15s ease,
+    border-color 0.15s ease;
 }
 
-.help-tabs button.active {
-  border-bottom: 3px solid #ff9800;
-  color: #ff9800;
-  background-color: #fff3e0;
+.hp-tab:hover {
+  border-color: #b9c6d6;
+  color: var(--sig-navy-800);
 }
 
-.help-tabs button:hover {
-  background-color: #ffe0b2;
+.hp-tab--active {
+  background: var(--sig-navy-800);
+  border-color: var(--sig-navy-800);
+  color: #fff;
 }
 
-.help-content h2 {
-  font-size: 1.6rem;
-  margin-bottom: 1rem;
-  color: #333;
+.hp-card {
+  overflow: hidden;
+  margin-bottom: 18px;
 }
 
-.help-content p {
-  margin-bottom: 1rem;
-  font-size: 1rem;
-  color: #555;
+.hp-card__head {
+  padding: 18px 22px 14px;
+  margin-bottom: 0;
 }
 
-.help-content ul {
-  list-style-type: disc;
-  padding-left: 1.5rem;
-  margin-bottom: 2rem;
-  color: #444;
+.hp-intro {
+  margin: 0;
+  padding: 0 22px;
+  font-size: 0.92rem;
+  color: var(--sig-ink-soft);
 }
 
-.help-content li {
-  margin-bottom: 0.5rem;
+.hp-list {
+  list-style: none;
+  margin: 16px 0 0;
+  padding: 0 22px 22px;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px 20px;
 }
 
-.help-content h4 {
-  margin-top: 2rem;
-  font-size: 1.2rem;
-  color: #333;
+.hp-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px;
+  border-radius: var(--sig-radius-sm);
+  background: #f8fafc;
+  border: 1px solid var(--sig-line);
 }
 
-.help-content a {
-  color: #ff9800;
+.hp-item__icon {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  flex: 0 0 34px;
+  border-radius: 10px;
+  background: var(--sig-navy-100);
+  color: var(--sig-navy-700);
+}
+
+.hp-item__title {
+  margin: 0 0 3px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--sig-navy-800);
+}
+
+.hp-item__text {
+  margin: 0;
+  font-size: 0.83rem;
+  line-height: 1.5;
+  color: var(--sig-ink-soft);
+}
+
+/* --- Contact ------------------------------------------------------------- */
+
+.hp-contact {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  flex-wrap: wrap;
+  padding: 22px;
+  margin-bottom: 22px;
+}
+
+.hp-contact__body {
+  min-width: 0;
+  flex: 1 1 320px;
+}
+
+.hp-contact__body .sig-card__title {
+  margin-bottom: 6px;
+}
+
+.hp-contact__body .hp-intro {
+  padding: 0;
+}
+
+.hp-contact__links {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.hp-contact__link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: var(--sig-radius-sm);
+  background: #f8fafc;
+  border: 1px solid var(--sig-line);
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--sig-navy-800);
+  text-decoration: none;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+.hp-contact__link:hover {
+  background: var(--sig-navy-100);
+  border-color: #b9c6d6;
   text-decoration: none;
 }
 
-.help-content a:hover {
-  text-decoration: underline;
+.hp-back {
+  margin-top: 4px;
+}
+
+/* --- Responsive ---------------------------------------------------------- */
+
+@media (max-width: 860px) {
+  .hp-list {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 560px) {
+  .hp-tabs {
+    gap: 6px;
+  }
+
+  .hp-tab {
+    padding: 9px 13px;
+    font-size: 0.82rem;
+  }
+
+  .hp-list,
+  .hp-card__head,
+  .hp-intro {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+
+  .hp-contact {
+    padding: 18px;
+  }
+
+  .hp-contact__links,
+  .hp-contact__link {
+    width: 100%;
+  }
 }

@@ -1,32 +1,41 @@
-.admin-tech-container {
-  padding: 2rem;
-  background-color: #fff8e1;
-  min-height: 100vh;
+/* Gestion des techniciens */
+
+.atm-layout {
+  display: grid;
+  grid-template-columns: 380px minmax(0, 1fr);
+  gap: 20px;
+  align-items: start;
 }
 
-.admin-tech-container h2 {
-  color: #003366;
-  margin-bottom: 1rem;
+.atm-form-card,
+.atm-list-card {
+  overflow: hidden;
 }
 
-.tech-form {
+.atm-card-head {
+  padding: 18px 20px 14px;
+  margin-bottom: 0;
+}
+
+.atm-count {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--sig-ink-faint);
+}
+
+.atm-form {
   display: flex;
-  gap: 1rem;
-  flex-wrap: wrap;
-  margin-bottom: 2rem;
+  flex-direction: column;
+  gap: 16px;
+  padding: 18px 20px 22px;
 }
 
-.tech-form input {
-  padding: 0.5rem;
-  border: 1px solid #ccc;
-  border-radius: 4px;
+.atm-submit {
+  margin-top: 4px;
 }
 
-.tech-form button {
-  background-color: #003366;
-  color: white;
-  border: none;
-  padding: 0.6rem 1rem;
-  border-radius: 4px;
-  font-weight: bold;
+@media (max-width: 1180px) {
+  .atm-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
 }

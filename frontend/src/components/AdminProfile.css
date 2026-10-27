@@ -1,47 +1,109 @@
-.admin-profile {
-  max-width: 700px;
-  margin: auto;
-  padding: 2rem;
-  background-color: #ffffff;
-  border-radius: 12px;
-  box-shadow: 0 0 15px rgba(0,0,0,0.1);
+/* Profil administrateur */
+
+.ap-layout {
+  display: grid;
+  grid-template-columns: 320px minmax(0, 1fr);
+  gap: 20px;
+  align-items: start;
 }
 
-.admin-profile h2 {
-  text-align: center;
-  margin-bottom: 2rem;
-  font-size: 1.8rem;
-  color: #333;
+.ap-id {
+  padding: 26px 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
 }
 
-.admin-profile label {
+.ap-id__avatar {
+  display: grid;
+  place-items: center;
+  width: 62px;
+  height: 62px;
+  border-radius: 18px;
+  background: var(--sig-navy-100);
+  color: var(--sig-navy-700);
+  margin-bottom: 10px;
+}
+
+.ap-id__name {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: var(--sig-navy-900);
+}
+
+.ap-id__role {
+  margin: 0 0 16px;
+  font-size: 0.85rem;
+  color: var(--sig-ink-soft);
+}
+
+.ap-id__meta {
+  width: 100%;
+  margin: 0;
+  display: grid;
+  gap: 12px;
+  padding-top: 16px;
+  border-top: 1px solid var(--sig-line);
+}
+
+.ap-id__meta dt {
+  margin: 0 0 2px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--sig-ink-faint);
+}
+
+.ap-id__meta dd {
+  margin: 0;
+  font-size: 0.88rem;
   font-weight: 600;
-  margin-bottom: 0.3rem;
-  color: #444;
-  display: block;
+  color: var(--sig-ink);
+  overflow-wrap: anywhere;
 }
 
-.admin-profile input {
-  width: 100%;
-  padding: 0.6rem;
-  margin-bottom: 1rem;
-  border-radius: 6px;
-  border: 1px solid #ccc;
-  font-size: 1rem;
-  background-color: #fdfdfd;
+.ap-form-card {
+  overflow: hidden;
 }
 
-.admin-profile button {
-  padding: 0.8rem;
-  font-size: 1rem;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  width: 100%;
-  background-color: #28a745;
-  color: white;
+.ap-card-head {
+  padding: 18px 22px 14px;
+  margin-bottom: 0;
 }
 
-.admin-profile button:hover {
-  background-color: #218838;
+.ap-form {
+  padding: 20px 22px 24px;
+}
+
+.ap-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 22px;
+  padding-top: 18px;
+  border-top: 1px solid var(--sig-line);
+}
+
+@media (max-width: 1080px) {
+  .ap-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .ap-id {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .ap-id__avatar {
+    margin-bottom: 0;
+  }
+
+  .ap-id__meta {
+    flex-basis: 100%;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }

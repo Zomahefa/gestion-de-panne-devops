@@ -1,23 +1,33 @@
-import React, { useEffect, useState } from 'react';
-import axios from 'axios';
-import Swal from 'sweetalert2';
-import './AdminTechnicianManager.css';
-import { Link } from 'react-router-dom';
+import React, { useEffect, useState } from "react";
+import axios from "axios";
+import Swal from "sweetalert2";
+import {
+  LoaderCircle,
+  Pencil,
+  Plus,
+  Trash2,
+  UserPlus,
+  Users,
+} from "lucide-react";
+import AdminShell from "./AdminShell.jsx";
+import "./AdminTechnicianManager.css";
+
+const EMPTY = { full_name: "", matricule: "", contact: "", password: "" };
 
 const AdminTechnicianManager = () => {
   const [technicians, setTechnicians] = useState([]);
-  const [formData, setFormData] = useState({
-    full_name: '',
-    matricule: '',
-    contact: '',
-    password: '',
-  });
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [formData, setFormData] = useState(EMPTY);
+
   const fetchTechnicians = async () => {
     try {
       const res = await axios.get(`${process.env.REACT_APP_API_URL}technicians/`);
       setTechnicians(res.data);
     } catch (err) {
-      console.error('Erreur chargement techniciens', err);
+      console.error("Erreur chargement techniciens", err);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -26,15 +36,34 @@ const AdminTechnicianManager = () => {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
+  const translate = (msg) => {
+    if (msg.includes("This password is too short")) {
+      return "Le mot de passe est trop court (8 caractères minimum).";
+    }
+    if (msg.includes("This password is too common")) {
+      return "Le mot de passe est trop commun, choisissez-en un plus solide.";
+    }
+    if (msg.includes("This password is entirely numeric")) {
+      return "Le mot de passe ne doit pas contenir uniquement des chiffres.";
+    }
+    return msg;
+  };
+
   const handleCreate = async (e) => {
     e.preventDefault();
+    setSaving(true);
 
     const generatedUsername = formData.full_name
-      ? formData.full_name.toLowerCase().replace(/\s+/g, '')
+      ? formData.full_name.toLowerCase().replace(/\s+/g, "")
       : null;
 
     if (!generatedUsername) {
-      Swal.fire('❌ Nom complet requis pour générer le nom d’utilisateur');
+      setSaving(false);
+      Swal.fire({
+        title: "Nom complet requis",
+        text: "Le nom d'utilisateur est généré à partir du nom complet.",
+        icon: "warning",
+      });
       return;
     }
 
@@ -46,38 +75,23 @@ const AdminTechnicianManager = () => {
         contact: formData.contact,
         password: formData.password,
       });
-      Swal.fire('✅ Technicien ajouté !');
-      setFormData({ full_name: '', matricule: '', contact: '', password: '' });
+      Swal.fire({
+        title: "Technicien ajouté",
+        text: `${formData.full_name} peut désormais se connecter.`,
+        icon: "success",
+      });
+      setFormData(EMPTY);
       fetchTechnicians();
     } catch (err) {
-      console.log(err.response?.data);
-      if (err.response && err.response.data) {
-      const errors = err.response.data;
-
-      // Traduction personnalisée des messages
-      const translate = (msg) => {
-        if (msg.includes('This password is too short')) {
-          return 'Le mot de passe est trop court. Il doit contenir au moins 8 caractères.';
-        }
-        if (msg.includes('This password is too common')) {
-          return 'Le mot de passe est trop commun. Choisissez un mot de passe plus sécurisé.';
-        }
-        if (msg.includes('This password is entirely numeric')) {
-          return 'Le mot de passe ne doit pas être uniquement composé de chiffres.';
-        }
-        return msg; // Message par défaut si non reconnu
-      };
-
-      const rawMessages = Object.values(errors).flat();
-      const translatedMessages = rawMessages.map(translate).join('\n');
-
-      Swal.fire('❌ Erreur création technicien', translatedMessages, 'error');
-    } else {
-      Swal.fire('❌ Erreur création technicien', 'Une erreur inconnue est survenue.', 'error');
-    }
+      const errors = err.response?.data;
+      const message = errors
+        ? Object.values(errors).flat().map(translate).join("\n")
+        : "Une erreur inconnue est survenue.";
+      Swal.fire({ title: "Création impossible", text: message, icon: "error" });
+    } finally {
+      setSaving(false);
     }
   };
-
 
   const handleEdit = async (tech) => {
     const { value: formValues } = await Swal.fire({
@@ -89,46 +103,57 @@ const AdminTechnicianManager = () => {
         `<input id="swal-password" class="swal2-input" placeholder="Nouveau mot de passe (optionnel)" type="password">`,
       focusConfirm: false,
       showCancelButton: true,
-      confirmButtonText: 'Modifier',
-      preConfirm: () => {
-        return {
-          full_name: document.getElementById('swal-fullname').value,
-          matricule: document.getElementById('swal-matricule').value,
-          contact: document.getElementById('swal-contact').value,
-          password: document.getElementById('swal-password').value || undefined,
-        };
-      },
+      confirmButtonText: "Enregistrer",
+      cancelButtonText: "Annuler",
+      confirmButtonColor: "#003366",
+      preConfirm: () => ({
+        full_name: document.getElementById("swal-fullname").value,
+        matricule: document.getElementById("swal-matricule").value,
+        contact: document.getElementById("swal-contact").value,
+        password: document.getElementById("swal-password").value || undefined,
+      }),
     });
 
     if (formValues) {
       try {
-        await axios.put(`${process.env.REACT_APP_API_URL}technicians/${tech.id}/`, formValues);
-        Swal.fire('✅ Technicien modifié !');
+        await axios.put(
+          `${process.env.REACT_APP_API_URL}technicians/${tech.id}/`,
+          formValues,
+        );
+        Swal.fire({
+          title: "Technicien modifié",
+          icon: "success",
+        });
         fetchTechnicians();
       } catch (err) {
-        console.log('Erreur modification :', err.response?.data);
-        Swal.fire('❌ Erreur modification');
+        Swal.fire({
+          title: "Modification impossible",
+          text: "Vérifiez les informations saisies.",
+          icon: "error",
+        });
       }
     }
   };
 
   const handleDelete = async (id) => {
     const result = await Swal.fire({
-      title: '🗑️ Supprimer ce technicien ?',
-      text: 'Cette action est irréversible.',
-      icon: 'warning',
+      title: "Supprimer ce technicien ?",
+      text: "Cette action est irréversible.",
+      icon: "warning",
       showCancelButton: true,
-      confirmButtonText: 'Oui, supprimer',
-      cancelButtonText: 'Annuler',
+      confirmButtonText: "Oui, supprimer",
+      cancelButtonText: "Annuler",
+      confirmButtonColor: "#c0392b",
+      cancelButtonColor: "#55677c",
     });
 
     if (result.isConfirmed) {
       try {
         await axios.delete(`${process.env.REACT_APP_API_URL}technicians/${id}/`);
-        Swal.fire('✅ Supprimé !');
+        Swal.fire({ title: "Technicien supprimé", icon: "success" });
         fetchTechnicians();
       } catch (err) {
-        Swal.fire('❌ Erreur suppression');
+        Swal.fire({ title: "Suppression impossible", icon: "error" });
       }
     }
   };
@@ -138,46 +163,176 @@ const AdminTechnicianManager = () => {
   }, []);
 
   return (
-    <div className="admin-tech-container">
-      <h2>👥 Gestion des techniciens</h2>
+    <AdminShell
+      title="Gestion des techniciens"
+      subtitle="Créez les comptes terrain et mettez à jour leurs coordonnées"
+    >
+      <div className="atm-layout">
+        <section className="sig-card atm-form-card">
+          <div className="sig-card__head atm-card-head">
+            <h2 className="sig-card__title">
+              <UserPlus size={18} aria-hidden="true" />
+              Nouveau technicien
+            </h2>
+          </div>
 
-      <form onSubmit={handleCreate} className="tech-form">
-        <input type="text" name="full_name" autoComplete="off" placeholder="Nom complet" value={formData.full_name} onChange={handleChange} required />
-        <input type="text" name="matricule" autoComplete="off" placeholder="Matricule" value={formData.matricule} onChange={handleChange} required />
-        <input type="text" name="contact" autoComplete="off" placeholder="Contact" value={formData.contact} onChange={handleChange} required />
-        <input type="password" name="password" autoComplete="new-password" placeholder="Mot de passe" value={formData.password} onChange={handleChange} required />
-        <div style={{ display: 'flex', gap: '10px', marginTop: '10px' }}>
-          <button type="submit" className="btn btn-success">➕ Ajouter</button>
-          <Link to="/admin-dashboard" className="btn btn-secondary">⬅️ Retour admin</Link>
-        </div>
-      </form>
+          <form className="atm-form" onSubmit={handleCreate}>
+            <div className="sig-field">
+              <label className="sig-label" htmlFor="tech-fullname">
+                Nom complet *
+              </label>
+              <input
+                id="tech-fullname"
+                className="sig-input"
+                type="text"
+                name="full_name"
+                autoComplete="off"
+                placeholder="Ex. Rakoto Jean"
+                value={formData.full_name}
+                onChange={handleChange}
+                required
+              />
+              <span className="sig-hint">
+                Le nom d'utilisateur est généré automatiquement.
+              </span>
+            </div>
 
-      <table className="table mt-4">
-        <thead>
-          <tr>
-            <th>Nom complet</th>
-            <th>Matricule</th>
-            <th>Contact</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {technicians.map((tech) => (
-            <tr key={tech.id}>
-              <td>{tech.full_name}</td>
-              <td>{tech.matricule}</td>
-              <td>{tech.contact}</td>
-              <td>
-                <div style={{ display: 'flex', gap: '5px' }}>
-                  <button className="btn btn-sm btn-warning" onClick={() => handleEdit(tech)}>✏️ Modifier</button>
-                  <button className="btn btn-sm btn-danger" onClick={() => handleDelete(tech.id)}>🗑️ Supprimer</button>
-                </div>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
+            <div className="sig-field">
+              <label className="sig-label" htmlFor="tech-matricule">
+                Matricule *
+              </label>
+              <input
+                id="tech-matricule"
+                className="sig-input"
+                type="text"
+                name="matricule"
+                autoComplete="off"
+                placeholder="Ex. TECH-014"
+                value={formData.matricule}
+                onChange={handleChange}
+                required
+              />
+            </div>
+
+            <div className="sig-field">
+              <label className="sig-label" htmlFor="tech-contact">
+                Contact *
+              </label>
+              <input
+                id="tech-contact"
+                className="sig-input"
+                type="text"
+                name="contact"
+                autoComplete="off"
+                placeholder="Ex. 034 00 000 00"
+                value={formData.contact}
+                onChange={handleChange}
+                required
+              />
+            </div>
+
+            <div className="sig-field">
+              <label className="sig-label" htmlFor="tech-password">
+                Mot de passe *
+              </label>
+              <input
+                id="tech-password"
+                className="sig-input"
+                type="password"
+                name="password"
+                autoComplete="new-password"
+                placeholder="8 caractères minimum"
+                value={formData.password}
+                onChange={handleChange}
+                required
+              />
+            </div>
+
+            <button
+              type="submit"
+              className="sig-btn sig-btn--primary atm-submit"
+              disabled={saving}
+            >
+              {saving ? (
+                <LoaderCircle size={17} className="sig-spin" aria-hidden="true" />
+              ) : (
+                <Plus size={17} aria-hidden="true" />
+              )}
+              {saving ? "Création…" : "Ajouter le technicien"}
+            </button>
+          </form>
+        </section>
+
+        <section className="sig-card atm-list-card">
+          <div className="sig-card__head atm-card-head">
+            <h2 className="sig-card__title">
+              <Users size={18} aria-hidden="true" />
+              Équipe terrain
+            </h2>
+            <span className="atm-count">{technicians.length} technicien(s)</span>
+          </div>
+
+          {loading ? (
+            <div className="sig-empty">
+              <LoaderCircle size={22} className="sig-spin" aria-hidden="true" />
+              <p className="sig-empty__title">Chargement…</p>
+            </div>
+          ) : technicians.length === 0 ? (
+            <div className="sig-empty">
+              <span className="sig-empty__icon">
+                <Users size={22} aria-hidden="true" />
+              </span>
+              <p className="sig-empty__title">Aucun technicien enregistré</p>
+            </div>
+          ) : (
+            <div className="ad-table-wrap">
+              <table className="ad-table">
+                <thead>
+                  <tr>
+                    <th>Nom complet</th>
+                    <th>Matricule</th>
+                    <th>Contact</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {technicians.map((tech) => (
+                    <tr key={tech.id}>
+                      <td>
+                        <span className="ad-client">{tech.full_name}</span>
+                        <span className="ad-client__meta">{tech.username}</span>
+                      </td>
+                      <td>{tech.matricule}</td>
+                      <td>{tech.contact}</td>
+                      <td>
+                        <div className="ad-row-actions">
+                          <button
+                            type="button"
+                            className="sig-btn sig-btn--ghost sig-btn--sm"
+                            onClick={() => handleEdit(tech)}
+                          >
+                            <Pencil size={14} aria-hidden="true" />
+                            Modifier
+                          </button>
+                          <button
+                            type="button"
+                            className="ad-icon-btn"
+                            onClick={() => handleDelete(tech.id)}
+                            aria-label={`Supprimer ${tech.full_name}`}
+                          >
+                            <Trash2 size={15} aria-hidden="true" />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </section>
+      </div>
+    </AdminShell>
   );
 };
 

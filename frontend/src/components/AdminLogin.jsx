@@ -1,77 +1,132 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import "./AdminLogin.css";
-import logoPanne from "./icone-panne.jpeg";
 import axios from "axios";
-import { Link } from "react-router-dom";
+import {
+  Eye,
+  EyeOff,
+  LoaderCircle,
+  LogIn,
+  ShieldCheck,
+  TriangleAlert,
+  Users,
+} from "lucide-react";
+import AuthLayout from "./AuthLayout.jsx";
 
 const AdminLogin = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleLogin = async (e) => {
     e.preventDefault();
+    setLoading(true);
     try {
       const res = await axios.post(
         `${process.env.REACT_APP_API_URL}admin-login/`,
-        {
-          username,
-          password,
-        },
+        { username, password },
       );
       localStorage.setItem("admin_token", res.data.token);
       navigate("/admin-dashboard");
     } catch (err) {
-      setError("Identifiants incorrects");
-      console.log(err.response?.data);
+      setError("Identifiants incorrects. Vérifiez le nom et le mot de passe.");
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div className="login-container">
-      <Link to="/ClientForm" className="btn btn-outline-primary mb-3">
-        🔙
-      </Link>
-      <img src={logoPanne} alt="Logo " className="logo" />
-      <h2>🛠️ Connexion administrateur</h2>
+    <AuthLayout
+      Icon={ShieldCheck}
+      role="Administrateur"
+      title="Connexion administrateur"
+      subtitle="Pilotez les signalements, affectez les techniciens et suivez les statistiques."
+      panelTitle="Supervision des interventions"
+      panelText="Un poste de pilotage unique pour suivre chaque panne, du signalement du client jusqu'à la résolution par le technicien."
+      points={[
+        "Tableau de bord temps réel",
+        "Affectation au bon technicien",
+        "Statistiques et historique",
+      ]}
+      accent="accent-soft"
+    >
+      <form className="auth__form" onSubmit={handleLogin}>
+        <div className="auth__field">
+          <label className="sig-label" htmlFor="admin-username">
+            <Users size={15} aria-hidden="true" />
+            Nom d'utilisateur
+          </label>
+          <input
+            id="admin-username"
+            type="text"
+            name="username"
+            autoComplete="username"
+            className="sig-input"
+            placeholder="Ex. admin123"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            required
+          />
+        </div>
 
-      <input
-        type="text"
-        name="username"
-        autoComplete="off"
-        className="form-control"
-        placeholder="Nom d'utilisateur"
-        value={username}
-        onChange={(e) => setUsername(e.target.value)}
-        required
-      />
-      <div className="password-wrapper">
-        <input
-          type={showPassword ? "text" : "password"}
-          name="password"
-          autoComplete="new-password"
-          className="form-control mt-2"
-          placeholder="Mot de passe"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-        />
+        <div className="auth__field">
+          <label className="sig-label" htmlFor="admin-password">
+            Mot de passe
+          </label>
+          <div className="auth__pass">
+            <input
+              id="admin-password"
+              type={showPassword ? "text" : "password"}
+              name="password"
+              autoComplete="current-password"
+              className="sig-input"
+              placeholder="Mot de passe"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
+            <button
+              type="button"
+              className="auth__pass-toggle"
+              onClick={() => setShowPassword((v) => !v)}
+              aria-label={
+                showPassword
+                  ? "Masquer le mot de passe"
+                  : "Afficher le mot de passe"
+              }
+            >
+              {showPassword ? (
+                <EyeOff size={17} aria-hidden="true" />
+              ) : (
+                <Eye size={17} aria-hidden="true" />
+              )}
+            </button>
+          </div>
+        </div>
+
+        {error && (
+          <p className="auth__error" role="alert">
+            <TriangleAlert size={16} aria-hidden="true" />
+            {error}
+          </p>
+        )}
+
         <button
-          type="button"
-          className="password-toggle"
-          onClick={() => setShowPassword(!showPassword)}
+          type="submit"
+          className="sig-btn sig-btn--primary sig-btn--block"
+          disabled={loading}
         >
-          {showPassword ? "🙈" : "👁️"}
+          {loading ? (
+            <LoaderCircle size={18} className="sig-spin" aria-hidden="true" />
+          ) : (
+            <LogIn size={18} aria-hidden="true" />
+          )}
+          {loading ? "Connexion…" : "Se connecter"}
         </button>
-      </div>
-      <button className="btn btn-primary mt-3" onClick={handleLogin}>
-        Se connecter
-      </button>
-      {error && <p className="text-danger mt-2">{error}</p>}
-    </div>
+      </form>
+    </AuthLayout>
   );
 };
 

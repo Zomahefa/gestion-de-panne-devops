@@ -34,6 +34,26 @@
   min-width: 280px;
 }
 
+.cf-draft-indicator {
+  background: #fff3e0;
+  border: 1px solid #ffcc80;
+  color: #e65100;
+  padding: 8px 12px;
+  border-radius: var(--sig-radius-sm);
+  font-size: 0.8rem;
+  margin-top: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.cf-form-controls {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 8px;
+}
+
 @media (max-width: 720px) {
   .cf-hero {
     margin-bottom: 20px;
@@ -51,5 +71,9 @@
 
   .cf-actions .sig-btn {
     width: 100%;
+  }
+
+  .cf-form-controls {
+    justify-content: center;
   }
 }

@@ -1,0 +1,234 @@
+/* Coquille des pages d'administration : barre latérale + contenu large */
+
+.ashell {
+  display: grid;
+  grid-template-columns: 258px minmax(0, 1fr);
+  min-height: 100vh;
+  background: var(--sig-bg);
+}
+
+/* --- Barre latérale ------------------------------------------------------ */
+
+.ashell__side {
+  position: sticky;
+  top: 0;
+  align-self: start;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding: 24px 18px;
+  background: linear-gradient(180deg, #00203f 0%, #003366 60%, #08406f 100%);
+  color: #ffffff;
+  overflow-y: auto;
+}
+
+.ashell__brand {
+  display: inline-flex;
+  text-decoration: none;
+  padding: 2px 6px;
+}
+
+.ashell__badge {
+  display: inline-flex;
+  align-self: flex-start;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #ffd79a;
+  background: rgba(255, 152, 0, 0.16);
+  border: 1px solid rgba(255, 152, 0, 0.35);
+}
+
+.ashell__nav {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: 6px;
+}
+
+.ashell__link,
+.ashell__logout {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 11px 12px;
+  border: none;
+  border-radius: var(--sig-radius-sm);
+  background: transparent;
+  font-family: inherit;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.72);
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color 0.16s ease, color 0.16s ease;
+  text-align: left;
+  white-space: nowrap;
+}
+
+.ashell__link:hover,
+.ashell__logout:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+  text-decoration: none;
+}
+
+.ashell__link--active {
+  background: rgba(255, 255, 255, 0.14);
+  color: #ffffff;
+  box-shadow: inset 3px 0 0 var(--sig-accent);
+}
+
+.ashell__bottom {
+  margin-top: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding-top: 14px;
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.ashell__logout {
+  color: #ffb3a7;
+}
+
+.ashell__logout:hover {
+  background: rgba(255, 92, 71, 0.16);
+  color: #ffd2cb;
+}
+
+/* --- Contenu ------------------------------------------------------------- */
+
+.ashell__main {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.ashell__topbar {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 20px;
+  flex-wrap: wrap;
+  padding: 26px 32px 18px;
+  background: rgba(255, 255, 255, 0.75);
+  border-bottom: 1px solid var(--sig-line);
+  backdrop-filter: blur(8px);
+}
+
+.ashell__title {
+  margin: 0;
+  font-size: clamp(1.35rem, 1rem + 1.1vw, 1.75rem);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--sig-navy-900);
+}
+
+.ashell__sub {
+  margin: 5px 0 0;
+  font-size: 0.88rem;
+  color: var(--sig-ink-soft);
+}
+
+.ashell__actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.ashell__content {
+  padding: 24px 32px 56px;
+  max-width: 1320px;
+  width: 100%;
+}
+
+/* --- Responsive ---------------------------------------------------------- */
+
+@media (max-width: 1100px) {
+  .ashell {
+    grid-template-columns: 1fr;
+  }
+
+  .ashell__side {
+    position: sticky;
+    top: 0;
+    z-index: 30;
+    height: auto;
+    flex-direction: row;
+    align-items: center;
+    gap: 14px;
+    padding: 10px 16px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scrollbar-width: none;
+  }
+
+  .ashell__side::-webkit-scrollbar {
+    display: none;
+  }
+
+  .ashell__badge {
+    display: none;
+  }
+
+  .ashell__nav {
+    flex-direction: row;
+    gap: 2px;
+    margin: 0;
+  }
+
+  .ashell__link,
+  .ashell__logout {
+    padding: 9px 11px;
+    font-size: 0.82rem;
+  }
+
+  .ashell__link--active {
+    box-shadow: inset 0 -3px 0 var(--sig-accent);
+  }
+
+  .ashell__bottom {
+    flex-direction: row;
+    align-items: center;
+    gap: 2px;
+    margin: 0;
+    padding: 0;
+    border-top: none;
+    border-left: 1px solid rgba(255, 255, 255, 0.14);
+    padding-left: 8px;
+  }
+
+  .ashell__topbar {
+    padding: 20px 18px 14px;
+  }
+
+  .ashell__content {
+    padding: 18px 18px 48px;
+  }
+}
+
+@media (max-width: 620px) {
+  .ashell__side {
+    padding: 10px 12px;
+    gap: 10px;
+  }
+
+  .ashell__link,
+  .ashell__logout {
+    padding: 8px 9px;
+    font-size: 0.78rem;
+    gap: 7px;
+  }
+
+  .ashell__topbar {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 12px;
+  }
+}
