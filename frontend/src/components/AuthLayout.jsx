@@ -29,7 +29,7 @@ const AuthLayout = ({
             height="32" 
             style={{ display: "block", borderRadius: "8px" }}
           />
-          <span style={{ marginLeft: "8px", fontSize: "20px", fontWeight: "800", color: "#003366" }}>Signaleo</span>
+          <span style={{ marginLeft: "8px", fontSize: "20px", fontWeight: "800", color: "#ffffff" }}>Signaleo</span>
         </Link>
 
         <div className="auth__panel-body">

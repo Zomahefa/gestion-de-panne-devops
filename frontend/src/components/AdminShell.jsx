@@ -37,7 +37,7 @@ const AdminShell = ({ title, subtitle, actions, children }) => {
             height="28" 
             style={{ display: "block", borderRadius: "8px" }}
           />
-          <span style={{ marginLeft: "8px", fontSize: "18px", fontWeight: "800", color: "#003366" }}>Signaleo</span>
+          <span style={{ marginLeft: "8px", fontSize: "18px", fontWeight: "800", color: "#ffffff" }}>Signaleo</span>
         </Link>
 
         <span className="ashell__badge">Administration</span>

@@ -1,8 +1,7 @@
 from django.urls import path, include
 from rest_framework import routers
 from .views import TodoViewSet, TechnicianViewSet, AdminViewSet, AttributionViewSet, NotificationViewSet
-from .views import admin_login
-from .views import notify_admin
+from .views import admin_login, admin_register, notify_admin
 
 
 
@@ -20,6 +19,7 @@ router.register('notifications', NotificationViewSet)
 urlpatterns = [
     path('', include(router.urls)),
     path('admin-login/', admin_login , name='admin-login'),
+    path('admin-register/', admin_register , name='admin-register'),
     path('notify-admin/', notify_admin , name='notify-admin'),
 ]
 

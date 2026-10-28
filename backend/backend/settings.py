@@ -124,9 +124,10 @@ if DATABASE_URL and dj_database_url:
     }
     # Recommandé par Neon/Django : évite les curseurs côté serveur,
     # inutiles ici et incompatibles avec certains poolers (PgBouncer).
-    DATABASES['default']['DISABLE_SERVER_SIDE_CURSORS'] = True
-    # Neon impose TLS.
-    DATABASES['default'].setdefault('OPTIONS', {}).setdefault('sslmode', 'require')
+    if DATABASES['default']['ENGINE'].endswith('postgresql'):
+        DATABASES['default']['DISABLE_SERVER_SIDE_CURSORS'] = True
+        # Neon impose TLS.
+        DATABASES['default'].setdefault('OPTIONS', {}).setdefault('sslmode', 'require')
 else:
     # Fallback local / Docker Compose : MySQL ou MariaDB.
     DATABASES = {
@@ -237,3 +238,12 @@ if os.environ.get("CLOUDINARY_URL"):
     }
 
 AUTH_USER_MODEL = 'todo.Technician'
+
+# Création de compte administrateur (page de démonstration).
+# En entreprise, le compte de référence est créé en base par le développeur
+# (commande `create_admin`) ; cette page n'est ouverte qu'avec un code remis
+# sur demande. Mettre ADMIN_REGISTRATION_ENABLED=0 pour la fermer totalement.
+ADMIN_REGISTRATION_ENABLED = os.environ.get(
+    "ADMIN_REGISTRATION_ENABLED", "1"
+).lower() in ("1", "true", "yes", "on")
+ADMIN_REGISTRATION_CODE = os.environ.get("ADMIN_REGISTRATION_CODE", "2005")

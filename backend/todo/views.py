@@ -1,4 +1,5 @@
 from django.http import HttpResponse, JsonResponse
+from django.conf import settings
 from rest_framework import viewsets, status
 from rest_framework.decorators import api_view
 from rest_framework.permissions import AllowAny
@@ -133,6 +134,74 @@ def notify_admin(request):
     message = request.data.get('message')
     Notification.objects.create(message=message)
     return Response({'status': 'Notification enregistrée'})
+
+
+@api_view(['POST'])
+def admin_register(request):
+    """Crée un compte administrateur (démonstration portfolio).
+
+    Contexte réel : Signaleo est une application d'entreprise. Le compte
+    administrateur de référence est créé directement en base par le
+    développeur avec la commande ``python manage.py create_admin``.
+    Cette vue n'existe que pour permettre au recruteur d'explorer les
+    fonctions d'administration ; elle exige un code de validation remis
+    sur demande.
+
+    Le code est configurable via ``ADMIN_REGISTRATION_CODE`` (défaut 2005)
+    et la vue peut être désactivée avec ``ADMIN_REGISTRATION_ENABLED=0``.
+    """
+    if not getattr(settings, "ADMIN_REGISTRATION_ENABLED", True):
+        return Response(
+            {'error': "La création de compte est désactivée."},
+            status=status.HTTP_403_FORBIDDEN,
+        )
+
+    username = (request.data.get('username') or '').strip()
+    password = request.data.get('password') or ''
+    validation_code = (request.data.get('validation_code') or '').strip()
+
+    expected_code = getattr(settings, "ADMIN_REGISTRATION_CODE", "2005")
+    if validation_code != expected_code:
+        return Response(
+            {'error': "Code de validation invalide."},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+
+    if not username or not password:
+        return Response(
+            {'error': "Le nom d'utilisateur et le mot de passe sont obligatoires."},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+
+    if len(password) < 8:
+        return Response(
+            {'error': "Le mot de passe doit contenir au moins 8 caractères."},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+
+    if Admin.objects.filter(username__iexact=username).exists():
+        return Response(
+            {'error': "Ce nom d'utilisateur est déjà utilisé."},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+
+    # Champs non saisis dans le formulaire de démonstration : valeurs
+    # cohérentes générées pour respecter le schéma existant.
+    last_id = Admin.objects.order_by('-id').values_list('id', flat=True).first() or 0
+    admin = Admin.objects.create(
+        username=username,
+        full_name=request.data.get('full_name') or username,
+        matricule=request.data.get('matricule') or f"ADM-{last_id + 1:04d}",
+        role=request.data.get('role') or 'admin',
+        contact=request.data.get('contact') or '',
+        email=request.data.get('email') or '',
+        password=password,
+    )
+
+    return Response(
+        {'success': 'Compte admin créé avec succès', 'admin_id': admin.id},
+        status=status.HTTP_201_CREATED,
+    )
 
 
 @require_GET

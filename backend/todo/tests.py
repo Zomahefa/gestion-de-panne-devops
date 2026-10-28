@@ -124,6 +124,70 @@ class TestNotifyAdminAPI(APITestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(Notification.objects.count(), 1)
 
+
+class TestAdminRegisterAPI(APITestCase):
+    def test_register_with_valid_code(self):
+        url = reverse('admin-register')
+        response = self.client.post(
+            url,
+            {
+                "username": "nouvel.admin",
+                "password": "MotDePasse!2026",
+                "validation_code": "2005",
+            },
+        )
+        self.assertEqual(response.status_code, 201)
+        admin = Admin.objects.get(username="nouvel.admin")
+        self.assertTrue(check_password("MotDePasse!2026", admin.password))
+        self.assertTrue(admin.matricule.startswith("ADM-"))
+
+    def test_register_with_invalid_code(self):
+        url = reverse('admin-register')
+        response = self.client.post(
+            url,
+            {
+                "username": "intrus",
+                "password": "MotDePasse!2026",
+                "validation_code": "0000",
+            },
+        )
+        self.assertEqual(response.status_code, 400)
+        self.assertFalse(Admin.objects.filter(username="intrus").exists())
+
+    def test_register_rejects_duplicate_username(self):
+        Admin.objects.create(
+            full_name="Admin Zo",
+            matricule="ADM-001",
+            contact="0000000000",
+            email="admin@example.com",
+            username="adminzo",
+            password="plaintext123",
+        )
+        url = reverse('admin-register')
+        response = self.client.post(
+            url,
+            {
+                "username": "adminzo",
+                "password": "MotDePasse!2026",
+                "validation_code": "2005",
+            },
+        )
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(Admin.objects.filter(username="adminzo").count(), 1)
+
+    def test_register_rejects_short_password(self):
+        url = reverse('admin-register')
+        response = self.client.post(
+            url,
+            {
+                "username": "court",
+                "password": "abc",
+                "validation_code": "2005",
+            },
+        )
+        self.assertEqual(response.status_code, 400)
+        self.assertFalse(Admin.objects.filter(username="court").exists())
+
 class TestUrls(SimpleTestCase):
     def test_todo_list_url_resolves(self):
         url = reverse('todo-list')

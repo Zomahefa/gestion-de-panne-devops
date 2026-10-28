@@ -263,6 +263,28 @@
   text-decoration: none;
 }
 
+.auth__error--ok {
+  background: var(--sig-resolved-bg);
+  border-color: #bfe8d5;
+  color: var(--sig-resolved);
+}
+
+.auth__switch {
+  margin: 18px 0 0;
+  font-size: 0.85rem;
+  color: var(--sig-ink-soft);
+}
+
+.auth__switch a {
+  font-weight: 700;
+  color: var(--sig-navy-800);
+  text-decoration: none;
+}
+
+.auth__switch a:hover {
+  text-decoration: underline;
+}
+
 .auth__demo {
   margin-top: 22px;
   padding: 12px 14px;

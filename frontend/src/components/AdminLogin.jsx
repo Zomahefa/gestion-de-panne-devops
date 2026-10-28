@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import {
   Eye,
@@ -126,6 +126,11 @@ const AdminLogin = () => {
           {loading ? "Connexion…" : "Se connecter"}
         </button>
       </form>
+
+      <p className="auth__switch">
+        Pas encore de compte ?{" "}
+        <Link to="/admin-register">Créer un compte admin</Link>
+      </p>
     </AuthLayout>
   );
 };
