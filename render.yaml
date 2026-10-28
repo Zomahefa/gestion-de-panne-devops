@@ -29,6 +29,24 @@ services:
         sync: false
       - key: SEED_DEMO
         value: "1"
+      # Compte administrateur de reference. Passer BOOTSTRAP_ADMIN=1 le
+      # temps d'un deploiement (avec ADMIN_PASSWORD) puis revenir a 0.
+      - key: BOOTSTRAP_ADMIN
+        value: "0"
+      - key: ADMIN_USERNAME
+        value: "admin"
+      - key: ADMIN_PASSWORD
+        sync: false
+      - key: ADMIN_EMAIL
+        sync: false
+      - key: ADMIN_RESET_PASSWORD
+        value: "0"
+      # Page /admin-register (demonstration). Laisser le code en variable
+      # d'environnement pour ne pas l'exposer dans le depot.
+      - key: ADMIN_REGISTRATION_ENABLED
+        value: "1"
+      - key: ADMIN_REGISTRATION_CODE
+        sync: false
       - key: WEB_CONCURRENCY
         value: "2"
 
