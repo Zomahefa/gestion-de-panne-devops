@@ -160,9 +160,72 @@ make dev-logs        # Suivre les logs en temps réel
 
 
 
+---
 
+## Sécurité de l'API
 
+Les rôles sont vérifiés côté serveur et le navigateur ne conserve qu'un jeton
+signé.
 
+### Droits d'accès
+
+| Route | Accès |
+|-------|-------|
+| `GET /api/todos/` | public (suivi des signalements) |
+| `POST /api/todos/` | public (dépôt d'un signalement) |
+| `POST /api/notify-admin/` | public |
+| `POST /api/admin-login/`, `POST /api/token/` | public (connexion) |
+| `/api/techniciens/`, `/api/notifications/`, `/api/attributions/`, `/api/admins/` | authentifié |
+| modification / suppression d'un signalement | administrateur (un technicien ne peut changer que le statut et sa note) |
+
+Un administrateur reçoit un jeton JWT signé (portée `admin`, 12 h), un
+technicien un jeton JWT standard. Une seule classe d'authentification
+(`backend/todo/authentication.py`) traite les deux.
+
+### Limitation de débit
+
+Les routes publiques et les connexions sont limitées par adresse IP, avec des
+compteurs stockés dans un cache fichier partagé par les workers gunicorn :
+
+| Route | Quota |
+|-------|-------|
+| dépôt d'un signalement | 10 / minute |
+| notification administrateur | 20 / minute |
+| connexion administrateur | 10 / minute |
+| connexion technicien | 10 / minute |
+| inscription administrateur | 10 / heure |
+
+Les quotas sont portés par les classes de `backend/todo/throttling.py`. Sur
+Render, l'adresse du client est lue dans `CF-Connecting-IP` : `X-Forwarded-For`
+contient des sauts internes qui changent à chaque requête et ne peut pas servir
+d'identité. `GET /health/` expose le quota appliqué et l'état du cache.
+
+### Comptes administrateur
+
+Le compte de référence est créé en base par `python manage.py create_admin`
+(voir `backend/entrypoint.sh`). La page `/admin-register` n'existe que pour la
+démonstration : elle exige le code fourni par le développeur via
+`ADMIN_REGISTRATION_CODE`. Aucune valeur par défaut n'est présente dans le
+dépôt : sans cette variable, la page répond 403.
+
+Ne jamais committer de secret (`.env`, `DATABASE_URL`, `CLOUDINARY_URL`, code
+d'inscription).
+
+---
+
+## Déploiement (Render)
+
+| Service | URL |
+|---------|-----|
+| Frontend (site statique) | https://signaleo.onrender.com |
+| API (Docker) | https://gestion-de-panne-devops.onrender.com |
+
+- branche déployée : `deploy/render-online`
+- base de données : Neon (PostgreSQL) — images : Cloudinary
+- plan gratuit : mise en veille après 15 min d'inactivité, disque éphémère
+  (les compteurs de limitation repartent de zéro à chaque déploiement)
+
+---
 
 Auteur
 Zo mahefa Ranaivo – DevOps & Fullstack Developer Projet soutenu en octobre 2025
