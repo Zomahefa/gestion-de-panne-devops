@@ -391,33 +391,15 @@ def admin_register(request):
 def health_check(request):
     """État du service, utilisé par Render et pour vérifier un déploiement.
 
-    Expose les quotas réellement appliqués et l'état du cache partagé : sans
-    cache fonctionnel, la limitation de débit ne compte plus les requêtes.
+    Expose le quota réellement appliqué et l'état du cache partagé : sans
+    cache fonctionnel, les compteurs de limitation ne seraient plus partagés
+    entre les workers et la protection deviendrait inopérante.
     """
     cache.set('health-probe', 'ok', 5)
-    throttle_cache = settings.CACHES['default']
-
-    # Diagnostic temporaire : le compteur doit s'incrementer d'un appel a
-    # l'autre si le cache survit entre deux requetes.
-    counter = (cache.get('health-counter') or 0) + 1
-    cache.set('health-counter', counter, 600)
-
-    throttle = IncidentCreateThrottle()
-    ident = throttle.get_ident(request)
-    key = throttle.cache_format % {'scope': throttle.scope, 'ident': ident}
 
     return JsonResponse({
         'status': 'ok',
         'commit': os.environ.get('RENDER_GIT_COMMIT', 'local')[:7],
-        'throttle': throttle.rate,
-        'throttle_cache': throttle_cache['BACKEND'].rsplit('.', 1)[-1],
-        'throttle_cache_dir': throttle_cache['LOCATION'],
+        'throttle': IncidentCreateThrottle().rate,
         'cache_ok': cache.get('health-probe') == 'ok',
-        'counter': counter,
-        'ident': ident,
-        'history': len(cache.get(key, [])),
-        'meta': {
-            k: v for k, v in request.META.items()
-            if 'IP' in k or 'FORWARD' in k or 'REAL' in k or 'CF_' in k
-        },
     })
