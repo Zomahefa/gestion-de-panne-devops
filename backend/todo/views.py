@@ -416,4 +416,8 @@ def health_check(request):
         'counter': counter,
         'ident': ident,
         'history': len(cache.get(key, [])),
+        'meta': {
+            k: v for k, v in request.META.items()
+            if 'IP' in k or 'FORWARD' in k or 'REAL' in k or 'CF_' in k
+        },
     })
