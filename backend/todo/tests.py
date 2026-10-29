@@ -472,6 +472,22 @@ class TestAPISecurity(APITestCase):
             client.get(f'/api/admins/{self.other_admin.id}/').status_code, 403
         )
 
+    def test_login_does_not_reveal_account_existence(self):
+        wrong_password = self.client.post(
+            reverse('admin-login'),
+            {"username": "securite", "password": "mauvais-mot-de-passe"},
+            format="json",
+        )
+        unknown_account = self.client.post(
+            reverse('admin-login'),
+            {"username": "compte.inexistant", "password": "mauvais-mot-de-passe"},
+            format="json",
+        )
+
+        self.assertEqual(wrong_password.status_code, 401)
+        self.assertEqual(unknown_account.status_code, 401)
+        self.assertEqual(wrong_password.data, unknown_account.data)
+
     def test_notifications_require_admin(self):
         self.assertEqual(self.client.get('/api/notifications/').status_code, 401)
 

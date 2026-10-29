@@ -244,6 +244,10 @@ def admin_profile(request):
 def admin_login(request):
     username = request.data.get('username')
     password = request.data.get('password')
+    invalid_credentials = Response(
+        {'error': 'Identifiants incorrects'},
+        status=status.HTTP_401_UNAUTHORIZED,
+    )
 
     try:
         admin = Admin.objects.get(username=username)
@@ -263,15 +267,11 @@ def admin_login(request):
                     'contact': admin.contact,
                 },
             })
-        else:
-            return Response({'error': 'Mot de passe incorrect'}, status=status.HTTP_401_UNAUTHORIZED)
+        # Même réponse que pour un compte inexistant : on n'indique jamais
+        # si un nom d'utilisateur existe (énumération de comptes).
+        return invalid_credentials
     except Admin.DoesNotExist:
-        # Même réponse qu'un mot de passe erroné : on n'indique pas si le
-        # compte existe (énumération de comptes).
-        return Response(
-            {'error': 'Identifiants incorrects'},
-            status=status.HTTP_401_UNAUTHORIZED,
-        )
+        return invalid_credentials
 
 
 @api_view(['POST'])
