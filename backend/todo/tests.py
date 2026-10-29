@@ -1,4 +1,4 @@
-from django.test import TestCase, SimpleTestCase, override_settings
+from django.test import RequestFactory, TestCase, SimpleTestCase, override_settings
 from rest_framework.test import APITestCase, APIClient
 from django.urls import reverse, resolve
 from django.contrib.admin.sites import site
@@ -15,6 +15,7 @@ from .throttling import (
     IncidentCreateThrottle,
     NotifyAdminThrottle,
     TechnicianLoginThrottle,
+    client_ip,
 )
 
 TEST_REGISTRATION_CODE = "code-de-test-2026"
@@ -566,6 +567,50 @@ class TestAPISecurity(APITestCase):
         self.assertEqual(response.status_code, 401)
 
 
+class TestClientIP(SimpleTestCase):
+    """Adresse utilisée comme identité par la limitation de débit."""
+
+    def _request(self, **meta):
+        request = RequestFactory().post('/api/todos/')
+        request.META.update(meta)
+        return request
+
+    def test_public_remote_addr_is_used_directly(self):
+        # Sans proxy, l'adresse de la connexion prime : un X-Forwarded-For
+        # fabriqué par le client ne permet pas de changer d'identité.
+        request = self._request(
+            REMOTE_ADDR='153.67.85.132',
+            HTTP_X_FORWARDED_FOR='1.2.3.4, 10.0.0.1',
+            HTTP_CF_CONNECTING_IP='5.6.7.8',
+        )
+        self.assertEqual(client_ip(request), '153.67.85.132')
+
+    def test_cloudflare_header_is_used_behind_proxy(self):
+        # Chaîne observée sur Render : les sauts internes changent d'une
+        # requête à l'autre, seule l'adresse du client est stable.
+        request = self._request(
+            REMOTE_ADDR='10.195.91.120',
+            HTTP_X_FORWARDED_FOR=(
+                '153.67.85.132, 197.234.242.36, 10.195.91.120'
+            ),
+            HTTP_CF_CONNECTING_IP='153.67.85.132',
+        )
+        self.assertEqual(client_ip(request), '153.67.85.132')
+
+    def test_forwarded_for_fallback_without_edge_header(self):
+        request = self._request(
+            REMOTE_ADDR='10.195.91.120',
+            HTTP_X_FORWARDED_FOR=(
+                '153.67.85.132, 197.234.242.36, 10.195.91.120'
+            ),
+        )
+        self.assertEqual(client_ip(request), '153.67.85.132')
+
+    def test_local_connection(self):
+        request = self._request(REMOTE_ADDR='127.0.0.1')
+        self.assertEqual(client_ip(request), '127.0.0.1')
+
+
 class TestThrottling(APITestCase):
     """Quotas par adresse IP sur les routes publiques et les connexions."""
 
@@ -617,6 +662,27 @@ class TestThrottling(APITestCase):
         self.assertEqual(first.status_code, 201)
         self.assertEqual(second.status_code, 429)
         self.assertEqual(Todo.objects.count(), 1)
+
+    def test_counter_is_per_forwarded_client(self):
+        """Deux clients derrière le même proxy ne partagent pas le quota."""
+        with self._rates(incident_create='1/min'):
+            first = self.client.post(
+                '/api/todos/', self.todo_payload, format='json',
+                HTTP_CF_CONNECTING_IP='198.51.100.1',
+            )
+            blocked = self.client.post(
+                '/api/todos/', self.todo_payload, format='json',
+                HTTP_CF_CONNECTING_IP='198.51.100.1',
+            )
+            other_client = self.client.post(
+                '/api/todos/', self.todo_payload, format='json',
+                HTTP_CF_CONNECTING_IP='198.51.100.2',
+            )
+
+        self.assertEqual(first.status_code, 201)
+        self.assertEqual(blocked.status_code, 429)
+        self.assertEqual(other_client.status_code, 201)
+        self.assertEqual(Todo.objects.count(), 2)
 
     def test_notify_admin_is_throttled(self):
         with self._rates(notify_admin='1/min'):
