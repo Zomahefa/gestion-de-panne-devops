@@ -397,11 +397,23 @@ def health_check(request):
     cache.set('health-probe', 'ok', 5)
     throttle_cache = settings.CACHES['default']
 
+    # Diagnostic temporaire : le compteur doit s'incrementer d'un appel a
+    # l'autre si le cache survit entre deux requetes.
+    counter = (cache.get('health-counter') or 0) + 1
+    cache.set('health-counter', counter, 600)
+
+    throttle = IncidentCreateThrottle()
+    ident = throttle.get_ident(request)
+    key = throttle.cache_format % {'scope': throttle.scope, 'ident': ident}
+
     return JsonResponse({
         'status': 'ok',
         'commit': os.environ.get('RENDER_GIT_COMMIT', 'local')[:7],
-        'throttle': IncidentCreateThrottle().rate,
+        'throttle': throttle.rate,
         'throttle_cache': throttle_cache['BACKEND'].rsplit('.', 1)[-1],
         'throttle_cache_dir': throttle_cache['LOCATION'],
         'cache_ok': cache.get('health-probe') == 'ok',
+        'counter': counter,
+        'ident': ident,
+        'history': len(cache.get(key, [])),
     })
