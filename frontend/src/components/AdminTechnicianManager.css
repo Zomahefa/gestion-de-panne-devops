@@ -34,6 +34,17 @@
   margin-top: 4px;
 }
 
+.atm-username {
+  display: inline-block;
+  padding: 2px 7px;
+  border-radius: 6px;
+  background: #eef3f9;
+  color: var(--sig-navy-800, #003366);
+  font-size: 0.8rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
 @media (max-width: 1180px) {
   .atm-layout {
     grid-template-columns: minmax(0, 1fr);

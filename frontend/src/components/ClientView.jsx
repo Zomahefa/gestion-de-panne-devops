@@ -24,8 +24,6 @@ const ClientView = () => {
   const [incidents, setIncidents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
-  const [lastUpdate, setLastUpdate] = useState(null);
-  const [statusFilter, setStatusFilter] = useState("all");
 
   const fetchIncidents = useCallback(async (manual = false) => {
     if (manual) setRefreshing(true);
@@ -36,7 +34,6 @@ const ClientView = () => {
           (a, b) => new Date(b.created_at) - new Date(a.created_at),
         ),
       );
-      setLastUpdate(new Date());
     } catch (err) {
       console.error("Erreur chargement incidents :", err);
     } finally {
@@ -50,11 +47,6 @@ const ClientView = () => {
     const interval = setInterval(fetchIncidents, 5000);
     return () => clearInterval(interval);
   }, [fetchIncidents]);
-
-  const counts = STATUS_ORDER.reduce((acc, key) => {
-    acc[key] = incidents.filter((i) => i.status === key).length;
-    return acc;
-  }, {});
 
   return (
     <div className="sig-shell">

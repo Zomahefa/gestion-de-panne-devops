@@ -23,6 +23,8 @@ const AdminShell = ({ title, subtitle, actions, children }) => {
 
   const handleLogout = () => {
     localStorage.removeItem("admin_token");
+    localStorage.removeItem("admin_id");
+    localStorage.removeItem("admin_username");
     navigate("/admin-login");
   };
 

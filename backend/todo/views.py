@@ -27,8 +27,11 @@ class TechnicianViewSet(viewsets.ModelViewSet):
     serializer_class = TechnicianSerializer
 
     def update(self, request, *args, **kwargs):
+        partial = kwargs.pop('partial', False)
         instance = self.get_object()
-        serializer = self.get_serializer(instance, data=request.data, partial=False)
+        serializer = self.get_serializer(
+            instance, data=request.data, partial=partial
+        )
 
         if not serializer.is_valid():
             print("❌ Erreurs de validation :", serializer.errors)
@@ -53,16 +56,61 @@ class AdminViewSet(viewsets.ModelViewSet):
     serializer_class = AdminSerializer
 
     def update(self, request, *args, **kwargs):
+        """Met à jour un administrateur.
+
+        Deux règles importantes :
+        - un mot de passe vide (champ laissé vide dans le profil) ne doit
+          jamais écraser le mot de passe existant ;
+        - le nom d'utilisateur et le matricule restent uniques, avec un
+          message d'erreur explicite au lieu d'une erreur serveur.
+        """
         admin = self.get_object()
         data = request.data
+        errors = {}
 
-        for field in ['username', 'full_name', 'matricule', 'role', 'contact', 'email']:
+        username = data.get('username')
+        if username is not None:
+            username = str(username).strip()
+            if not username:
+                errors['username'] = "Le nom d'utilisateur est obligatoire."
+            elif (
+                Admin.objects.filter(username__iexact=username)
+                .exclude(pk=admin.pk)
+                .exists()
+            ):
+                errors['username'] = "Ce nom d'utilisateur est déjà utilisé."
+            else:
+                admin.username = username
+
+        matricule = data.get('matricule')
+        if matricule is not None:
+            matricule = str(matricule).strip()
+            if not matricule:
+                errors['matricule'] = "Le matricule est obligatoire."
+            elif (
+                Admin.objects.filter(matricule__iexact=matricule)
+                .exclude(pk=admin.pk)
+                .exists()
+            ):
+                errors['matricule'] = "Ce matricule est déjà utilisé."
+            else:
+                admin.matricule = matricule
+
+        for field in ['full_name', 'role', 'contact', 'email']:
             if field in data:
                 setattr(admin, field, data[field])
 
-        # Hash le mot de passe si présent
-        if 'password' in data:
-            admin.password = make_password(data['password'])
+        password = data.get('password')
+        if password:
+            if len(password) < 8:
+                errors['password'] = (
+                    "Le mot de passe doit contenir au moins 8 caractères."
+                )
+            else:
+                admin.password = make_password(password)
+
+        if errors:
+            return Response(errors, status=status.HTTP_400_BAD_REQUEST)
 
         admin.save()
         serializer = self.get_serializer(admin)
@@ -122,7 +170,21 @@ def admin_login(request):
     try:
         admin = Admin.objects.get(username=username)
         if check_password(password, admin.password):
-            return Response({'token': 'admin-token-123'})  # à remplacer par JWT plus tard
+            # Le frontend a besoin de l'identifiant réel du compte connecté
+            # pour afficher « Mon profil » (et non un administrateur codé en
+            # dur). Le token reste statique en attendant une vraie auth JWT.
+            return Response({
+                'token': 'admin-token-123',
+                'admin': {
+                    'id': admin.id,
+                    'username': admin.username,
+                    'full_name': admin.full_name,
+                    'email': admin.email,
+                    'role': admin.role,
+                    'matricule': admin.matricule,
+                    'contact': admin.contact,
+                },
+            })
         else:
             return Response({'error': 'Mot de passe incorrect'}, status=status.HTTP_401_UNAUTHORIZED)
     except Admin.DoesNotExist:

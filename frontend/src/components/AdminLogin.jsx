@@ -29,6 +29,12 @@ const AdminLogin = () => {
         { username, password },
       );
       localStorage.setItem("admin_token", res.data.token);
+      // Identité du compte réellement connecté : indispensable pour que
+      // « Mon profil » n'affiche pas un administrateur codé en dur.
+      if (res.data.admin) {
+        localStorage.setItem("admin_id", String(res.data.admin.id));
+        localStorage.setItem("admin_username", res.data.admin.username);
+      }
       navigate("/admin-dashboard");
     } catch (err) {
       setError("Identifiants incorrects. Vérifiez le nom et le mot de passe.");

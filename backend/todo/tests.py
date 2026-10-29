@@ -188,6 +188,132 @@ class TestAdminRegisterAPI(APITestCase):
         self.assertEqual(response.status_code, 400)
         self.assertFalse(Admin.objects.filter(username="court").exists())
 
+
+class TestAdminProfileAPI(APITestCase):
+    """Le profil doit porter sur le compte connecté et préserver le mot de passe."""
+
+    def setUp(self):
+        self.admin = Admin.objects.create(
+            full_name="Zomahefa Ranaivo",
+            matricule="ADM-0002",
+            contact="",
+            email="zomahefa@example.com",
+            username="zomahefa",
+            password="MotDePasse!2026",
+        )
+
+    def test_login_returns_admin_identity(self):
+        response = self.client.post(
+            reverse('admin-login'),
+            {"username": "zomahefa", "password": "MotDePasse!2026"},
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data['admin']['id'], self.admin.id)
+        self.assertEqual(response.data['admin']['username'], "zomahefa")
+
+    def test_empty_password_does_not_overwrite_existing_one(self):
+        response = self.client.put(
+            f"/api/admins/{self.admin.id}/",
+            {
+                "username": "zomahefa",
+                "full_name": "Zomahefa R.",
+                "matricule": "ADM-0002",
+                "role": "admin",
+                "contact": "0340000000",
+                "email": "zomahefa@example.com",
+                "password": "",
+            },
+            format="json",
+        )
+        self.assertEqual(response.status_code, 200)
+        self.admin.refresh_from_db()
+        self.assertTrue(check_password("MotDePasse!2026", self.admin.password))
+        self.assertEqual(self.admin.full_name, "Zomahefa R.")
+
+    def test_password_change_is_hashed(self):
+        response = self.client.put(
+            f"/api/admins/{self.admin.id}/",
+            {"password": "NouveauPass!2026"},
+            format="json",
+        )
+        self.assertEqual(response.status_code, 200)
+        self.admin.refresh_from_db()
+        self.assertTrue(check_password("NouveauPass!2026", self.admin.password))
+        self.assertFalse(check_password("MotDePasse!2026", self.admin.password))
+
+    def test_duplicate_username_is_rejected(self):
+        Admin.objects.create(
+            full_name="Autre Admin",
+            matricule="ADM-0003",
+            contact="",
+            email="autre@example.com",
+            username="autre",
+            password="MotDePasse!2026",
+        )
+        response = self.client.put(
+            f"/api/admins/{self.admin.id}/",
+            {"username": "autre"},
+            format="json",
+        )
+        self.assertEqual(response.status_code, 400)
+        self.assertIn("username", response.data)
+
+
+class TestTechnicianAPI(APITestCase):
+    def setUp(self):
+        self.payload = {
+            "username": "rakotojean",
+            "full_name": "Rakoto Jean",
+            "matricule": "TECH-014",
+            "contact": "0340000000",
+            "password": "Technicien!2026",
+        }
+
+    def test_create_and_login(self):
+        response = self.client.post("/api/technicians/", self.payload, format="json")
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(response.data["username"], "rakotojean")
+
+        login = self.client.post(
+            reverse('token_obtain_pair'),
+            {
+                "username": "rakotojean",
+                "password": "Technicien!2026",
+            },
+            format="json",
+        )
+        self.assertEqual(login.status_code, 200)
+        self.assertIn("access", login.data)
+
+    def test_edit_full_name_keeps_username(self):
+        response = self.client.post("/api/technicians/", self.payload, format="json")
+        technician_id = response.data["id"]
+
+        update = self.client.patch(
+            f"/api/technicians/{technician_id}/",
+            {"full_name": "Rakoto Jean Claude"},
+            format="json",
+        )
+        self.assertEqual(update.status_code, 200)
+        self.assertEqual(update.data["username"], "rakotojean")
+
+        login = self.client.post(
+            reverse('token_obtain_pair'),
+            {
+                "username": "rakotojean",
+                "password": "Technicien!2026",
+            },
+            format="json",
+        )
+        self.assertEqual(login.status_code, 200)
+
+    def test_duplicate_username_is_rejected(self):
+        self.client.post("/api/technicians/", self.payload, format="json")
+        duplicate = dict(self.payload, matricule="TECH-015")
+        response = self.client.post("/api/technicians/", duplicate, format="json")
+        self.assertEqual(response.status_code, 400)
+        self.assertIn("username", response.data)
+
 class TestUrls(SimpleTestCase):
     def test_todo_list_url_resolves(self):
         url = reverse('todo-list')
