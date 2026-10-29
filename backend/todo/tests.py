@@ -3,15 +3,39 @@ from rest_framework.test import APITestCase, APIClient
 from django.urls import reverse, resolve
 from django.contrib.admin.sites import site
 from django.contrib.auth.hashers import check_password
+from contextlib import ExitStack
 from django.core.cache import cache
-from django.conf import settings
 from unittest.mock import patch
-from rest_framework.throttling import SimpleRateThrottle
 from .authentication import build_admin_token
 from .models import Todo, Technician, Admin, Attribution, Notification
 from .serializers import TodoSerializer, TechnicianSerializer
+from .throttling import (
+    AdminLoginThrottle,
+    AdminRegisterThrottle,
+    IncidentCreateThrottle,
+    NotifyAdminThrottle,
+    TechnicianLoginThrottle,
+)
 
 TEST_REGISTRATION_CODE = "code-de-test-2026"
+
+# Quotas réellement appliqués, par scope. Chaque classe porte son quota :
+# aucun réglage global ne peut les désactiver par inadvertance.
+THROTTLES = {
+    'incident_create': IncidentCreateThrottle,
+    'notify_admin': NotifyAdminThrottle,
+    'admin_login': AdminLoginThrottle,
+    'technician_login': TechnicianLoginThrottle,
+    'admin_register': AdminRegisterThrottle,
+}
+
+# La suite envoie beaucoup de requêtes depuis la même adresse IP : les quotas
+# de production (10 par minute) seraient atteints et feraient échouer des
+# tests sans rapport. On les élève ici ; TestThrottling les abaisse le temps
+# d'un test pour vérifier qu'ils s'appliquent bien.
+for _throttle in THROTTLES.values():
+    _throttle.rate = '10000/min'
+
 
 
 def authenticate_admin(client, admin):
@@ -571,17 +595,15 @@ class TestThrottling(APITestCase):
         }
 
     def _rates(self, **rates):
-        """Réactive la limitation avec des quotas très bas pour le test.
+        """Abaisse les quotas le temps d'un test.
 
-        ``SimpleRateThrottle.THROTTLE_RATES`` est lié au dictionnaire chargé
-        au démarrage : ``override_settings`` ne suffit pas, il faut remplacer
-        l'attribut de classe (les sous-classes en héritent).
+        Les quotas sont des attributs de classe (voir todo/throttling.py) :
+        on les remplace directement pour rendre le test déterministe.
         """
-        merged = {
-            **(settings.REST_FRAMEWORK.get('DEFAULT_THROTTLE_RATES') or {}),
-            **rates,
-        }
-        return patch.object(SimpleRateThrottle, 'THROTTLE_RATES', merged)
+        stack = ExitStack()
+        for scope, value in rates.items():
+            stack.enter_context(patch.object(THROTTLES[scope], 'rate', value))
+        return stack
 
     def test_incident_create_is_throttled(self):
         with self._rates(incident_create='1/min'):

@@ -4,6 +4,11 @@ Signaleo expose deux routes sans authentification (dépôt d'un signalement et
 notification) et deux routes de connexion. Sans limite, elles permettent de
 saturer la base, d'inonder les notifications ou de deviner un mot de passe.
 
+Chaque classe porte son propre quota (attribut ``rate``) au lieu de le lire
+dans ``REST_FRAMEWORK`` : un quota qui dépend d'un réglage global peut être
+désactivé par erreur (variable d'environnement, détection d'un contexte de
+test) et la protection disparaît alors silencieusement en production.
+
 Les compteurs sont stockés dans le cache Django (voir ``CACHES``), partagé
 par les workers gunicorn.
 """
@@ -27,30 +32,35 @@ class IPRateThrottle(SimpleRateThrottle):
 
 
 class IncidentCreateThrottle(IPRateThrottle):
-    """Dépôt d'un signalement client."""
+    """Dépôt d'un signalement client : 10 par minute et par adresse IP."""
 
     scope = 'incident_create'
+    rate = '10/min'
 
 
 class NotifyAdminThrottle(IPRateThrottle):
-    """Notification envoyée au tableau de bord après un signalement."""
+    """Notification envoyée au tableau de bord : 20 par minute."""
 
     scope = 'notify_admin'
+    rate = '20/min'
 
 
 class AdminLoginThrottle(IPRateThrottle):
-    """Tentatives de connexion administrateur."""
+    """Tentatives de connexion administrateur : 10 par minute."""
 
     scope = 'admin_login'
+    rate = '10/min'
 
 
 class TechnicianLoginThrottle(IPRateThrottle):
-    """Tentatives de connexion technicien (endpoint JWT)."""
+    """Tentatives de connexion technicien : 10 par minute."""
 
     scope = 'technician_login'
+    rate = '10/min'
 
 
 class AdminRegisterThrottle(IPRateThrottle):
-    """Tentatives de saisie du code d'inscription administrateur."""
+    """Tentatives de saisie du code d'inscription : 10 par heure."""
 
     scope = 'admin_register'
+    rate = '10/hour'

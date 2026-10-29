@@ -1,3 +1,6 @@
+import os
+
+from django.core.cache import cache
 from django.http import HttpResponse, JsonResponse
 from django.conf import settings
 from rest_framework import viewsets, status
@@ -386,4 +389,19 @@ def admin_register(request):
 
 @require_GET
 def health_check(request):
-    return JsonResponse({'status': 'ok'})
+    """État du service, utilisé par Render et pour vérifier un déploiement.
+
+    Expose les quotas réellement appliqués et l'état du cache partagé : sans
+    cache fonctionnel, la limitation de débit ne compte plus les requêtes.
+    """
+    cache.set('health-probe', 'ok', 5)
+    throttle_cache = settings.CACHES['default']
+
+    return JsonResponse({
+        'status': 'ok',
+        'commit': os.environ.get('RENDER_GIT_COMMIT', 'local')[:7],
+        'throttle': IncidentCreateThrottle().rate,
+        'throttle_cache': throttle_cache['BACKEND'].rsplit('.', 1)[-1],
+        'throttle_cache_dir': throttle_cache['LOCATION'],
+        'cache_ok': cache.get('health-probe') == 'ok',
+    })

@@ -13,7 +13,6 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 from datetime import timedelta
 from pathlib import Path
 import os
-import sys
 
 try:
     import dj_database_url
@@ -245,11 +244,9 @@ AUTH_USER_MODEL = 'todo.Technician'
 # pour les administrateurs (jeton scopé, voir todo/authentication.py).
 # Le défaut reste public : chaque vue déclare explicitement ses permissions.
 #
-# Les tests désactivent la limitation de débit (les compteurs sont partagés
-# par processus et rendraient les exécutions répétées instables) ; les tests
-# dédiés la réactivent explicitement.
-TESTING = any(arg in ('test', 'pytest') for arg in sys.argv)
-
+# Les quotas (todo/throttling.py) sont portés par les classes de limitation
+# et non par ce réglage global : ils restent ainsi actifs même si une
+# variable d'environnement ou un contexte de test modifie la configuration.
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'todo.authentication.SignaleoJWTAuthentication',
@@ -257,13 +254,6 @@ REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': (
         'rest_framework.permissions.AllowAny',
     ),
-    'DEFAULT_THROTTLE_RATES': {
-        'incident_create': None if TESTING else '10/min',
-        'notify_admin': None if TESTING else '20/min',
-        'admin_login': None if TESTING else '10/min',
-        'technician_login': None if TESTING else '10/min',
-        'admin_register': None if TESTING else '10/hour',
-    },
 }
 
 # Compteurs de limitation de débit. Le cache fichier est partagé par les
