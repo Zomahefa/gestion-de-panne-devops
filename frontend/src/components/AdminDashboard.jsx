@@ -15,6 +15,7 @@ import {
 import AdminShell from "./AdminShell.jsx";
 import StatusBadge from "./StatusBadge.jsx";
 import { STATUS_ORDER } from "../utils/status";
+import { adminHeaders, handleAdminAuthError } from "../utils/adminAuth";
 import "./AdminDashboard.css";
 
 const getImageUrl = (imagePath) => {
@@ -32,14 +33,18 @@ const AdminDashboard = () => {
 
   const fetchPannes = async () => {
     try {
-      const res = await axios.get(`${process.env.REACT_APP_API_URL}todos/`);
+      const res = await axios.get(`${process.env.REACT_APP_API_URL}todos/`, {
+        headers: adminHeaders(),
+      });
       setPannes(
         [...res.data].sort(
           (a, b) => new Date(b.created_at) - new Date(a.created_at),
         ),
       );
     } catch (err) {
-      console.error("Erreur de chargement des pannes", err);
+      if (!handleAdminAuthError(err)) {
+        console.error("Erreur de chargement des pannes", err);
+      }
     } finally {
       setLoading(false);
     }
@@ -47,19 +52,27 @@ const AdminDashboard = () => {
 
   const fetchTechnicians = async () => {
     try {
-      const res = await axios.get(`${process.env.REACT_APP_API_URL}technicians/`);
+      const res = await axios.get(`${process.env.REACT_APP_API_URL}technicians/`, {
+        headers: adminHeaders(),
+      });
       setTechnicians(res.data);
     } catch (err) {
-      console.error("Erreur chargement techniciens", err);
+      if (!handleAdminAuthError(err)) {
+        console.error("Erreur chargement techniciens", err);
+      }
     }
   };
 
   const fetchNotifications = async () => {
     try {
-      const res = await axios.get(`${process.env.REACT_APP_API_URL}notifications/`);
+      const res = await axios.get(`${process.env.REACT_APP_API_URL}notifications/`, {
+        headers: adminHeaders(),
+      });
       setNotifications(res.data.slice(0, 6));
     } catch (err) {
-      console.error("Erreur chargement notifications", err);
+      if (!handleAdminAuthError(err)) {
+        console.error("Erreur chargement notifications", err);
+      }
     }
   };
 
@@ -83,7 +96,9 @@ const AdminDashboard = () => {
 
     if (result.isConfirmed) {
       try {
-        await axios.delete(`${process.env.REACT_APP_API_URL}todos/${id}/`);
+        await axios.delete(`${process.env.REACT_APP_API_URL}todos/${id}/`, {
+          headers: adminHeaders(),
+        });
         setPannes((prev) => prev.filter((p) => p.id !== id));
         Swal.fire({
           title: "Signalement supprimé",
@@ -91,6 +106,7 @@ const AdminDashboard = () => {
           icon: "success",
         });
       } catch (err) {
+        if (handleAdminAuthError(err)) return;
         Swal.fire({
           title: "Suppression impossible",
           text: "La suppression a échoué, réessayez.",
@@ -117,11 +133,14 @@ const AdminDashboard = () => {
 
     if (techId) {
       try {
-        await axios.post(`${process.env.REACT_APP_API_URL}attributions/`, {
-          panne: panneId,
-          technician: techId,
-          assigned_by: 1,
-        });
+        await axios.post(
+          `${process.env.REACT_APP_API_URL}attributions/`,
+          {
+            panne: panneId,
+            technician: techId,
+          },
+          { headers: adminHeaders() },
+        );
         Swal.fire({
           title: "Tâche attribuée",
           text: "Le technicien a été prévenu.",
@@ -129,6 +148,7 @@ const AdminDashboard = () => {
         });
         fetchPannes();
       } catch (err) {
+        if (handleAdminAuthError(err)) return;
         console.error("Erreur attribution", err.response?.data);
         Swal.fire({
           title: "Attribution impossible",
@@ -141,9 +161,13 @@ const AdminDashboard = () => {
 
   const deleteNotification = async (id) => {
     try {
-      await axios.delete(`${process.env.REACT_APP_API_URL}notifications/${id}/`);
+      await axios.delete(
+        `${process.env.REACT_APP_API_URL}notifications/${id}/`,
+        { headers: adminHeaders() },
+      );
       setNotifications((prev) => prev.filter((n) => n.id !== id));
     } catch (err) {
+      if (handleAdminAuthError(err)) return;
       Swal.fire({
         title: "Suppression impossible",
         text: "La notification n'a pas pu être supprimée.",

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import {
   ArrowLeftRight,
@@ -9,6 +9,7 @@ import {
   UserCircle,
   Users,
 } from "lucide-react";
+import { clearAdminSession, isAdminAuthenticated } from "../utils/adminAuth";
 import "./AdminShell.css";
 
 const NAV = [
@@ -21,10 +22,16 @@ const NAV = [
 const AdminShell = ({ title, subtitle, actions, children }) => {
   const navigate = useNavigate();
 
+  // Aucune page d'administration ne doit s'afficher sans jeton : sans lui,
+  // les appels API seraient refusés et l'écran resterait vide.
+  useEffect(() => {
+    if (!isAdminAuthenticated()) {
+      navigate("/admin-login", { replace: true });
+    }
+  }, [navigate]);
+
   const handleLogout = () => {
-    localStorage.removeItem("admin_token");
-    localStorage.removeItem("admin_id");
-    localStorage.removeItem("admin_username");
+    clearAdminSession();
     navigate("/admin-login");
   };
 

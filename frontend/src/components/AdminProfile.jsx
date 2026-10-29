@@ -12,6 +12,7 @@ import {
   UserCircle,
 } from "lucide-react";
 import AdminShell from "./AdminShell.jsx";
+import { adminHeaders, handleAdminAuthError } from "../utils/adminAuth";
 import "./AdminProfile.css";
 
 const API_URL = process.env.REACT_APP_API_URL;
@@ -46,6 +47,7 @@ const AdminProfile = () => {
             );
           }
           const list = await axios.get(`${API_URL}admins/`, {
+            headers: adminHeaders(),
             timeout: 20000,
           });
           const found = (Array.isArray(list.data) ? list.data : []).find(
@@ -61,12 +63,14 @@ const AdminProfile = () => {
         }
 
         const res = await axios.get(`${API_URL}admins/${id}/`, {
+          headers: adminHeaders(),
           timeout: 20000,
         });
         setAdminId(res.data.id);
         setFormData({ ...res.data, password: "" });
         localStorage.setItem("admin_username", res.data.username);
       } catch (err) {
+        if (handleAdminAuthError(err)) return;
         console.error("Erreur chargement admin", err);
         setLoadError(
           err.response?.data?.detail ||
@@ -128,6 +132,7 @@ const AdminProfile = () => {
       }
 
       const res = await axios.put(`${API_URL}admins/${adminId}/`, payload, {
+        headers: adminHeaders(),
         timeout: 20000,
       });
 
@@ -141,6 +146,7 @@ const AdminProfile = () => {
         icon: "success",
       });
     } catch (err) {
+      if (handleAdminAuthError(err)) return;
       console.error("Erreur mise à jour", err);
 
       const data = err.response?.data;

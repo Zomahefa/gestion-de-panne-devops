@@ -1,10 +1,17 @@
 from django.test import TestCase, SimpleTestCase
-from rest_framework.test import APITestCase
+from rest_framework.test import APITestCase, APIClient
 from django.urls import reverse, resolve
 from django.contrib.admin.sites import site
 from django.contrib.auth.hashers import check_password
+from .authentication import build_admin_token
 from .models import Todo, Technician, Admin, Attribution, Notification
 from .serializers import TodoSerializer, TechnicianSerializer
+
+
+def authenticate_admin(client, admin):
+    """Ajoute l'en-tête Authorization d'un administrateur au client de test."""
+    client.credentials(HTTP_AUTHORIZATION=f"Bearer {build_admin_token(admin)}")
+    return client
 
 class TestTodoModel(TestCase):
     def test_str_representation(self):
@@ -201,6 +208,7 @@ class TestAdminProfileAPI(APITestCase):
             username="zomahefa",
             password="MotDePasse!2026",
         )
+        authenticate_admin(self.client, self.admin)
 
     def test_login_returns_admin_identity(self):
         response = self.client.post(
@@ -261,6 +269,15 @@ class TestAdminProfileAPI(APITestCase):
 
 class TestTechnicianAPI(APITestCase):
     def setUp(self):
+        self.admin = Admin.objects.create(
+            full_name="Admin Zo",
+            matricule="ADM-900",
+            contact="",
+            email="admin@example.com",
+            username="adminzo",
+            password="AdminPass!2026",
+        )
+        authenticate_admin(self.client, self.admin)
         self.payload = {
             "username": "rakotojean",
             "full_name": "Rakoto Jean",
@@ -313,6 +330,179 @@ class TestTechnicianAPI(APITestCase):
         response = self.client.post("/api/technicians/", duplicate, format="json")
         self.assertEqual(response.status_code, 400)
         self.assertIn("username", response.data)
+
+class TestAPISecurity(APITestCase):
+    """Vérifie que les endpoints sensibles exigent un jeton valide."""
+
+    def setUp(self):
+        self.admin = Admin.objects.create(
+            full_name="Admin Sécurité",
+            matricule="ADM-100",
+            contact="",
+            email="admin@example.com",
+            username="securite",
+            password="Securite!2026",
+        )
+        self.other_admin = Admin.objects.create(
+            full_name="Autre Admin",
+            matricule="ADM-101",
+            contact="",
+            email="autre@example.com",
+            username="autre.admin",
+            password="Securite!2026",
+        )
+        self.technician = Technician.objects.create_user(
+            username="tech.securite",
+            password="TechPass!2026",
+            full_name="Tech Sécurité",
+            matricule="TECH-100",
+        )
+        self.todo = Todo.objects.create(
+            client_name="Client",
+            contact="0340000000",
+            quartier="Analakely",
+            localisation="Antananarivo",
+            description="Panne de test",
+        )
+
+    def _technician_token(self):
+        response = self.client.post(
+            reverse('token_obtain_pair'),
+            {"username": "tech.securite", "password": "TechPass!2026"},
+            format="json",
+        )
+        self.assertEqual(response.status_code, 200)
+        return response.data['access']
+
+    def test_todo_list_and_create_are_public(self):
+        self.assertEqual(self.client.get('/api/todos/').status_code, 200)
+
+        created = self.client.post(
+            '/api/todos/',
+            {
+                "client_name": "Nouveau Client",
+                "contact": "0341111111",
+                "quartier": "Isoraka",
+                "localisation": "Antananarivo",
+                "description": "Coupure de courant",
+            },
+            format="json",
+        )
+        self.assertEqual(created.status_code, 201)
+
+    def test_todo_delete_requires_authentication(self):
+        response = self.client.delete(f'/api/todos/{self.todo.id}/')
+        self.assertEqual(response.status_code, 401)
+        self.assertTrue(Todo.objects.filter(id=self.todo.id).exists())
+
+    def test_technician_can_update_status(self):
+        client = APIClient()
+        client.credentials(HTTP_AUTHORIZATION=f"Bearer {self._technician_token()}")
+
+        response = client.patch(
+            f'/api/todos/{self.todo.id}/',
+            {"status": "on_the_way"},
+            format="json",
+        )
+        self.assertEqual(response.status_code, 200)
+        self.todo.refresh_from_db()
+        self.assertEqual(self.todo.status, "on_the_way")
+
+    def test_technician_cannot_rewrite_client_data(self):
+        client = APIClient()
+        client.credentials(HTTP_AUTHORIZATION=f"Bearer {self._technician_token()}")
+
+        response = client.patch(
+            f'/api/todos/{self.todo.id}/',
+            {"client_name": "Usurpation"},
+            format="json",
+        )
+        self.assertEqual(response.status_code, 403)
+        self.todo.refresh_from_db()
+        self.assertEqual(self.todo.client_name, "Client")
+
+    def test_technician_endpoints_are_admin_only(self):
+        unauthenticated = self.client.get('/api/technicians/')
+        self.assertEqual(unauthenticated.status_code, 401)
+
+        client = APIClient()
+        client.credentials(HTTP_AUTHORIZATION=f"Bearer {self._technician_token()}")
+        forbidden = client.get('/api/technicians/')
+        self.assertEqual(forbidden.status_code, 403)
+
+        admin_client = APIClient()
+        authenticate_admin(admin_client, self.admin)
+        allowed = admin_client.get('/api/technicians/')
+        self.assertEqual(allowed.status_code, 200)
+
+    def test_admin_login_token_grants_access(self):
+        login = self.client.post(
+            reverse('admin-login'),
+            {"username": "securite", "password": "Securite!2026"},
+            format="json",
+        )
+        self.assertEqual(login.status_code, 200)
+        token = login.data['token']
+        self.assertNotEqual(token, 'admin-token-123')
+
+        client = APIClient()
+        client.credentials(HTTP_AUTHORIZATION=f"Bearer {token}")
+        profile = client.get(f'/api/admins/{self.admin.id}/')
+        self.assertEqual(profile.status_code, 200)
+        self.assertEqual(profile.data['username'], "securite")
+
+        notifications = client.get('/api/notifications/')
+        self.assertEqual(notifications.status_code, 200)
+
+    def test_admin_cannot_edit_another_admin(self):
+        client = APIClient()
+        authenticate_admin(client, self.admin)
+
+        response = client.put(
+            f'/api/admins/{self.other_admin.id}/',
+            {"full_name": "Piraté"},
+            format="json",
+        )
+        self.assertEqual(response.status_code, 403)
+        self.other_admin.refresh_from_db()
+        self.assertNotEqual(self.other_admin.full_name, "Piraté")
+
+        # La lecture d'un autre profil est également refusée.
+        self.assertEqual(
+            client.get(f'/api/admins/{self.other_admin.id}/').status_code, 403
+        )
+
+    def test_notifications_require_admin(self):
+        self.assertEqual(self.client.get('/api/notifications/').status_code, 401)
+
+    def test_attribution_records_authenticated_admin(self):
+        client = APIClient()
+        authenticate_admin(client, self.admin)
+
+        response = client.post(
+            '/api/attributions/',
+            {
+                "panne": self.todo.id,
+                "technician": self.technician.id,
+                # Valeur volontairement fausse : elle doit être ignorée.
+                "assigned_by": self.other_admin.id,
+            },
+            format="json",
+        )
+        self.assertEqual(response.status_code, 201)
+        attribution = Attribution.objects.get(id=response.data['id'])
+        self.assertEqual(attribution.assigned_by_id, self.admin.id)
+
+        self.todo.refresh_from_db()
+        self.assertEqual(self.todo.technician_confirmed_id, self.technician.id)
+
+    def test_invalid_token_is_rejected(self):
+        response = self.client.get(
+            '/api/technicians/',
+            HTTP_AUTHORIZATION="Bearer jeton.invalide.xxx",
+        )
+        self.assertEqual(response.status_code, 401)
+
 
 class TestUrls(SimpleTestCase):
     def test_todo_list_url_resolves(self):

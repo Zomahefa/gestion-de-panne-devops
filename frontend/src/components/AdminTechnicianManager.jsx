@@ -11,6 +11,7 @@ import {
   Users,
 } from "lucide-react";
 import AdminShell from "./AdminShell.jsx";
+import { adminHeaders, handleAdminAuthError } from "../utils/adminAuth";
 import "./AdminTechnicianManager.css";
 
 const API_URL = process.env.REACT_APP_API_URL;
@@ -83,10 +84,12 @@ const AdminTechnicianManager = () => {
     setLoadError("");
     try {
       const res = await axios.get(`${API_URL}technicians/`, {
+        headers: adminHeaders(),
         timeout: 20000,
       });
       setTechnicians(Array.isArray(res.data) ? res.data : []);
     } catch (err) {
+      if (handleAdminAuthError(err)) return;
       console.error("Erreur chargement techniciens", err);
       setLoadError(parseApiError(err));
     } finally {
@@ -136,7 +139,7 @@ const AdminTechnicianManager = () => {
           contact: formData.contact.trim(),
           password: formData.password,
         },
-        { timeout: 30000 },
+        { timeout: 30000, headers: adminHeaders() },
       );
 
       Swal.fire({
@@ -149,6 +152,7 @@ const AdminTechnicianManager = () => {
       setUsernameTouched(false);
       fetchTechnicians();
     } catch (err) {
+      if (handleAdminAuthError(err)) return;
       Swal.fire({
         title: "Création impossible",
         text: parseApiError(err),
@@ -213,7 +217,7 @@ const AdminTechnicianManager = () => {
       await axios.patch(
         `${API_URL}technicians/${tech.id}/`,
         formValues,
-        { timeout: 30000 },
+        { timeout: 30000, headers: adminHeaders() },
       );
 
       const usernameChanged =
@@ -229,6 +233,7 @@ const AdminTechnicianManager = () => {
       });
       fetchTechnicians();
     } catch (err) {
+      if (handleAdminAuthError(err)) return;
       Swal.fire({
         title: "Modification impossible",
         text: parseApiError(err),
@@ -253,11 +258,13 @@ const AdminTechnicianManager = () => {
 
     try {
       await axios.delete(`${API_URL}technicians/${tech.id}/`, {
+        headers: adminHeaders(),
         timeout: 20000,
       });
       Swal.fire({ title: "Technicien supprimé", icon: "success" });
       fetchTechnicians();
     } catch (err) {
+      if (handleAdminAuthError(err)) return;
       Swal.fire({
         title: "Suppression impossible",
         text: parseApiError(err),

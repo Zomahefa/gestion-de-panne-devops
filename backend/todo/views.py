@@ -1,14 +1,16 @@
 from django.http import HttpResponse, JsonResponse
 from django.conf import settings
 from rest_framework import viewsets, status
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from django.views.decorators.http import require_GET # Déplacé ici pour E402
 from django.contrib.auth.hashers import check_password
 from django.contrib.auth.hashers import make_password
 
+from .authentication import AdminPrincipal, build_admin_token
 from .models import Technician, Todo, Admin, Attribution, Notification
+from .permissions import IsAdminAccount, IsAdminOrTechnician
 from .serializers import (
     TechnicianSerializer,
     TodoSerializer,
@@ -17,14 +19,22 @@ from .serializers import (
     NotificationSerializer,
  )
 
+# Champs qu'un technicien peut modifier sur un signalement. Un compte
+# technicien ne doit pas pouvoir réécrire le nom du client, la photo ou la
+# localisation d'une intervention.
+TECHNICIAN_EDITABLE_TODO_FIELDS = {'status', 'technician_note'}
+
 
 def home(request):
     return HttpResponse("Bienvenue sur le backend Django du gestion de panne🚀")
 
 
 class TechnicianViewSet(viewsets.ModelViewSet):
+    """Gestion des comptes techniciens : réservée aux administrateurs."""
+
     queryset = Technician.objects.all()
     serializer_class = TechnicianSerializer
+    permission_classes = [IsAdminAccount]
 
     def update(self, request, *args, **kwargs):
         partial = kwargs.pop('partial', False)
@@ -44,16 +54,71 @@ class TechnicianViewSet(viewsets.ModelViewSet):
 class TodoViewSet(viewsets.ModelViewSet):
     queryset = Todo.objects.all()
     serializer_class = TodoSerializer
-    permission_classes = [AllowAny]
+
+    def get_permissions(self):
+        """Le public signale et suit une panne ; la gestion est protégée.
+
+        - ``list`` / ``retrieve`` / ``create`` : ouverts (formulaire client
+          et page de suivi) ;
+        - ``update`` / ``partial_update`` / ``destroy`` : admin ou technicien.
+        """
+        if self.action in ('list', 'retrieve', 'create'):
+            return [AllowAny()]
+        return [IsAdminOrTechnician()]
 
     def create(self, request, *args, **kwargs):
         print("📥 Données reçues :", request.data)
         return super().create(request, *args, **kwargs)
 
+    def update(self, request, *args, **kwargs):
+        user = request.user
+        if not isinstance(user, AdminPrincipal):
+            unauthorized = set(request.data) - TECHNICIAN_EDITABLE_TODO_FIELDS
+            if unauthorized:
+                return Response(
+                    {
+                        'detail': (
+                            "Un technicien ne peut modifier que le statut "
+                            "et sa note d'intervention."
+                        )
+                    },
+                    status=status.HTTP_403_FORBIDDEN,
+                )
+        return super().update(request, *args, **kwargs)
+
 
 class AdminViewSet(viewsets.ModelViewSet):
+    """Gestion des administrateurs.
+
+    Un administrateur ne consulte et ne modifie que son propre compte : le
+    profil est le seul écran qui utilise ces routes. La liste reste
+    accessible pour retrouver son identifiant après une ancienne session.
+    """
+
     queryset = Admin.objects.all()
     serializer_class = AdminSerializer
+    permission_classes = [IsAdminAccount]
+
+    def _is_self(self, admin):
+        return admin.pk == self.request.user.admin.pk
+
+    def retrieve(self, request, *args, **kwargs):
+        admin = self.get_object()
+        if not self._is_self(admin):
+            return Response(
+                {'detail': "Vous ne pouvez consulter que votre propre profil."},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+        return super().retrieve(request, *args, **kwargs)
+
+    def destroy(self, request, *args, **kwargs):
+        admin = self.get_object()
+        if not self._is_self(admin):
+            return Response(
+                {'detail': "Vous ne pouvez supprimer que votre propre compte."},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+        return super().destroy(request, *args, **kwargs)
 
     def update(self, request, *args, **kwargs):
         """Met à jour un administrateur.
@@ -65,6 +130,13 @@ class AdminViewSet(viewsets.ModelViewSet):
           message d'erreur explicite au lieu d'une erreur serveur.
         """
         admin = self.get_object()
+
+        if not self._is_self(admin):
+            return Response(
+                {'detail': "Vous ne pouvez modifier que votre propre profil."},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+
         data = request.data
         errors = {}
 
@@ -117,25 +189,32 @@ class AdminViewSet(viewsets.ModelViewSet):
         return Response(serializer.data)
 
 class AttributionViewSet(viewsets.ModelViewSet):
+    """Attribution d'une panne à un technicien (administrateurs seulement)."""
+
     queryset = Attribution.objects.all()
     serializer_class = AttributionSerializer
+    permission_classes = [IsAdminAccount]
 
     def create(self, request, *args, **kwargs):
-        response = super().create(request, *args, **kwargs)
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        # L'auteur de l'attribution vient du jeton, jamais du corps de la
+        # requête : un client ne peut pas se faire passer pour un autre admin.
+        attribution = serializer.save(assigned_by=request.user.admin)
 
         # 🔁 Mise à jour du champ technician_confirmed dans Todo
-        attribution_id = response.data.get('id')
-        attribution = Attribution.objects.get(id=attribution_id)
         todo = attribution.panne
         todo.technician_confirmed = attribution.technician
-        todo.save()
+        todo.save(update_fields=['technician_confirmed'])
 
-        return response
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
 class NotificationViewSet(viewsets.ModelViewSet):
     queryset = Notification.objects.all().order_by('-created_at')
     serializer_class = NotificationSerializer
+    permission_classes = [IsAdminAccount]
 
     def destroy(self, request, *args, **kwargs):
         notification = self.get_object()
@@ -144,25 +223,24 @@ class NotificationViewSet(viewsets.ModelViewSet):
 
 
 @api_view(['GET', 'PATCH'])
+@permission_classes([IsAdminAccount])
 def admin_profile(request):
-    try:
-        admin = Admin.objects.get(username=request.data.get('username'))
-    except Admin.DoesNotExist:
-        return Response({'error': 'Admin introuvable'}, status=404)
+    """Profil de l'administrateur connecté (identifié par son jeton)."""
+    admin = request.user.admin
 
     if request.method == 'GET':
         serializer = AdminSerializer(admin)
         return Response(serializer.data)
 
-    if request.method == 'PATCH':
-        serializer = AdminSerializer(admin, data=request.data, partial=True)
-        if serializer.is_valid():
-            serializer.save()
-            return Response({'status': 'Profil mis à jour'})
-        return Response(serializer.errors, status=400)
+    serializer = AdminSerializer(admin, data=request.data, partial=True)
+    if serializer.is_valid():
+        serializer.save()
+        return Response({'status': 'Profil mis à jour'})
+    return Response(serializer.errors, status=400)
 
 
 @api_view(['POST'])
+@permission_classes([AllowAny])
 def admin_login(request):
     username = request.data.get('username')
     password = request.data.get('password')
@@ -171,10 +249,10 @@ def admin_login(request):
         admin = Admin.objects.get(username=username)
         if check_password(password, admin.password):
             # Le frontend a besoin de l'identifiant réel du compte connecté
-            # pour afficher « Mon profil » (et non un administrateur codé en
-            # dur). Le token reste statique en attendant une vraie auth JWT.
+            # pour afficher « Mon profil ». Le jeton est un vrai JWT signé,
+            # porté par l'en-tête Authorization des requêtes d'administration.
             return Response({
-                'token': 'admin-token-123',
+                'token': build_admin_token(admin),
                 'admin': {
                     'id': admin.id,
                     'username': admin.username,
@@ -188,10 +266,16 @@ def admin_login(request):
         else:
             return Response({'error': 'Mot de passe incorrect'}, status=status.HTTP_401_UNAUTHORIZED)
     except Admin.DoesNotExist:
-        return Response({'error': 'Admin introuvable'}, status=status.HTTP_404_NOT_FOUND)
+        # Même réponse qu'un mot de passe erroné : on n'indique pas si le
+        # compte existe (énumération de comptes).
+        return Response(
+            {'error': 'Identifiants incorrects'},
+            status=status.HTTP_401_UNAUTHORIZED,
+        )
 
 
 @api_view(['POST'])
+@permission_classes([AllowAny])
 def notify_admin(request):
     message = request.data.get('message')
     Notification.objects.create(message=message)
@@ -199,6 +283,7 @@ def notify_admin(request):
 
 
 @api_view(['POST'])
+@permission_classes([AllowAny])
 def admin_register(request):
     """Crée un compte administrateur (démonstration portfolio).
 

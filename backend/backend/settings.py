@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
+from datetime import timedelta
 from pathlib import Path
 import os
 
@@ -238,6 +239,27 @@ if os.environ.get("CLOUDINARY_URL"):
     }
 
 AUTH_USER_MODEL = 'todo.Technician'
+
+# API REST : authentification JWT pour les techniciens (compte Django) et
+# pour les administrateurs (jeton scopé, voir todo/authentication.py).
+# Le défaut reste public : chaque vue déclare explicitement ses permissions.
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'todo.authentication.SignaleoJWTAuthentication',
+    ),
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.AllowAny',
+    ),
+}
+
+# Une session de travail dure une journée : le frontend ne rafraîchit pas
+# encore les jetons, une expiration à 5 minutes déconnecterait l'utilisateur
+# en pleine saisie.
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(hours=12),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
+    'AUTH_HEADER_TYPES': ('Bearer',),
+}
 
 # Création de compte administrateur (page de démonstration).
 # En entreprise, le compte de référence est créé en base par le développeur

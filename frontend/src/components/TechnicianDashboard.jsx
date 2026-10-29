@@ -30,6 +30,11 @@ const getImageUrl = (imagePath) => {
   return `${window.location.origin}${imagePath}`;
 };
 
+const authHeaders = () => {
+  const token = localStorage.getItem("token");
+  return token ? { Authorization: `Bearer ${token}` } : {};
+};
+
 const TechnicianDashboard = () => {
   const [incidents, setIncidents] = useState([]);
   const [filter, setFilter] = useState("all");
@@ -43,7 +48,9 @@ const TechnicianDashboard = () => {
 
   const fetchIncidents = async () => {
     try {
-      const res = await axios.get(`${process.env.REACT_APP_API_URL}todos/`);
+      const res = await axios.get(`${process.env.REACT_APP_API_URL}todos/`, {
+        headers: authHeaders(),
+      });
       setIncidents(
         [...res.data].sort(
           (a, b) => new Date(b.created_at) - new Date(a.created_at),
@@ -64,15 +71,23 @@ const TechnicianDashboard = () => {
 
   const handleStatusUpdate = async (id, newStatus) => {
     try {
-      await axios.patch(`${process.env.REACT_APP_API_URL}todos/${id}/`, {
-        status: newStatus,
-      });
+      await axios.patch(
+        `${process.env.REACT_APP_API_URL}todos/${id}/`,
+        { status: newStatus },
+        { headers: authHeaders() },
+      );
       setIncidents((prev) =>
         prev.map((incident) =>
           incident.id === id ? { ...incident, status: newStatus } : incident,
         ),
       );
     } catch (err) {
+      if (err.response?.status === 401) {
+        localStorage.removeItem("token");
+        localStorage.removeItem("username");
+        navigate("/login");
+        return;
+      }
       console.error("Erreur mise à jour statut :", err);
     }
   };
