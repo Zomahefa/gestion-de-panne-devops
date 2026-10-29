@@ -32,7 +32,11 @@ const LoginTechnician = () => {
       localStorage.setItem("username", username);
       navigate("/technicien");
     } catch (err) {
-      setError("Nom d'utilisateur ou mot de passe incorrect.");
+      setError(
+        err.response?.status === 429
+          ? "Trop de tentatives de connexion. Patientez une minute puis réessayez."
+          : "Nom d'utilisateur ou mot de passe incorrect.",
+      );
     } finally {
       setLoading(false);
     }

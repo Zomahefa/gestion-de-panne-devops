@@ -37,7 +37,11 @@ const AdminLogin = () => {
       }
       navigate("/admin-dashboard");
     } catch (err) {
-      setError("Identifiants incorrects. Vérifiez le nom et le mot de passe.");
+      setError(
+        err.response?.status === 429
+          ? "Trop de tentatives de connexion. Patientez une minute puis réessayez."
+          : "Identifiants incorrects. Vérifiez le nom et le mot de passe.",
+      );
     } finally {
       setLoading(false);
     }

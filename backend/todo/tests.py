@@ -1,11 +1,17 @@
-from django.test import TestCase, SimpleTestCase
+from django.test import TestCase, SimpleTestCase, override_settings
 from rest_framework.test import APITestCase, APIClient
 from django.urls import reverse, resolve
 from django.contrib.admin.sites import site
 from django.contrib.auth.hashers import check_password
+from django.core.cache import cache
+from django.conf import settings
+from unittest.mock import patch
+from rest_framework.throttling import SimpleRateThrottle
 from .authentication import build_admin_token
 from .models import Todo, Technician, Admin, Attribution, Notification
 from .serializers import TodoSerializer, TechnicianSerializer
+
+TEST_REGISTRATION_CODE = "code-de-test-2026"
 
 
 def authenticate_admin(client, admin):
@@ -132,6 +138,7 @@ class TestNotifyAdminAPI(APITestCase):
         self.assertEqual(Notification.objects.count(), 1)
 
 
+@override_settings(ADMIN_REGISTRATION_CODE=TEST_REGISTRATION_CODE)
 class TestAdminRegisterAPI(APITestCase):
     def test_register_with_valid_code(self):
         url = reverse('admin-register')
@@ -140,7 +147,7 @@ class TestAdminRegisterAPI(APITestCase):
             {
                 "username": "nouvel.admin",
                 "password": "MotDePasse!2026",
-                "validation_code": "2005",
+                "validation_code": TEST_REGISTRATION_CODE,
             },
         )
         self.assertEqual(response.status_code, 201)
@@ -176,7 +183,7 @@ class TestAdminRegisterAPI(APITestCase):
             {
                 "username": "adminzo",
                 "password": "MotDePasse!2026",
-                "validation_code": "2005",
+                "validation_code": TEST_REGISTRATION_CODE,
             },
         )
         self.assertEqual(response.status_code, 400)
@@ -189,11 +196,26 @@ class TestAdminRegisterAPI(APITestCase):
             {
                 "username": "court",
                 "password": "abc",
-                "validation_code": "2005",
+                "validation_code": TEST_REGISTRATION_CODE,
             },
         )
         self.assertEqual(response.status_code, 400)
         self.assertFalse(Admin.objects.filter(username="court").exists())
+
+    @override_settings(ADMIN_REGISTRATION_CODE="")
+    def test_registration_closed_when_no_code_configured(self):
+        """Sans ADMIN_REGISTRATION_CODE, la page est fermée (pas de code par défaut)."""
+        response = self.client.post(
+            reverse('admin-register'),
+            {
+                "username": "sans.code",
+                "password": "MotDePasse!2026",
+                "validation_code": "",
+            },
+            format="json",
+        )
+        self.assertEqual(response.status_code, 403)
+        self.assertFalse(Admin.objects.filter(username="sans.code").exists())
 
 
 class TestAdminProfileAPI(APITestCase):
@@ -518,6 +540,125 @@ class TestAPISecurity(APITestCase):
             HTTP_AUTHORIZATION="Bearer jeton.invalide.xxx",
         )
         self.assertEqual(response.status_code, 401)
+
+
+class TestThrottling(APITestCase):
+    """Quotas par adresse IP sur les routes publiques et les connexions."""
+
+    def setUp(self):
+        # Les compteurs vivent dans le cache : on repart d'un état propre.
+        cache.clear()
+        self.admin = Admin.objects.create(
+            full_name="Admin Quota",
+            matricule="ADM-200",
+            contact="",
+            email="quota@example.com",
+            username="quota.admin",
+            password="QuotaPass!2026",
+        )
+        self.technician = Technician.objects.create_user(
+            username="quota.tech",
+            password="QuotaTech!2026",
+            full_name="Tech Quota",
+            matricule="TECH-200",
+        )
+        self.todo_payload = {
+            "client_name": "Client Quota",
+            "contact": "0340000000",
+            "quartier": "Analakely",
+            "localisation": "Antananarivo",
+            "description": "Signalement de test",
+        }
+
+    def _rates(self, **rates):
+        """Réactive la limitation avec des quotas très bas pour le test.
+
+        ``SimpleRateThrottle.THROTTLE_RATES`` est lié au dictionnaire chargé
+        au démarrage : ``override_settings`` ne suffit pas, il faut remplacer
+        l'attribut de classe (les sous-classes en héritent).
+        """
+        merged = {
+            **(settings.REST_FRAMEWORK.get('DEFAULT_THROTTLE_RATES') or {}),
+            **rates,
+        }
+        return patch.object(SimpleRateThrottle, 'THROTTLE_RATES', merged)
+
+    def test_incident_create_is_throttled(self):
+        with self._rates(incident_create='1/min'):
+            first = self.client.post(
+                '/api/todos/', self.todo_payload, format='json'
+            )
+            second = self.client.post(
+                '/api/todos/', self.todo_payload, format='json'
+            )
+
+        self.assertEqual(first.status_code, 201)
+        self.assertEqual(second.status_code, 429)
+        self.assertEqual(Todo.objects.count(), 1)
+
+    def test_notify_admin_is_throttled(self):
+        with self._rates(notify_admin='1/min'):
+            first = self.client.post(
+                reverse('notify-admin'), {"message": "Test"}, format='json'
+            )
+            second = self.client.post(
+                reverse('notify-admin'), {"message": "Test"}, format='json'
+            )
+
+        self.assertEqual(first.status_code, 200)
+        self.assertEqual(second.status_code, 429)
+        self.assertEqual(Notification.objects.count(), 1)
+
+    def test_admin_login_is_throttled(self):
+        with self._rates(admin_login='1/min'):
+            first = self.client.post(
+                reverse('admin-login'),
+                {"username": "quota.admin", "password": "mauvais"},
+                format='json',
+            )
+            second = self.client.post(
+                reverse('admin-login'),
+                {"username": "quota.admin", "password": "mauvais"},
+                format='json',
+            )
+
+        self.assertEqual(first.status_code, 401)
+        self.assertEqual(second.status_code, 429)
+
+    def test_technician_login_is_throttled(self):
+        with self._rates(technician_login='1/min'):
+            first = self.client.post(
+                reverse('token_obtain_pair'),
+                {"username": "quota.tech", "password": "QuotaTech!2026"},
+                format='json',
+            )
+            second = self.client.post(
+                reverse('token_obtain_pair'),
+                {"username": "quota.tech", "password": "QuotaTech!2026"},
+                format='json',
+            )
+
+        self.assertEqual(first.status_code, 200)
+        self.assertEqual(second.status_code, 429)
+
+    @override_settings(ADMIN_REGISTRATION_CODE=TEST_REGISTRATION_CODE)
+    def test_admin_register_is_throttled(self):
+        payload = {
+            "username": "quota.inscrit",
+            "password": "MotDePasse!2026",
+            "validation_code": TEST_REGISTRATION_CODE,
+        }
+        with self._rates(admin_register='1/hour'):
+            first = self.client.post(
+                reverse('admin-register'), payload, format='json'
+            )
+            second = self.client.post(
+                reverse('admin-register'), payload, format='json'
+            )
+
+        self.assertEqual(first.status_code, 201)
+        self.assertEqual(second.status_code, 429)
+        self.assertEqual(Admin.objects.filter(username="quota.inscrit").count(), 1)
 
 
 class TestUrls(SimpleTestCase):

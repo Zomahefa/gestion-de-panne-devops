@@ -41,12 +41,16 @@ services:
         sync: false
       - key: ADMIN_RESET_PASSWORD
         value: "0"
-      # Page /admin-register (demonstration). Laisser le code en variable
-      # d'environnement pour ne pas l'exposer dans le depot.
+      # Page /admin-register (demonstration). Le code est obligatoire : sans
+      # ADMIN_REGISTRATION_CODE, la page est fermee (aucun code par defaut
+      # dans le depot).
       - key: ADMIN_REGISTRATION_ENABLED
         value: "1"
       - key: ADMIN_REGISTRATION_CODE
         sync: false
+      # Repertoire du cache partage par les workers (limitation de debit).
+      - key: THROTTLE_CACHE_DIR
+        value: "/tmp/signaleo-cache"
       - key: WEB_CONCURRENCY
         value: "2"
 

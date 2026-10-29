@@ -279,6 +279,9 @@ const ClientForm = () => {
       if (err.code === "ECONNABORTED" || err.code === "ETIMEDOUT") {
         message =
           "Le serveur met trop de temps à répondre. Vérifiez votre connexion puis réessayez.";
+      } else if (err.response?.status === 429) {
+        message =
+          "Trop de signalements envoyés depuis cette connexion. Patientez une minute puis réessayez.";
       } else if (err.response?.data) {
         const payload = err.response.data;
         if (typeof payload === "string") {

@@ -1,9 +1,14 @@
 from django.http import HttpResponse, JsonResponse
 from django.conf import settings
 from rest_framework import viewsets, status
-from rest_framework.decorators import api_view, permission_classes
+from rest_framework.decorators import (
+    api_view,
+    permission_classes,
+    throttle_classes,
+)
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
+from rest_framework_simplejwt.views import TokenObtainPairView
 from django.views.decorators.http import require_GET # Déplacé ici pour E402
 from django.contrib.auth.hashers import check_password
 from django.contrib.auth.hashers import make_password
@@ -18,11 +23,24 @@ from .serializers import (
     AttributionSerializer,
     NotificationSerializer,
  )
+from .throttling import (
+    AdminLoginThrottle,
+    AdminRegisterThrottle,
+    IncidentCreateThrottle,
+    NotifyAdminThrottle,
+    TechnicianLoginThrottle,
+)
 
 # Champs qu'un technicien peut modifier sur un signalement. Un compte
 # technicien ne doit pas pouvoir réécrire le nom du client, la photo ou la
 # localisation d'une intervention.
 TECHNICIAN_EDITABLE_TODO_FIELDS = {'status', 'technician_note'}
+
+
+class ThrottledTokenObtainPairView(TokenObtainPairView):
+    """Connexion technicien, limitée pour freiner le bourrage d'identifiants."""
+
+    throttle_classes = [TechnicianLoginThrottle]
 
 
 def home(request):
@@ -65,6 +83,13 @@ class TodoViewSet(viewsets.ModelViewSet):
         if self.action in ('list', 'retrieve', 'create'):
             return [AllowAny()]
         return [IsAdminOrTechnician()]
+
+    def get_throttles(self):
+        # Seul le dépôt public est limité : la lecture du suivi doit rester
+        # fluide (rafraîchissement automatique toutes les 5 s).
+        if self.action == 'create':
+            return [IncidentCreateThrottle()]
+        return super().get_throttles()
 
     def create(self, request, *args, **kwargs):
         print("📥 Données reçues :", request.data)
@@ -241,6 +266,7 @@ def admin_profile(request):
 
 @api_view(['POST'])
 @permission_classes([AllowAny])
+@throttle_classes([AdminLoginThrottle])
 def admin_login(request):
     username = request.data.get('username')
     password = request.data.get('password')
@@ -276,6 +302,7 @@ def admin_login(request):
 
 @api_view(['POST'])
 @permission_classes([AllowAny])
+@throttle_classes([NotifyAdminThrottle])
 def notify_admin(request):
     message = request.data.get('message')
     Notification.objects.create(message=message)
@@ -284,6 +311,7 @@ def notify_admin(request):
 
 @api_view(['POST'])
 @permission_classes([AllowAny])
+@throttle_classes([AdminRegisterThrottle])
 def admin_register(request):
     """Crée un compte administrateur (démonstration portfolio).
 
@@ -294,12 +322,17 @@ def admin_register(request):
     fonctions d'administration ; elle exige un code de validation remis
     sur demande.
 
-    Le code est configurable via ``ADMIN_REGISTRATION_CODE`` (défaut 2005)
-    et la vue peut être désactivée avec ``ADMIN_REGISTRATION_ENABLED=0``.
+    Le code est fourni par ``ADMIN_REGISTRATION_CODE``. Il n'existe volontairement
+    aucune valeur par défaut : sans variable d'environnement, la page reste
+    fermée, car un code écrit dans le dépôt serait public. La vue peut aussi
+    être fermée avec ``ADMIN_REGISTRATION_ENABLED=0``.
     """
-    if not getattr(settings, "ADMIN_REGISTRATION_ENABLED", True):
+    expected_code = getattr(settings, "ADMIN_REGISTRATION_CODE", "").strip()
+    enabled = getattr(settings, "ADMIN_REGISTRATION_ENABLED", True)
+
+    if not enabled or not expected_code:
         return Response(
-            {'error': "La création de compte est désactivée."},
+            {'error': "L'inscription administrateur est désactivée."},
             status=status.HTTP_403_FORBIDDEN,
         )
 
@@ -307,7 +340,7 @@ def admin_register(request):
     password = request.data.get('password') or ''
     validation_code = (request.data.get('validation_code') or '').strip()
 
-    expected_code = getattr(settings, "ADMIN_REGISTRATION_CODE", "2005")
+    expected_code = getattr(settings, "ADMIN_REGISTRATION_CODE", "").strip()
     if validation_code != expected_code:
         return Response(
             {'error': "Code de validation invalide."},

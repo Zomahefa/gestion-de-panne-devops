@@ -51,8 +51,10 @@ const AdminRegister = () => {
       setTimeout(() => navigate("/admin-login"), 1200);
     } catch (err) {
       const message =
-        err.response?.data?.error ||
-        "Création impossible. Vérifiez le code de validation.";
+        err.response?.status === 429
+          ? "Trop de tentatives. Patientez avant de réessayer."
+          : err.response?.data?.error ||
+            "Création impossible. Vérifiez le code de validation.";
       setError(message);
     } finally {
       setLoading(false);
@@ -138,11 +140,10 @@ const AdminRegister = () => {
             id="reg-code"
             type="text"
             name="validation_code"
-            inputMode="numeric"
             autoComplete="one-time-code"
             className="sig-input"
-            placeholder="Code à 4 chiffres"
-            maxLength={8}
+            placeholder="Code remis par le développeur"
+            maxLength={32}
             value={formData.validation_code}
             onChange={handleChange}
             required

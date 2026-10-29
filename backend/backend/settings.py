@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 from datetime import timedelta
 from pathlib import Path
 import os
+import sys
 
 try:
     import dj_database_url
@@ -243,6 +244,12 @@ AUTH_USER_MODEL = 'todo.Technician'
 # API REST : authentification JWT pour les techniciens (compte Django) et
 # pour les administrateurs (jeton scopé, voir todo/authentication.py).
 # Le défaut reste public : chaque vue déclare explicitement ses permissions.
+#
+# Les tests désactivent la limitation de débit (les compteurs sont partagés
+# par processus et rendraient les exécutions répétées instables) ; les tests
+# dédiés la réactivent explicitement.
+TESTING = any(arg in ('test', 'pytest') for arg in sys.argv)
+
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'todo.authentication.SignaleoJWTAuthentication',
@@ -250,6 +257,28 @@ REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': (
         'rest_framework.permissions.AllowAny',
     ),
+    'DEFAULT_THROTTLE_RATES': {
+        'incident_create': None if TESTING else '10/min',
+        'notify_admin': None if TESTING else '20/min',
+        'admin_login': None if TESTING else '10/min',
+        'technician_login': None if TESTING else '10/min',
+        'admin_register': None if TESTING else '10/hour',
+    },
+}
+
+# Compteurs de limitation de débit. Le cache fichier est partagé par les
+# workers gunicorn (WEB_CONCURRENCY=2), contrairement à LocMemCache qui
+# donnerait une limite par worker. Le disque Render est éphémère : les
+# compteurs repartent de zéro à chaque déploiement, ce qui est sans risque.
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
+        'LOCATION': os.environ.get(
+            'THROTTLE_CACHE_DIR', '/tmp/signaleo-cache'
+        ),
+        'TIMEOUT': 300,
+        'OPTIONS': {'MAX_ENTRIES': 10000},
+    }
 }
 
 # Une session de travail dure une journée : le frontend ne rafraîchit pas
@@ -265,7 +294,10 @@ SIMPLE_JWT = {
 # En entreprise, le compte de référence est créé en base par le développeur
 # (commande `create_admin`) ; cette page n'est ouverte qu'avec un code remis
 # sur demande. Mettre ADMIN_REGISTRATION_ENABLED=0 pour la fermer totalement.
+#
+# Aucun code par défaut : sans ADMIN_REGISTRATION_CODE, la page est fermée.
+# Un code écrit dans le dépôt serait public et ne protégerait plus rien.
 ADMIN_REGISTRATION_ENABLED = os.environ.get(
     "ADMIN_REGISTRATION_ENABLED", "1"
 ).lower() in ("1", "true", "yes", "on")
-ADMIN_REGISTRATION_CODE = os.environ.get("ADMIN_REGISTRATION_CODE", "2005")
+ADMIN_REGISTRATION_CODE = os.environ.get("ADMIN_REGISTRATION_CODE", "").strip()
