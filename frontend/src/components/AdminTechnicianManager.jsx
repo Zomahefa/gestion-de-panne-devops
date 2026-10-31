@@ -1,14 +1,17 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import axios from "axios";
 import Swal from "sweetalert2";
 import {
+  Eye,
   LoaderCircle,
   Pencil,
   Plus,
+  Search,
   Trash2,
   TriangleAlert,
   UserPlus,
   Users,
+  X,
 } from "lucide-react";
 import AdminShell from "./AdminShell.jsx";
 import { adminHeaders, handleAdminAuthError } from "../utils/adminAuth";
@@ -79,6 +82,7 @@ const AdminTechnicianManager = () => {
   const [saving, setSaving] = useState(false);
   const [formData, setFormData] = useState(EMPTY);
   const [usernameTouched, setUsernameTouched] = useState(false);
+  const [search, setSearch] = useState("");
 
   const fetchTechnicians = async () => {
     setLoadError("");
@@ -242,6 +246,31 @@ const AdminTechnicianManager = () => {
     }
   };
 
+  const handleView = async (tech) => {
+    Swal.fire({
+      title: tech.full_name,
+      html:
+        `<div style="text-align:left;font-size:.9rem;line-height:1.6">` +
+        `<p style="margin:0 0 6px"><strong>Identifiant :</strong> <code>${escapeHtml(
+          tech.username,
+        )}</code></p>` +
+        `<p style="margin:0 0 6px"><strong>Matricule :</strong> ${escapeHtml(
+          tech.matricule,
+        )}</p>` +
+        `<p style="margin:0 0 6px"><strong>Contact :</strong> ${escapeHtml(
+          tech.contact || "—",
+        )}</p>` +
+        `<p style="margin:12px 0 0;padding-top:10px;border-top:1px solid #e2e8f0;font-size:.82rem;color:#5b6b7c">` +
+        `Le technicien ne peut pas modifier ses propres informations : ` +
+        `toute mise à jour du mot de passe, du contact ou du rôle se fait ici, ` +
+        `dans l'interface administrateur.</p>` +
+        `</div>`,
+      icon: "info",
+      confirmButtonText: "Fermer",
+      confirmButtonColor: "#003366",
+    });
+  };
+
   const handleDelete = async (tech) => {
     const result = await Swal.fire({
       title: `Supprimer ${tech.full_name} ?`,
@@ -276,6 +305,19 @@ const AdminTechnicianManager = () => {
   useEffect(() => {
     fetchTechnicians();
   }, []);
+
+  const filtered = useMemo(() => {
+    const term = search.trim().toLowerCase();
+    if (!term) return technicians;
+
+    return technicians.filter((tech) =>
+      [tech.full_name, tech.username, tech.matricule, tech.contact]
+        .filter(Boolean)
+        .join(" ")
+        .toLowerCase()
+        .includes(term),
+    );
+  }, [technicians, search]);
 
   return (
     <AdminShell
@@ -402,14 +444,36 @@ const AdminTechnicianManager = () => {
         </section>
 
         <section className="sig-card atm-list-card">
-          <div className="sig-card__head atm-card-head">
+          <div className="sig-card__head atm-card-head atm-toolbar">
             <h2 className="sig-card__title">
               <Users size={18} aria-hidden="true" />
               Équipe terrain
+              <span className="atm-count">
+                {filtered.length} / {technicians.length}
+              </span>
             </h2>
-            <span className="atm-count">
-              {technicians.length} technicien(s)
-            </span>
+
+            <div className="ad-search">
+              <Search size={16} aria-hidden="true" />
+              <input
+                type="search"
+                className="sig-input ad-search__input"
+                placeholder="Rechercher un nom, un matricule, un contact…"
+                value={search}
+                onChange={(event) => setSearch(event.target.value)}
+                aria-label="Rechercher un technicien"
+              />
+              {search && (
+                <button
+                  type="button"
+                  className="ad-search__clear"
+                  onClick={() => setSearch("")}
+                  aria-label="Effacer la recherche"
+                >
+                  <X size={14} aria-hidden="true" />
+                </button>
+              )}
+            </div>
           </div>
 
           {loading ? (
@@ -434,12 +498,16 @@ const AdminTechnicianManager = () => {
                 Réessayer
               </button>
             </div>
-          ) : technicians.length === 0 ? (
+          ) : filtered.length === 0 ? (
             <div className="sig-empty">
               <span className="sig-empty__icon">
                 <Users size={22} aria-hidden="true" />
               </span>
-              <p className="sig-empty__title">Aucun technicien enregistré</p>
+              <p className="sig-empty__title">
+                {search
+                  ? "Aucun technicien ne correspond"
+                  : "Aucun technicien enregistré"}
+              </p>
             </div>
           ) : (
             <div className="ad-table-wrap">
@@ -454,7 +522,7 @@ const AdminTechnicianManager = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {technicians.map((tech) => (
+                  {filtered.map((tech) => (
                     <tr key={tech.id}>
                       <td>
                         <span className="ad-client">{tech.full_name}</span>
@@ -466,6 +534,14 @@ const AdminTechnicianManager = () => {
                       <td>{tech.contact}</td>
                       <td>
                         <div className="ad-row-actions">
+                          <button
+                            type="button"
+                            className="sig-btn sig-btn--ghost sig-btn--sm"
+                            onClick={() => handleView(tech)}
+                          >
+                            <Eye size={14} aria-hidden="true" />
+                            Voir
+                          </button>
                           <button
                             type="button"
                             className="sig-btn sig-btn--ghost sig-btn--sm"

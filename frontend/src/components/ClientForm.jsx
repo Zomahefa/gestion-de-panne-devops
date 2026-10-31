@@ -244,20 +244,6 @@ const ClientForm = () => {
       // formulaire ne peut plus tourner indéfiniment.
       await axios.post(`${API_URL}todos/`, data, { timeout: 60000 });
 
-      // La notification est un bonus : son échec ne doit jamais faire croire
-      // que le signalement n'a pas été enregistré.
-      axios
-        .post(
-          `${API_URL}notify-admin/`,
-          {
-            message: `Nouvelle panne signalée par ${formData.client_name} à ${formData.localisation}`,
-          },
-          { timeout: 15000 },
-        )
-        .catch((notifyError) => {
-          console.warn("Notification admin non envoyée :", notifyError);
-        });
-
       setSuccess(true);
       setError("");
       setGeoError("");

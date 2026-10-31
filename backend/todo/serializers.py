@@ -86,10 +86,13 @@ class TodoSerializer(serializers.ModelSerializer):
 class AdminSerializer(serializers.ModelSerializer):
     class Meta:
         model = Admin
-        fields = ['id', 'username', 'full_name', 'matricule', 'role', 'contact', 'email']
-        extra_kwargs = {
-            'password': {'write_only': True}
-        }
+        fields = [
+            'id', 'username', 'full_name', 'matricule', 'role',
+            'contact', 'email', 'is_super_admin',
+        ]
+        # Le statut de super administrateur est attribué en base, jamais
+        # depuis l'API (évite une escalade de privilèges).
+        read_only_fields = ['is_super_admin']
 
 class AttributionSerializer(serializers.ModelSerializer):
     class Meta:
@@ -99,4 +102,5 @@ class AttributionSerializer(serializers.ModelSerializer):
 class NotificationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Notification
-        fields = '__all__'
+        fields = ['id', 'message', 'kind', 'is_read', 'todo', 'created_at']
+        read_only_fields = ['kind', 'todo', 'created_at']

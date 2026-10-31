@@ -10,6 +10,7 @@ import AdminDashboard from './components/AdminDashboard.jsx';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './styles/theme.css';
 import AdminTechnicianManager from './components/AdminTechnicianManager.jsx';
+import AdminAccountManager from './components/AdminAccountManager.jsx';
 import HelpPage from './components/HelpPage.jsx';
 import AdminProfile from './components/AdminProfile.jsx';
 import PanneChart from './components/PanneChart.jsx';
@@ -33,6 +34,7 @@ function App() {
         <Route path="/admin-register" element={<AdminRegister />} />
         <Route path="/admin-dashboard" element={<AdminDashboard />} />
         <Route path="/admin-technicians" element={<AdminTechnicianManager />} />
+        <Route path="/admin-admins" element={<AdminAccountManager />} />
         <Route path="/admin-profile" element={<AdminProfile />} />
         <Route path="/admin-chart" element={<PanneChart />} />
         <Route path="/help" element={<HelpPage />} />

@@ -442,7 +442,17 @@ class TestAPISecurity(APITestCase):
         self.assertEqual(response.status_code, 401)
         self.assertTrue(Todo.objects.filter(id=self.todo.id).exists())
 
+        # Même attribué, un technicien ne supprime pas un signalement.
+        client = APIClient()
+        client.credentials(HTTP_AUTHORIZATION=f"Bearer {self._technician_token()}")
+        forbidden = client.delete(f'/api/todos/{self.todo.id}/')
+        self.assertEqual(forbidden.status_code, 403)
+        self.assertTrue(Todo.objects.filter(id=self.todo.id).exists())
+
     def test_technician_can_update_status(self):
+        self.todo.technician_confirmed = self.technician
+        self.todo.save(update_fields=['technician_confirmed'])
+
         client = APIClient()
         client.credentials(HTTP_AUTHORIZATION=f"Bearer {self._technician_token()}")
 
@@ -456,6 +466,9 @@ class TestAPISecurity(APITestCase):
         self.assertEqual(self.todo.status, "on_the_way")
 
     def test_technician_cannot_rewrite_client_data(self):
+        self.todo.technician_confirmed = self.technician
+        self.todo.save(update_fields=['technician_confirmed'])
+
         client = APIClient()
         client.credentials(HTTP_AUTHORIZATION=f"Bearer {self._technician_token()}")
 
@@ -535,8 +548,12 @@ class TestAPISecurity(APITestCase):
         self.assertEqual(unknown_account.status_code, 401)
         self.assertEqual(wrong_password.data, unknown_account.data)
 
-    def test_notifications_require_admin(self):
+    def test_notifications_require_authentication(self):
         self.assertEqual(self.client.get('/api/notifications/').status_code, 401)
+
+        client = APIClient()
+        client.credentials(HTTP_AUTHORIZATION=f"Bearer {self._technician_token()}")
+        self.assertEqual(client.get('/api/notifications/').status_code, 200)
 
     def test_attribution_records_authenticated_admin(self):
         client = APIClient()
@@ -565,6 +582,384 @@ class TestAPISecurity(APITestCase):
             HTTP_AUTHORIZATION="Bearer jeton.invalide.xxx",
         )
         self.assertEqual(response.status_code, 401)
+
+
+class TestAssignmentRules(APITestCase):
+    """Une intervention n'est modifiable que par le technicien attribué."""
+
+    def setUp(self):
+        self.admin = Admin.objects.create(
+            full_name="Admin Attribution",
+            matricule="ADM-300",
+            contact="",
+            email="attr@example.com",
+            username="attr.admin",
+            password="AttrAdmin!2026",
+            is_super_admin=True,
+        )
+        self.assigned = Technician.objects.create_user(
+            username="tech.attitre",
+            password="TechPass!2026",
+            full_name="Tech Attribué",
+            matricule="TECH-300",
+        )
+        self.other_technician = Technician.objects.create_user(
+            username="tech.autre",
+            password="TechPass!2026",
+            full_name="Tech Autre",
+            matricule="TECH-301",
+        )
+        self.todo = Todo.objects.create(
+            client_name="Client Attribué",
+            contact="0340000000",
+            quartier="Analakely",
+            localisation="Antananarivo",
+            description="Panne attribuée",
+            technician_confirmed=self.assigned,
+        )
+
+    def _client_for(self, username, password):
+        response = self.client.post(
+            reverse('token_obtain_pair'),
+            {"username": username, "password": password},
+            format="json",
+        )
+        self.assertEqual(response.status_code, 200)
+        client = APIClient()
+        client.credentials(HTTP_AUTHORIZATION=f"Bearer {response.data['access']}")
+        return client
+
+    def test_unassigned_technician_cannot_change_status(self):
+        client = self._client_for("tech.autre", "TechPass!2026")
+        response = client.patch(
+            f'/api/todos/{self.todo.id}/',
+            {"status": "resolved"},
+            format="json",
+        )
+        self.assertEqual(response.status_code, 403)
+        self.todo.refresh_from_db()
+        self.assertEqual(self.todo.status, "pending")
+
+    def test_assigned_technician_can_change_status(self):
+        client = self._client_for("tech.attitre", "TechPass!2026")
+        response = client.patch(
+            f'/api/todos/{self.todo.id}/',
+            {"status": "on_the_way", "technician_note": "Je pars"},
+            format="json",
+        )
+        self.assertEqual(response.status_code, 200)
+        self.todo.refresh_from_db()
+        self.assertEqual(self.todo.status, "on_the_way")
+        self.assertEqual(self.todo.technician_note, "Je pars")
+
+    def test_assigned_technician_cannot_rewrite_client_data(self):
+        client = self._client_for("tech.attitre", "TechPass!2026")
+        response = client.patch(
+            f'/api/todos/{self.todo.id}/',
+            {"client_name": "Usurpation"},
+            format="json",
+        )
+        self.assertEqual(response.status_code, 403)
+        self.todo.refresh_from_db()
+        self.assertEqual(self.todo.client_name, "Client Attribué")
+
+    def test_admin_can_update_any_incident(self):
+        client = APIClient()
+        authenticate_admin(client, self.admin)
+        response = client.patch(
+            f'/api/todos/{self.todo.id}/',
+            {"description": "Précision ajoutée par l'exploitation"},
+            format="json",
+        )
+        self.assertEqual(response.status_code, 200)
+
+
+class TestNotificationWorkflow(APITestCase):
+    """Les notifications alimentent la cloche de chaque espace."""
+
+    def setUp(self):
+        self.admin = Admin.objects.create(
+            full_name="Admin Notif",
+            matricule="ADM-310",
+            contact="",
+            email="notif@example.com",
+            username="notif.admin",
+            password="NotifAdmin!2026",
+            is_super_admin=True,
+        )
+        self.other_admin = Admin.objects.create(
+            full_name="Autre Admin Notif",
+            matricule="ADM-311",
+            contact="",
+            email="notif2@example.com",
+            username="notif.admin2",
+            password="NotifAdmin!2026",
+        )
+        self.technician = Technician.objects.create_user(
+            username="tech.notif",
+            password="TechPass!2026",
+            full_name="Tech Notif",
+            matricule="TECH-310",
+        )
+        self.other_technician = Technician.objects.create_user(
+            username="tech.notif2",
+            password="TechPass!2026",
+            full_name="Tech Notif 2",
+            matricule="TECH-311",
+        )
+
+    def _admin_client(self, admin):
+        client = APIClient()
+        authenticate_admin(client, admin)
+        return client
+
+    def _technician_client(self):
+        response = self.client.post(
+            reverse('token_obtain_pair'),
+            {"username": "tech.notif", "password": "TechPass!2026"},
+            format="json",
+        )
+        client = APIClient()
+        client.credentials(HTTP_AUTHORIZATION=f"Bearer {response.data['access']}")
+        return client
+
+    def _create_todo(self):
+        return Todo.objects.create(
+            client_name="Client Notif",
+            contact="0340000000",
+            quartier="Isoraka",
+            localisation="Antananarivo",
+            description="Panne à notifier",
+            technician_confirmed=self.technician,
+        )
+
+    def test_new_incident_notifies_admins_and_technicians(self):
+        response = self.client.post(
+            '/api/todos/',
+            {
+                "client_name": "Nouveau Client",
+                "contact": "0341111111",
+                "quartier": "Isoraka",
+                "localisation": "Antananarivo",
+                "description": "Coupure de courant",
+            },
+            format="json",
+        )
+        self.assertEqual(response.status_code, 201)
+
+        for admin in (self.admin, self.other_admin):
+            notification = Notification.objects.get(
+                admin=admin, kind='incident_created'
+            )
+            self.assertIn("Nouveau signalement", notification.message)
+            self.assertEqual(notification.todo_id, response.data['id'])
+
+        for technician in (self.technician, self.other_technician):
+            self.assertTrue(
+                Notification.objects.filter(
+                    technician=technician, kind='incident_created'
+                ).exists()
+            )
+
+    def test_assignment_notifies_the_assigned_technician_only(self):
+        todo = Todo.objects.create(
+            client_name="Client Assigné",
+            contact="0340000000",
+            quartier="Analakely",
+            localisation="Antananarivo",
+            description="À attribuer",
+        )
+        client = self._admin_client(self.admin)
+        response = client.post(
+            '/api/attributions/',
+            {"panne": todo.id, "technician": self.technician.id},
+            format="json",
+        )
+        self.assertEqual(response.status_code, 201)
+
+        self.assertEqual(
+            Notification.objects.filter(
+                technician=self.technician, kind='assigned'
+            ).count(),
+            1,
+        )
+        self.assertFalse(
+            Notification.objects.filter(
+                technician=self.other_technician, kind='assigned'
+            ).exists()
+        )
+
+    def test_status_change_notifies_admins(self):
+        todo = self._create_todo()
+        client = self._technician_client()
+        response = client.patch(
+            f'/api/todos/{todo.id}/', {"status": "in_progress"}, format="json"
+        )
+        self.assertEqual(response.status_code, 200)
+
+        notification = Notification.objects.get(
+            admin=self.admin, kind='status_update'
+        )
+        self.assertIn("En cours", notification.message)
+        self.assertEqual(notification.todo_id, todo.id)
+        self.assertTrue(
+            Notification.objects.filter(
+                admin=self.other_admin, kind='status_update'
+            ).exists()
+        )
+
+    def test_notifications_are_private_to_each_account(self):
+        Notification.objects.create(
+            admin=self.admin, message="Pour le premier admin", kind='info'
+        )
+        Notification.objects.create(
+            admin=self.other_admin, message="Pour le second admin", kind='info'
+        )
+        Notification.objects.create(
+            technician=self.technician, message="Pour le technicien", kind='info'
+        )
+
+        admin_notifications = self._admin_client(self.admin).get(
+            '/api/notifications/'
+        )
+        self.assertEqual(admin_notifications.status_code, 200)
+        self.assertEqual(len(admin_notifications.data), 1)
+        self.assertEqual(
+            admin_notifications.data[0]['message'], "Pour le premier admin"
+        )
+
+        technician_notifications = self._technician_client().get(
+            '/api/notifications/'
+        )
+        self.assertEqual(len(technician_notifications.data), 1)
+        self.assertEqual(
+            technician_notifications.data[0]['message'], "Pour le technicien"
+        )
+
+    def test_mark_one_and_mark_all_as_read(self):
+        first = Notification.objects.create(
+            admin=self.admin, message="Première", kind='info'
+        )
+        Notification.objects.create(
+            admin=self.admin, message="Seconde", kind='info'
+        )
+        client = self._admin_client(self.admin)
+
+        read = client.post(f'/api/notifications/{first.id}/read/')
+        self.assertEqual(read.status_code, 200)
+        first.refresh_from_db()
+        self.assertTrue(first.is_read)
+
+        all_read = client.post('/api/notifications/mark-all-read/')
+        self.assertEqual(all_read.status_code, 200)
+        self.assertFalse(
+            Notification.objects.filter(admin=self.admin, is_read=False).exists()
+        )
+
+
+class TestSuperAdmin(APITestCase):
+    """Le compte de référence gère les autres comptes administrateurs."""
+
+    def setUp(self):
+        self.root = Admin.objects.create(
+            full_name="Super Admin",
+            matricule="ADM-320",
+            contact="",
+            email="root@example.com",
+            username="root.admin",
+            password="RootAdmin!2026",
+            is_super_admin=True,
+        )
+        self.simple = Admin.objects.create(
+            full_name="Admin Simple",
+            matricule="ADM-321",
+            contact="",
+            email="simple@example.com",
+            username="simple.admin",
+            password="SimpleAdmin!2026",
+        )
+
+    def _client(self, admin):
+        client = APIClient()
+        authenticate_admin(client, admin)
+        return client
+
+    def test_super_admin_sees_every_account(self):
+        response = self._client(self.root).get('/api/admins/')
+        self.assertEqual(response.status_code, 200)
+        usernames = {item['username'] for item in response.data}
+        self.assertEqual(usernames, {'root.admin', 'simple.admin'})
+
+    def test_regular_admin_only_sees_own_account(self):
+        response = self._client(self.simple).get('/api/admins/')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 1)
+        self.assertEqual(response.data[0]['username'], 'simple.admin')
+
+    def test_super_admin_creates_edits_and_deletes_an_account(self):
+        client = self._client(self.root)
+        created = client.post(
+            '/api/admins/',
+            {
+                "username": "testeur",
+                "password": "Testeur!2026",
+                "full_name": "Compte Testeur",
+                "contact": "0340000000",
+                "email": "testeur@example.com",
+                "role": "admin",
+            },
+            format="json",
+        )
+        self.assertEqual(created.status_code, 201)
+        self.assertFalse(created.data['is_super_admin'])
+        account = Admin.objects.get(username="testeur")
+
+        updated = client.patch(
+            f'/api/admins/{account.id}/',
+            {"full_name": "Compte Testeur Modifié"},
+            format="json",
+        )
+        self.assertEqual(updated.status_code, 200)
+
+        # Le statut de super administrateur ne s'obtient pas par l'API.
+        escalated = client.patch(
+            f'/api/admins/{account.id}/',
+            {"is_super_admin": True},
+            format="json",
+        )
+        self.assertEqual(escalated.status_code, 200)
+        account.refresh_from_db()
+        self.assertFalse(account.is_super_admin)
+
+        deleted = client.delete(f'/api/admins/{account.id}/')
+        self.assertEqual(deleted.status_code, 204)
+        self.assertFalse(Admin.objects.filter(username="testeur").exists())
+
+    def test_regular_admin_cannot_create_accounts(self):
+        response = self._client(self.simple).post(
+            '/api/admins/',
+            {"username": "intrus", "password": "Intrus!2026"},
+            format="json",
+        )
+        self.assertEqual(response.status_code, 403)
+        self.assertFalse(Admin.objects.filter(username="intrus").exists())
+
+    def test_last_super_admin_cannot_be_deleted(self):
+        response = self._client(self.root).delete(
+            f'/api/admins/{self.root.id}/'
+        )
+        self.assertEqual(response.status_code, 403)
+        self.assertTrue(Admin.objects.filter(pk=self.root.pk).exists())
+
+    def test_super_admin_can_edit_another_account(self):
+        response = self._client(self.root).patch(
+            f'/api/admins/{self.simple.id}/',
+            {"contact": "0341111111"},
+            format="json",
+        )
+        self.assertEqual(response.status_code, 200)
+        self.simple.refresh_from_db()
+        self.assertEqual(self.simple.contact, "0341111111")
 
 
 class TestClientIP(SimpleTestCase):

@@ -34,6 +34,10 @@ const AdminLogin = () => {
       if (res.data.admin) {
         localStorage.setItem("admin_id", String(res.data.admin.id));
         localStorage.setItem("admin_username", res.data.admin.username);
+        localStorage.setItem(
+          "admin_is_super",
+          res.data.admin.is_super_admin ? "1" : "0",
+        );
       }
       navigate("/admin-dashboard");
     } catch (err) {

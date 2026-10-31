@@ -18,6 +18,9 @@ class Admin(models.Model):
     email = models.EmailField()
     username = models.CharField(max_length=100, unique=True)
     password = models.CharField(max_length=128)
+    # Compte de référence : il peut créer, modifier et supprimer les autres
+    # administrateurs (comptes de test accordés quelques minutes).
+    is_super_admin = models.BooleanField(default=False)
 
     def save(self, *args, **kwargs):
         # Hash le mot de passe uniquement s'il n'est pas déjà hashé
@@ -66,5 +69,43 @@ class Attribution(models.Model):
         return f"{self.panne} → {self.technician}"
 
 class Notification(models.Model):
+    """Notification destinée à un administrateur ou à un technicien.
+
+    Un même évènement (nouveau signalement, attribution, changement de
+    statut) crée une ligne par destinataire : chacun peut ensuite marquer la
+    sienne comme lue sans toucher à celle des autres. Les notifications
+    publiques sans destinataire (``notify_admin``) restent visibles par tous
+    les administrateurs.
+    """
+
+    KIND_CHOICES = [
+        ('incident_created', 'Nouveau signalement'),
+        ('assigned', 'Panne attribuée'),
+        ('status_update', 'Statut modifié'),
+        ('info', 'Information'),
+    ]
+
     message = models.TextField()
+    kind = models.CharField(
+        max_length=32, choices=KIND_CHOICES, default='info'
+    )
+    admin = models.ForeignKey(
+        Admin, null=True, blank=True, on_delete=models.CASCADE,
+        related_name='notifications',
+    )
+    technician = models.ForeignKey(
+        Technician, null=True, blank=True, on_delete=models.CASCADE,
+        related_name='notifications',
+    )
+    todo = models.ForeignKey(
+        Todo, null=True, blank=True, on_delete=models.SET_NULL,
+        related_name='notifications',
+    )
+    is_read = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"{self.get_kind_display()} - {self.message[:40]}"

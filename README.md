@@ -175,12 +175,32 @@ signé.
 | `POST /api/todos/` | public (dépôt d'un signalement) |
 | `POST /api/notify-admin/` | public |
 | `POST /api/admin-login/`, `POST /api/token/` | public (connexion) |
-| `/api/techniciens/`, `/api/notifications/`, `/api/attributions/`, `/api/admins/` | authentifié |
-| modification / suppression d'un signalement | administrateur (un technicien ne peut changer que le statut et sa note) |
+| `/api/technicians/`, `/api/attributions/`, `/api/admins/` | administrateur |
+| `/api/notifications/` | administrateur ou technicien (chacun ne voit que les siennes) |
+| modification d'un signalement | administrateur, ou technicien **attribué** (statut et note uniquement) |
+| suppression d'un signalement | administrateur |
 
 Un administrateur reçoit un jeton JWT signé (portée `admin`, 12 h), un
 technicien un jeton JWT standard. Une seule classe d'authentification
 (`backend/todo/authentication.py`) traite les deux.
+
+### Notifications et affectation
+
+- chaque nouveau signalement crée une notification pour tous les
+  administrateurs et tous les techniciens ;
+- l'administrateur attribue une panne à un technicien depuis le tableau de
+  bord : seul ce technicien peut ensuite faire évoluer son statut ;
+- le technicien attribué reçoit une notification à l'attribution, et les
+  administrateurs sont prévenus à chaque changement de statut ;
+- la cloche (admin et technicien) indique le nombre de notifications non
+  lues, avec « Tout lire ».
+
+Les techniciens ne peuvent pas modifier leurs propres informations (mot de
+passe, contact, rôle) : ces mises à jour passent par l'interface
+administrateur. Le compte de référence (`zomahefa`) est super administrateur :
+il liste, crée, modifie et supprime les autres comptes administrateurs
+(comptes de test), sans pouvoir retirer son propre statut via l'API.
+
 
 ### Limitation de débit
 

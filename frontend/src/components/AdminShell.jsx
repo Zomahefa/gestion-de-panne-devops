@@ -6,10 +6,17 @@ import {
   ClipboardList,
   Home,
   LogOut,
+  ShieldCheck,
   UserCircle,
   Users,
 } from "lucide-react";
-import { clearAdminSession, isAdminAuthenticated } from "../utils/adminAuth";
+import NotificationBell from "./NotificationBell.jsx";
+import {
+  adminHeaders,
+  clearAdminSession,
+  isAdminAuthenticated,
+  isSuperAdmin,
+} from "../utils/adminAuth";
 import "./AdminShell.css";
 
 const NAV = [
@@ -64,6 +71,19 @@ const AdminShell = ({ title, subtitle, actions, children }) => {
               {label}
             </NavLink>
           ))}
+
+          {/* Comptes administrateurs : réservé au compte de référence. */}
+          {isSuperAdmin() && (
+            <NavLink
+              to="/admin-admins"
+              className={({ isActive }) =>
+                `ashell__link${isActive ? " ashell__link--active" : ""}`
+              }
+            >
+              <ShieldCheck size={17} aria-hidden="true" />
+              Comptes admin
+            </NavLink>
+          )}
         </nav>
 
         <div className="ashell__bottom">
@@ -88,7 +108,13 @@ const AdminShell = ({ title, subtitle, actions, children }) => {
             <h1 className="ashell__title">{title}</h1>
             {subtitle && <p className="ashell__sub">{subtitle}</p>}
           </div>
-          {actions && <div className="ashell__actions">{actions}</div>}
+          <div className="ashell__actions">
+            {actions}
+            <NotificationBell
+              apiUrl={process.env.REACT_APP_API_URL}
+              headers={adminHeaders}
+            />
+          </div>
         </header>
 
         <div className="ashell__content">{children}</div>

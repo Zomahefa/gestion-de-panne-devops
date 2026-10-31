@@ -23,6 +23,32 @@
   color: var(--sig-ink-faint);
 }
 
+.atm-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.atm-toolbar .sig-card__title {
+  margin-bottom: 0;
+}
+
+.atm-toolbar .ad-search {
+  min-width: min(300px, 100%);
+}
+
+@media (max-width: 640px) {
+  .atm-toolbar {
+    align-items: stretch;
+  }
+
+  .atm-toolbar .ad-search {
+    min-width: 100%;
+  }
+}
+
 .atm-form {
   display: flex;
   flex-direction: column;

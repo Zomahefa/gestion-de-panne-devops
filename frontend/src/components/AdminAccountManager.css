@@ -1,0 +1,119 @@
+/* Gestion des comptes administrateurs (super administrateur) */
+
+.aam-layout {
+  display: grid;
+  grid-template-columns: 380px minmax(0, 1fr);
+  gap: 20px;
+  align-items: start;
+}
+
+.aam-form-card,
+.aam-list-card {
+  overflow: hidden;
+}
+
+.aam-card-head {
+  padding: 18px 20px 14px;
+  margin-bottom: 0;
+}
+
+.aam-count {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--sig-ink-faint);
+}
+
+.aam-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 18px 20px 22px;
+}
+
+.aam-submit {
+  margin-top: 4px;
+}
+
+.aam-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.aam-toolbar .sig-card__title {
+  margin-bottom: 0;
+}
+
+.aam-toolbar .ad-search {
+  min-width: min(320px, 100%);
+}
+
+.aam-username {
+  display: inline-block;
+  padding: 2px 7px;
+  border-radius: 6px;
+  background: #eef3f9;
+  color: var(--sig-navy-800, #003366);
+  font-size: 0.8rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.aam-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: #eef2f7;
+  color: var(--sig-ink-soft);
+  font-size: 0.72rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.aam-badge--super {
+  background: var(--sig-accent-050, #fff4e0);
+  color: #8a5a00;
+  border: 1px solid #f0d8a8;
+}
+
+.aam-forbidden {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 46px 24px;
+  text-align: center;
+  color: var(--sig-ink-soft);
+}
+
+.aam-forbidden h2 {
+  margin: 0;
+  font-size: 1.15rem;
+  color: var(--sig-navy-900);
+}
+
+.aam-forbidden p {
+  margin: 0 0 8px;
+  max-width: 460px;
+  font-size: 0.9rem;
+}
+
+@media (max-width: 1180px) {
+  .aam-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .aam-toolbar {
+    align-items: stretch;
+  }
+
+  .aam-toolbar .ad-search {
+    min-width: 100%;
+  }
+}

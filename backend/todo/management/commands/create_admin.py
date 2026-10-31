@@ -98,6 +98,9 @@ class Command(BaseCommand):
 
         if existing:
             existing.password = password  # hashé par Admin.save()
+            # Le compte de référence est le super administrateur : il gère
+            # les autres comptes administrateurs (comptes de test).
+            existing.is_super_admin = True
             if options["email"]:
                 existing.email = options["email"]
             if options["full_name"]:
@@ -125,6 +128,7 @@ class Command(BaseCommand):
             contact=options["contact"] or "",
             email=options["email"] or "",
             password=password,
+            is_super_admin=True,
         )
 
         self.stdout.write(

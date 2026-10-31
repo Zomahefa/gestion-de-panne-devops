@@ -5,6 +5,7 @@ import {
   ArrowLeftRight,
   Camera,
   ClipboardList,
+  Info,
   LoaderCircle,
   LogOut,
   MapPin,
@@ -12,6 +13,7 @@ import {
   User,
   Wrench,
 } from "lucide-react";
+import NotificationBell from "./NotificationBell.jsx";
 import StatusBadge from "./StatusBadge.jsx";
 import MapView from "./MapView.jsx";
 import { STATUS_CONFIG, STATUS_ORDER, getStatus } from "../utils/status";
@@ -38,8 +40,12 @@ const authHeaders = () => {
 const TechnicianDashboard = () => {
   const [incidents, setIncidents] = useState([]);
   const [filter, setFilter] = useState("all");
+  // « mine » : les pannes attribuées au technicien connecté ; « all » :
+  // tous les signalements, en lecture seule sauf ceux qui lui sont confiés.
+  const [scope, setScope] = useState("mine");
   const [currentUsername, setCurrentUsername] = useState("");
   const [loading, setLoading] = useState(true);
+  const [updateError, setUpdateError] = useState("");
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -70,6 +76,7 @@ const TechnicianDashboard = () => {
   }, []);
 
   const handleStatusUpdate = async (id, newStatus) => {
+    setUpdateError("");
     try {
       await axios.patch(
         `${process.env.REACT_APP_API_URL}todos/${id}/`,
@@ -88,7 +95,16 @@ const TechnicianDashboard = () => {
         navigate("/login");
         return;
       }
-      console.error("Erreur mise à jour statut :", err);
+      if (err.response?.status === 403) {
+        setUpdateError(
+          err.response?.data?.detail ||
+            "Cette panne ne vous est pas attribuée : seul le technicien affecté peut changer son statut.",
+        );
+        return;
+      }
+      setUpdateError(
+        "La mise à jour du statut a échoué. Réessayez dans un instant.",
+      );
     }
   };
 
@@ -98,13 +114,21 @@ const TechnicianDashboard = () => {
     navigate("/login");
   };
 
+  const mine = incidents.filter(
+    (incident) =>
+      incident.technician_confirmed?.username?.toLowerCase() ===
+      currentUsername?.toLowerCase(),
+  );
+
+  const scoped = scope === "mine" ? mine : incidents;
+
   const filtered =
-    filter === "all" ? incidents : incidents.filter((i) => i.status === filter);
+    filter === "all" ? scoped : scoped.filter((i) => i.status === filter);
 
   const countFor = (key) =>
     key === "all"
-      ? incidents.length
-      : incidents.filter((i) => i.status === key).length;
+      ? scoped.length
+      : scoped.filter((i) => i.status === key).length;
 
   return (
     <div className="sig-shell">
@@ -130,6 +154,10 @@ const TechnicianDashboard = () => {
               <ArrowLeftRight size={17} aria-hidden="true" />
               Suivi client
             </Link>
+            <NotificationBell
+              apiUrl={process.env.REACT_APP_API_URL}
+              headers={authHeaders}
+            />
             <button type="button" className="sig-nav__link td-logout" onClick={handleLogout}>
               <LogOut size={17} aria-hidden="true" />
               Quitter
@@ -145,13 +173,54 @@ const TechnicianDashboard = () => {
               <Wrench size={15} aria-hidden="true" />
               Espace technicien
             </span>
-            <h1 className="sig-title">Mes interventions</h1>
+            <h1 className="sig-title">
+              {scope === "mine" ? "Mes interventions" : "Toutes les pannes"}
+            </h1>
             <p className="sig-sub">
-              Les pannes qui vous sont affectées. Mettez à jour le statut à chaque
-              étape de l'intervention.
+              {scope === "mine"
+                ? "Les pannes qui vous sont affectées. Mettez à jour le statut à chaque étape de l'intervention."
+                : "Tous les signalements de l'application. Vous ne pouvez modifier que ceux qui vous sont attribués."}
             </p>
           </div>
         </div>
+
+        <p className="td-info">
+          <Info size={16} aria-hidden="true" />
+          Pour modifier vos informations (mot de passe, contact, rôle…),
+          contactez un administrateur : seul son espace permet ces mises à jour.
+        </p>
+
+        <div className="td-scope" role="tablist" aria-label="Portée de la liste">
+          <button
+            type="button"
+            role="tab"
+            aria-selected={scope === "mine"}
+            className={`td-scope__btn${scope === "mine" ? " td-scope__btn--active" : ""}`}
+            onClick={() => setScope("mine")}
+          >
+            <Wrench size={15} aria-hidden="true" />
+            Mes interventions
+            <span className="td-chip__count">{mine.length}</span>
+          </button>
+          <button
+            type="button"
+            role="tab"
+            aria-selected={scope === "all"}
+            className={`td-scope__btn${scope === "all" ? " td-scope__btn--active" : ""}`}
+            onClick={() => setScope("all")}
+          >
+            <ClipboardList size={15} aria-hidden="true" />
+            Toutes les pannes
+            <span className="td-chip__count">{incidents.length}</span>
+          </button>
+        </div>
+
+        {updateError && (
+          <p className="td-alert" role="alert">
+            <ShieldAlert size={16} aria-hidden="true" />
+            {updateError}
+          </p>
+        )}
 
         <div className="td-filters" role="tablist" aria-label="Filtrer par statut">
           <button
@@ -195,7 +264,11 @@ const TechnicianDashboard = () => {
             <span className="sig-empty__icon">
               <ClipboardList size={24} aria-hidden="true" />
             </span>
-            <p className="sig-empty__title">Aucune intervention dans ce filtre</p>
+            <p className="sig-empty__title">
+              {scope === "mine" && mine.length === 0
+                ? "Aucune panne ne vous est encore attribuée"
+                : "Aucune intervention dans ce filtre"}
+            </p>
           </div>
         ) : (
           <div className="td-grid">

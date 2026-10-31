@@ -10,6 +10,13 @@ export const getAdminToken = () => localStorage.getItem("admin_token") || "";
 
 export const isAdminAuthenticated = () => Boolean(getAdminToken());
 
+/**
+ * Le compte connecté est-il le super administrateur ? Lui seul voit et gère
+ * les autres comptes administrateurs (comptes de test).
+ */
+export const isSuperAdmin = () =>
+  localStorage.getItem("admin_is_super") === "1";
+
 export const adminHeaders = () => {
   const token = getAdminToken();
   return token ? { Authorization: `Bearer ${token}` } : {};
@@ -19,6 +26,7 @@ export const clearAdminSession = () => {
   localStorage.removeItem("admin_token");
   localStorage.removeItem("admin_id");
   localStorage.removeItem("admin_username");
+  localStorage.removeItem("admin_is_super");
 };
 
 /**
