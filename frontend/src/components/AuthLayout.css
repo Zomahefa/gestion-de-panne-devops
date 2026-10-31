@@ -13,6 +13,11 @@
   width: 100%;
   max-width: 900px;
   overflow: hidden;
+  background: #ffffff;
+  border: 1px solid rgba(0, 51, 102, 0.07);
+  box-shadow:
+    0 18px 45px rgba(3, 34, 64, 0.12),
+    0 2px 6px rgba(3, 34, 64, 0.05);
 }
 
 /* --- Panneau de marque --------------------------------------------------- */
@@ -126,7 +131,9 @@
   font-weight: 600;
   color: rgba(255, 255, 255, 0.8);
   text-decoration: none;
-  transition: background-color 0.15s ease, color 0.15s ease;
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease;
 }
 
 .auth__nav-link:hover {
@@ -146,6 +153,10 @@
   padding: 40px 40px 32px;
   display: flex;
   flex-direction: column;
+  background: #ffffff;
+  /* Fine ombre à la jonction avec le panneau bleu : la zone blanche ne se
+     confond plus avec le fond général de la page. */
+  box-shadow: inset 8px 0 16px -14px rgba(0, 30, 60, 0.45);
 }
 
 .auth__role {
@@ -224,7 +235,9 @@
   background: transparent;
   color: var(--sig-ink-faint);
   cursor: pointer;
-  transition: background-color 0.15s ease, color 0.15s ease;
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease;
 }
 
 .auth__pass-toggle:hover {
