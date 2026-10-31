@@ -91,6 +91,29 @@
 
 /* --- Barre d'outils / recherche ----------------------------------------- */
 
+.ad-error {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+  padding: 11px 14px;
+  border: 1px solid #f0d3a8;
+  border-radius: 10px;
+  background: #fff8ed;
+  color: #8a5a00;
+  font-size: 0.86rem;
+  font-weight: 600;
+}
+
+.ad-error svg {
+  flex: 0 0 auto;
+}
+
+.ad-error .sig-btn {
+  margin-left: auto;
+}
+
 .ad-toolbar {
   display: flex;
   align-items: center;

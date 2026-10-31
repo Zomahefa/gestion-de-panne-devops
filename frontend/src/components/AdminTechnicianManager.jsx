@@ -98,6 +98,7 @@ const AdminTechnicianManager = () => {
       const res = await axios.get(`${API_URL}technicians/`, {
         headers: adminHeaders(),
         timeout: 20000,
+        params: { _: Date.now() },
       });
       setTechnicians(Array.isArray(res.data) ? res.data : []);
     } catch (err) {
@@ -331,6 +332,19 @@ const AdminTechnicianManager = () => {
 
   useEffect(() => {
     fetchTechnicians();
+
+    // Retour sur l'onglet : on recharge pour ne pas garder une liste périmée
+    // après une modification faite ailleurs.
+    const refreshOnReturn = () => {
+      if (!document.hidden) fetchTechnicians();
+    };
+    window.addEventListener("focus", refreshOnReturn);
+    document.addEventListener("visibilitychange", refreshOnReturn);
+
+    return () => {
+      window.removeEventListener("focus", refreshOnReturn);
+      document.removeEventListener("visibilitychange", refreshOnReturn);
+    };
   }, []);
 
   const filtered = useMemo(() => {

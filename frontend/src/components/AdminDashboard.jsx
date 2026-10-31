@@ -11,6 +11,7 @@ import {
   RefreshCw,
   Search,
   Trash2,
+  TriangleAlert,
   UserPlus,
   Users,
   X,
@@ -48,21 +49,30 @@ const AdminDashboard = () => {
   const [refreshing, setRefreshing] = useState(false);
   const [search, setSearch] = useState("");
   const [selected, setSelected] = useState(null);
+  const [loadError, setLoadError] = useState("");
+  const [techError, setTechError] = useState("");
 
   const fetchPannes = useCallback(async () => {
     try {
       const res = await axios.get(`${API_URL}todos/`, {
         headers: adminHeaders(),
         timeout: 30000,
+        // Évite qu'un navigateur ou un proxy serve une ancienne réponse :
+        // après une suppression/création, la liste doit être à jour.
+        params: { _: Date.now() },
       });
       setPannes(
         [...res.data].sort(
           (a, b) => new Date(b.created_at) - new Date(a.created_at),
         ),
       );
+      setLoadError("");
     } catch (err) {
       if (!handleAdminAuthError(err)) {
         console.error("Erreur de chargement des pannes", err);
+        setLoadError(
+          "Impossible de charger les signalements pour le moment.",
+        );
       }
     } finally {
       setLoading(false);
@@ -74,11 +84,16 @@ const AdminDashboard = () => {
       const res = await axios.get(`${API_URL}technicians/`, {
         headers: adminHeaders(),
         timeout: 30000,
+        params: { _: Date.now() },
       });
       setTechnicians(Array.isArray(res.data) ? res.data : []);
+      setTechError("");
     } catch (err) {
       if (!handleAdminAuthError(err)) {
         console.error("Erreur chargement techniciens", err);
+        setTechError(
+          "Impossible de charger la liste des techniciens pour le moment.",
+        );
       }
     }
   }, []);
@@ -92,9 +107,30 @@ const AdminDashboard = () => {
   useEffect(() => {
     fetchPannes();
     fetchTechnicians();
-    // Le tableau reste à jour sans action de l'administrateur.
-    const interval = setInterval(fetchPannes, 20000);
-    return () => clearInterval(interval);
+
+    // Le tableau et la liste des techniciens restent à jour sans action de
+    // l'administrateur, y compris après un retour sur l'onglet (les
+    // navigateurs suspendent les minuteurs des onglets en arrière-plan).
+    const interval = setInterval(() => {
+      fetchPannes();
+      fetchTechnicians();
+    }, 20000);
+
+    const refreshOnReturn = () => {
+      if (!document.hidden) {
+        fetchPannes();
+        fetchTechnicians();
+      }
+    };
+
+    window.addEventListener("focus", refreshOnReturn);
+    document.addEventListener("visibilitychange", refreshOnReturn);
+
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener("focus", refreshOnReturn);
+      document.removeEventListener("visibilitychange", refreshOnReturn);
+    };
   }, [fetchPannes, fetchTechnicians]);
 
   const handleDelete = async (panne) => {
@@ -282,6 +318,26 @@ const AdminDashboard = () => {
         </div>
       </section>
 
+      {(loadError || techError) && (
+        <div className="ad-error" role="alert">
+          <TriangleAlert size={17} aria-hidden="true" />
+          <span>{loadError || techError}</span>
+          <button
+            type="button"
+            className="sig-btn sig-btn--ghost sig-btn--sm"
+            onClick={refreshAll}
+            disabled={refreshing}
+          >
+            <RefreshCw
+              size={14}
+              className={refreshing ? "sig-spin" : ""}
+              aria-hidden="true"
+            />
+            Réessayer
+          </button>
+        </div>
+      )}
+
       <section className="sig-card ad-panel">
         <div className="sig-card__head ad-panel__head ad-toolbar">
           <h2 className="sig-card__title">
@@ -319,6 +375,22 @@ const AdminDashboard = () => {
           <div className="sig-empty">
             <LoaderCircle size={24} className="sig-spin" aria-hidden="true" />
             <p className="sig-empty__title">Chargement…</p>
+          </div>
+        ) : loadError && pannes.length === 0 ? (
+          <div className="sig-empty" role="alert">
+            <span className="sig-empty__icon">
+              <TriangleAlert size={24} aria-hidden="true" />
+            </span>
+            <p className="sig-empty__title">Liste indisponible</p>
+            <p className="sig-hint">{loadError}</p>
+            <button
+              type="button"
+              className="sig-btn sig-btn--ghost sig-btn--sm"
+              onClick={refreshAll}
+              disabled={refreshing}
+            >
+              Réessayer
+            </button>
           </div>
         ) : filtered.length === 0 ? (
           <div className="sig-empty">

@@ -86,6 +86,7 @@ const AdminAccountManager = () => {
       const res = await axios.get(`${API_URL}admins/`, {
         headers: adminHeaders(),
         timeout: 20000,
+        params: { _: Date.now() },
       });
       setAccounts(Array.isArray(res.data) ? res.data : []);
     } catch (err) {
