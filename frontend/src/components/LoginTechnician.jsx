@@ -6,11 +6,13 @@ import {
   EyeOff,
   LoaderCircle,
   LogIn,
+  Sparkles,
   TriangleAlert,
   User,
   Wrench,
 } from "lucide-react";
 import AuthLayout from "./AuthLayout.jsx";
+import { DEMO_TECHNICIAN } from "../utils/demoAccounts";
 
 const LoginTechnician = () => {
   const [username, setUsername] = useState("");
@@ -18,19 +20,25 @@ const LoginTechnician = () => {
   const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [quickLoading, setQuickLoading] = useState(false);
   const navigate = useNavigate();
+
+  const openSession = (data, usernameValue) => {
+    localStorage.setItem("token", data.access);
+    localStorage.setItem("username", usernameValue);
+    navigate("/technicien");
+  };
 
   const handleLogin = async (e) => {
     e.preventDefault();
     setLoading(true);
+    setError("");
     try {
       const res = await axios.post(`${process.env.REACT_APP_API_URL}token/`, {
         username,
         password,
       });
-      localStorage.setItem("token", res.data.access);
-      localStorage.setItem("username", username);
-      navigate("/technicien");
+      openSession(res.data, username);
     } catch (err) {
       setError(
         err.response?.status === 429
@@ -39,6 +47,28 @@ const LoginTechnician = () => {
       );
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleQuickLogin = async () => {
+    setQuickLoading(true);
+    setError("");
+    setUsername(DEMO_TECHNICIAN.username);
+    setPassword(DEMO_TECHNICIAN.password);
+    try {
+      const res = await axios.post(`${process.env.REACT_APP_API_URL}token/`, {
+        username: DEMO_TECHNICIAN.username,
+        password: DEMO_TECHNICIAN.password,
+      });
+      openSession(res.data, DEMO_TECHNICIAN.username);
+    } catch (err) {
+      setError(
+        err.response?.status === 429
+          ? "Trop de tentatives de connexion. Patientez une minute puis réessayez."
+          : "La connexion rapide a échoué. Utilisez les champs ci-dessus.",
+      );
+    } finally {
+      setQuickLoading(false);
     }
   };
 
@@ -130,6 +160,32 @@ const LoginTechnician = () => {
           {loading ? "Connexion…" : "Se connecter"}
         </button>
       </form>
+
+      <div className="auth__demo">
+        <p className="auth__demo-head">
+          <Sparkles size={15} aria-hidden="true" />
+          Connexion rapide — démo
+        </p>
+        <p className="auth__demo-line">
+          Identifiant : <code>{DEMO_TECHNICIAN.username}</code>
+        </p>
+        <p className="auth__demo-line">
+          Mot de passe : <code>{DEMO_TECHNICIAN.password}</code>
+        </p>
+        <button
+          type="button"
+          className="sig-btn sig-btn--ghost sig-btn--block auth__demo-btn"
+          onClick={handleQuickLogin}
+          disabled={quickLoading || loading}
+        >
+          {quickLoading ? (
+            <LoaderCircle size={16} className="sig-spin" aria-hidden="true" />
+          ) : (
+            <LogIn size={16} aria-hidden="true" />
+          )}
+          {quickLoading ? "Connexion…" : "Entrer dans l'espace technicien"}
+        </button>
+      </div>
     </AuthLayout>
   );
 };

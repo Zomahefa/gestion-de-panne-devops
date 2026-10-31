@@ -7,10 +7,12 @@ import {
   LoaderCircle,
   LogIn,
   ShieldCheck,
+  Sparkles,
   TriangleAlert,
   Users,
 } from "lucide-react";
 import AuthLayout from "./AuthLayout.jsx";
+import { DEMO_ADMIN } from "../utils/demoAccounts";
 
 const AdminLogin = () => {
   const [username, setUsername] = useState("");
@@ -18,28 +20,34 @@ const AdminLogin = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [quickLoading, setQuickLoading] = useState(false);
   const navigate = useNavigate();
+
+  const openSession = (data) => {
+    localStorage.setItem("admin_token", data.token);
+    // Identité du compte réellement connecté : indispensable pour que
+    // « Mon profil » n'affiche pas un administrateur codé en dur.
+    if (data.admin) {
+      localStorage.setItem("admin_id", String(data.admin.id));
+      localStorage.setItem("admin_username", data.admin.username);
+      localStorage.setItem(
+        "admin_is_super",
+        data.admin.is_super_admin ? "1" : "0",
+      );
+    }
+    navigate("/admin-dashboard");
+  };
 
   const handleLogin = async (e) => {
     e.preventDefault();
     setLoading(true);
+    setError("");
     try {
       const res = await axios.post(
         `${process.env.REACT_APP_API_URL}admin-login/`,
         { username, password },
       );
-      localStorage.setItem("admin_token", res.data.token);
-      // Identité du compte réellement connecté : indispensable pour que
-      // « Mon profil » n'affiche pas un administrateur codé en dur.
-      if (res.data.admin) {
-        localStorage.setItem("admin_id", String(res.data.admin.id));
-        localStorage.setItem("admin_username", res.data.admin.username);
-        localStorage.setItem(
-          "admin_is_super",
-          res.data.admin.is_super_admin ? "1" : "0",
-        );
-      }
-      navigate("/admin-dashboard");
+      openSession(res.data);
     } catch (err) {
       setError(
         err.response?.status === 429
@@ -48,6 +56,31 @@ const AdminLogin = () => {
       );
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleQuickLogin = async () => {
+    setQuickLoading(true);
+    setError("");
+    setUsername(DEMO_ADMIN.username);
+    setPassword(DEMO_ADMIN.password);
+    try {
+      const res = await axios.post(
+        `${process.env.REACT_APP_API_URL}admin-login/`,
+        {
+          username: DEMO_ADMIN.username,
+          password: DEMO_ADMIN.password,
+        },
+      );
+      openSession(res.data);
+    } catch (err) {
+      setError(
+        err.response?.status === 429
+          ? "Trop de tentatives de connexion. Patientez une minute puis réessayez."
+          : "La connexion rapide a échoué. Utilisez les champs ci-dessus.",
+      );
+    } finally {
+      setQuickLoading(false);
     }
   };
 
@@ -140,6 +173,32 @@ const AdminLogin = () => {
           {loading ? "Connexion…" : "Se connecter"}
         </button>
       </form>
+
+      <div className="auth__demo">
+        <p className="auth__demo-head">
+          <Sparkles size={15} aria-hidden="true" />
+          Connexion rapide — démo
+        </p>
+        <p className="auth__demo-line">
+          Identifiant : <code>{DEMO_ADMIN.username}</code>
+        </p>
+        <p className="auth__demo-line">
+          Mot de passe : <code>{DEMO_ADMIN.password}</code>
+        </p>
+        <button
+          type="button"
+          className="sig-btn sig-btn--ghost sig-btn--block auth__demo-btn"
+          onClick={handleQuickLogin}
+          disabled={quickLoading || loading}
+        >
+          {quickLoading ? (
+            <LoaderCircle size={16} className="sig-spin" aria-hidden="true" />
+          ) : (
+            <LogIn size={16} aria-hidden="true" />
+          )}
+          {quickLoading ? "Connexion…" : "Entrer dans l'espace administrateur"}
+        </button>
+      </div>
 
       <p className="auth__switch">
         Pas encore de compte ?{" "}

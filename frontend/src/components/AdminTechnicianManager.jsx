@@ -3,6 +3,7 @@ import axios from "axios";
 import Swal from "sweetalert2";
 import {
   Eye,
+  EyeOff,
   LoaderCircle,
   Pencil,
   Plus,
@@ -25,6 +26,12 @@ const EMPTY = {
   contact: "",
   password: "",
 };
+
+// Icônes utilisées dans la fenêtre SweetAlert (contenu HTML, hors React).
+const EYE_SVG =
+  '<svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0"/><circle cx="12" cy="12" r="3"/></svg>';
+const EYE_OFF_SVG =
+  '<svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.733 5.076a10.744 10.744 0 0 1 11.205 6.575 1 1 0 0 1 0 .696 10.747 10.747 0 0 1-1.444 2.49"/><path d="M14.084 14.158a3 3 0 0 1-4.242-4.242"/><path d="M17.479 17.499a10.75 10.75 0 0 1-15.417-5.151 1 1 0 0 1 0-.696 10.75 10.75 0 0 1 4.446-5.143"/><path d="m2 2 20 20"/></svg>';
 
 const slugifyUsername = (value) =>
   (value || "")
@@ -83,6 +90,7 @@ const AdminTechnicianManager = () => {
   const [formData, setFormData] = useState(EMPTY);
   const [usernameTouched, setUsernameTouched] = useState(false);
   const [search, setSearch] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
 
   const fetchTechnicians = async () => {
     setLoadError("");
@@ -154,6 +162,7 @@ const AdminTechnicianManager = () => {
 
       setFormData(EMPTY);
       setUsernameTouched(false);
+      setShowPassword(false);
       fetchTechnicians();
     } catch (err) {
       if (handleAdminAuthError(err)) return;
@@ -185,8 +194,26 @@ const AdminTechnicianManager = () => {
         `<input id="swal-contact" class="swal2-input" placeholder="Contact" value="${escapeHtml(
           tech.contact,
         )}">` +
-        `<input id="swal-password" class="swal2-input" placeholder="Nouveau mot de passe (optionnel)" type="password">`,
+        `<div class="atm-swal-pass">` +
+        `<input id="swal-password" class="swal2-input" placeholder="Nouveau mot de passe (optionnel)" type="password" style="margin:0;width:100%">` +
+        `<button id="swal-pass-eye" type="button" class="atm-swal-pass__btn" aria-label="Afficher le mot de passe">${EYE_SVG}</button>` +
+        `</div>`,
       focusConfirm: false,
+      didOpen: () => {
+        const input = document.getElementById("swal-password");
+        const button = document.getElementById("swal-pass-eye");
+        if (!input || !button) return;
+
+        button.addEventListener("click", () => {
+          const visible = input.type === "text";
+          input.type = visible ? "password" : "text";
+          button.innerHTML = visible ? EYE_SVG : EYE_OFF_SVG;
+          button.setAttribute(
+            "aria-label",
+            visible ? "Afficher le mot de passe" : "Masquer le mot de passe",
+          );
+        });
+      },
       showCancelButton: true,
       confirmButtonText: "Enregistrer",
       cancelButtonText: "Annuler",
@@ -410,18 +437,36 @@ const AdminTechnicianManager = () => {
               <label className="sig-label" htmlFor="tech-password">
                 Mot de passe *
               </label>
-              <input
-                id="tech-password"
-                className="sig-input"
-                type="password"
-                name="password"
-                autoComplete="new-password"
-                placeholder="8 caractères minimum"
-                minLength={8}
-                value={formData.password}
-                onChange={handleChange}
-                required
-              />
+              <div className="atm-pass">
+                <input
+                  id="tech-password"
+                  className="sig-input"
+                  type={showPassword ? "text" : "password"}
+                  name="password"
+                  autoComplete="new-password"
+                  placeholder="8 caractères minimum"
+                  minLength={8}
+                  value={formData.password}
+                  onChange={handleChange}
+                  required
+                />
+                <button
+                  type="button"
+                  className="atm-pass__toggle"
+                  onClick={() => setShowPassword((value) => !value)}
+                  aria-label={
+                    showPassword
+                      ? "Masquer le mot de passe"
+                      : "Afficher le mot de passe"
+                  }
+                >
+                  {showPassword ? (
+                    <EyeOff size={17} aria-hidden="true" />
+                  ) : (
+                    <Eye size={17} aria-hidden="true" />
+                  )}
+                </button>
+              </div>
             </div>
 
             <button

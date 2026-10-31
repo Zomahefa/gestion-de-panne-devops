@@ -71,6 +71,61 @@
   white-space: nowrap;
 }
 
+/* --- Mot de passe : afficher / masquer ---------------------------------- */
+
+.atm-pass {
+  position: relative;
+}
+
+.atm-pass .sig-input {
+  padding-right: 46px;
+}
+
+.atm-pass__toggle,
+.atm-swal-pass__btn {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--sig-ink-faint);
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.atm-pass__toggle {
+  position: absolute;
+  top: 50%;
+  right: 8px;
+  transform: translateY(-50%);
+}
+
+.atm-pass__toggle:hover,
+.atm-swal-pass__btn:hover {
+  background: var(--sig-navy-100);
+  color: var(--sig-navy-800);
+}
+
+.atm-swal-pass {
+  position: relative;
+  width: 20em;
+  max-width: 100%;
+  margin: 0.5em auto 0;
+}
+
+.atm-swal-pass .swal2-input {
+  padding-right: 40px;
+}
+
+.atm-swal-pass__btn {
+  position: absolute;
+  top: 50%;
+  right: 6px;
+  transform: translateY(-50%);
+}
+
 @media (max-width: 1180px) {
   .atm-layout {
     grid-template-columns: minmax(0, 1fr);

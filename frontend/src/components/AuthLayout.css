@@ -308,6 +308,34 @@
   border-radius: 4px;
 }
 
+.auth__demo-head {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin: 0 0 8px;
+  font-size: 0.76rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--sig-navy-800);
+}
+
+.auth__demo-head svg {
+  color: var(--sig-accent);
+}
+
+.auth__demo-line {
+  margin: 0 0 3px;
+}
+
+.auth__demo-line:last-of-type {
+  margin-bottom: 0;
+}
+
+.auth__demo-btn {
+  margin-top: 12px;
+}
+
 /* --- Responsive ---------------------------------------------------------- */
 
 @media (max-width: 860px) {
