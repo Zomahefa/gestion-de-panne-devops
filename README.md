@@ -231,6 +231,21 @@ dépôt : sans cette variable, la page répond 403.
 Ne jamais committer de secret (`.env`, `DATABASE_URL`, `CLOUDINARY_URL`, code
 d'inscription).
 
+### Comptes de démonstration
+
+Les écrans `/login` (technicien) et `/admin-login` proposent une **connexion
+rapide** : les identifiants de démonstration sont affichés et un bouton ouvre
+directement l'espace correspondant, sans recopie.
+
+| Espace | Identifiant | Mot de passe |
+|--------|-------------|--------------|
+| Technicien | `demotechnicien` | `demo.pwd` |
+| Administrateur | `demo.admin` | `DemoAdmin!2026` |
+
+`demo.admin` est un administrateur ordinaire (pas super administrateur) : il
+sert à la démonstration et ne permet pas de gérer les autres comptes admin.
+Le compte de référence `zomahefa` reste le seul super administrateur.
+
 ---
 
 ## Déploiement (Render)
